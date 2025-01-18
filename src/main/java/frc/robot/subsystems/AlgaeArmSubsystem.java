@@ -1,31 +1,18 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.MAXMotionConfig;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-
-import edu.wpi.first.math.controller.PIDController;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -36,15 +23,11 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ElevatorConstants;
 
 
+public class AlgaeArmSubsystem extends SubsystemBase {
 
-
-public class ArmSubsystem extends SubsystemBase {
- 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   private final DCMotor m_armGearbox = DCMotor.getNEO(2);
 
@@ -58,7 +41,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder m_encoder = m_motor.getEncoder();
-  
+
 
   // Standard classes for controlling our arm
 
@@ -99,7 +82,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 
   /** Subsystem constructor. */
-  public ArmSubsystem() {
+  public AlgaeArmSubsystem() {
     SparkMaxConfig config = new SparkMaxConfig();
     config.encoder
     .positionConversionFactor(1/ArmConstants.kArmReduction)
@@ -193,7 +176,9 @@ public class ArmSubsystem extends SubsystemBase {
     return run(() -> reachSetpoint(degree));
   }
 
-
+  public Command setAlgaeArmAngle(double degree){
+      return run(() -> setGoal(degree));
+  }
 
 
   public void stop() {

@@ -310,4 +310,16 @@ public Command driveToPose(Pose2d pose)
     return swerveDrive.getPose();
   }
 
+  public Command LineUpHP(){
+      return run(()->{});
+  }
+
+  public Command LineUpReef(){
+      return run(()->{});
+  }
+
+  public Command lineUpProcessor(){
+      return run(()->{});
+  }
+
 }

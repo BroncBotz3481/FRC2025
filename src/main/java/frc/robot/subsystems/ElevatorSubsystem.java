@@ -164,6 +164,11 @@ public class ElevatorSubsystem extends SubsystemBase
     return run(() -> reachGoal(goal));
   }
 
+  public Command setElevatorHeight(double height){
+    return run(()-> {
+
+    });
+  }
   /**
    * Stop the control loop and motor output.
    */
