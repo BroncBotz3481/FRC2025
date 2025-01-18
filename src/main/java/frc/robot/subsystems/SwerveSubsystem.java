@@ -322,4 +322,7 @@ public Command driveToPose(Pose2d pose)
       return run(()->{});
   }
 
+    public Command scoreBackward() {
+        return Commands.none();
+    }
 }
