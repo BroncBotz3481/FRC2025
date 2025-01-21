@@ -125,9 +125,6 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-      m_operatorController.axisGreaterThan(1,0.3).whileTrue(
-              elevator.moveHeight(m_operatorController.getLeftY()));
-
       m_driverController.button(17).whileTrue(LazyLazyDrive());
 
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
@@ -167,7 +164,7 @@ public class RobotContainer {
             m_driverController.button(16).whileTrue(setElevArm(10, 70));
             elevator.atHeight(5, 0.1).whileTrue(Commands.print("I AM ALIVE, YAAA HAAAAA"));
 
-            m_driverController.button(19).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOutakeSpeeds));
+            m_driverController.button(19).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
             m_driverController.button(18).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeIntakeSpeeds));
 
             m_driverController.button(20).whileTrue(algaeArm.setGoal(45));

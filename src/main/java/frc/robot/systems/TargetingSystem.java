@@ -1,28 +1,40 @@
 package frc.robot.systems;
 
+import edu.wpi.first.math.util.Units;
+
 public class TargetingSystem {
 
     public double getTargetBranchHeightMeters() {
         switch (targetBranchLevel)
         {
-            case L1 -> {
-                return 1.0;
 
-            }
             case L2 -> {
-                return 0;
+                return Units.inchesToMeters(32);
             }
             case L3 -> {
-                return 0;
+                return Units.inchesToMeters(48);
             }
             case L4 -> {
-                return 0;
+                return Units.inchesToMeters(72);
             }
         }
         return 0;
     }
     public double getTargetBranchAlgaeArmAngle() {return 0;}
-    public double getTargetBranchCoralArmAngle() {return 0;}
+    public double getTargetBranchCoralArmAngle() {
+        switch (targetBranchLevel) {
+            case L2 -> {
+                return 30;
+            }
+            case L3 -> {
+                return 30;
+            }
+            case L4 -> {
+                return 60;
+            }
+        }
+        return 0;
+    }
 
 
     private ReefBranch targetBranch;
@@ -56,7 +68,6 @@ public class TargetingSystem {
     };
     enum ReefBranchLevel
     {
-        L1,
         L2,
         L3,
         L4

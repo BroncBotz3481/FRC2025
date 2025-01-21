@@ -49,7 +49,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim =
+  private final SingleJointedArmSim m_algaeArmSim =
       new SingleJointedArmSim(
           m_armGearbox,
           ArmConstants.kArmReduction,
@@ -74,7 +74,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
           new MechanismLigament2d(
               "Arm",
               30,
-              Units.radiansToDegrees(m_armSim.getAngleRads()),
+              Units.radiansToDegrees(m_algaeArmSim.getAngleRads()),
               6,
               new Color8Bit(Color.kGreenYellow)));
 
@@ -103,7 +103,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
 
 
     // Put Mechanism 2d to SmartDashboard
-    SmartDashboard.putData("Arm Sim", m_mech2d);
+    SmartDashboard.putData("algaeArm Sim", m_mech2d);
     m_armTower.setColor(new Color8Bit(Color.kGreen));
 
 
@@ -118,25 +118,25 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   public void simulationPeriodic() {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.setInput(m_motorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
+    m_algaeArmSim.setInput(m_motorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
 
     // Next, we update it. The standard loop time is 20ms.
-    m_armSim.update(0.020);
+    m_algaeArmSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    //m_encoderSim.setDistance(m_armSim.getAngleRads());
+    //m_encoderSim.setDistance(m_algaeArmSim.getAngleRads());
     m_motorSim.iterate(
         Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
-            m_armSim.getVelocityRadPerSec())*ArmConstants.kArmReduction,
+            m_algaeArmSim.getVelocityRadPerSec())*ArmConstants.kArmReduction,
         RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
         0.02); // Time interval, in Seconds
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_algaeArmSim.getCurrentDrawAmps()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
+    m_arm.setAngle(Units.radiansToDegrees(m_algaeArmSim.getAngleRads()));
 
   }
 

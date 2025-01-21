@@ -77,7 +77,7 @@ public final class Constants {
   }
   public static class IntakeConstants{
     public static final double AlgaeIntakeSpeeds = 0.8;
-    public static final double AlgaeOutakeSpeeds = -0.8;
+    public static final double AlgaeOuttakeSpeeds = -0.8;
   }
 
 }

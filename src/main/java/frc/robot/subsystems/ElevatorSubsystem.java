@@ -165,17 +165,7 @@ public class ElevatorSubsystem extends SubsystemBase
     return run(() -> reachGoal(goal));
   }
 
-  public Command moveHeight(double speed) {
-    if (getHeight() < ElevatorConstants.kMaxElevatorHeightMeters) {
-      return run(() -> {
-        m_motor.set(speed);
-      });
-    } else{
-      return run(() -> {
-        m_motor.set(0);
-      });
-    }
-  }
+
   public Command setElevatorHeight(double height){
     return run(()-> {
 
