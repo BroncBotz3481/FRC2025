@@ -7,6 +7,7 @@ public class TargetingSystem {
         {
             case L1 -> {
                 return 1.0;
+
             }
             case L2 -> {
                 return 0;

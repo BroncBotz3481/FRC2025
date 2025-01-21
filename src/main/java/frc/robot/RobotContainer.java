@@ -42,6 +42,9 @@ public class RobotContainer {
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
+  public static final CommandXboxController m_operatorController =
+    new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+
   private final ElevatorSubsystem     elevator           = new ElevatorSubsystem();
   private final CoralArmSubsystem arm                = new CoralArmSubsystem();
   private final ClimberSubsystem climb = new ClimberSubsystem();
@@ -57,7 +60,7 @@ public class RobotContainer {
     elevator.setDefaultCommand(elevator.setGoal(0));
     arm.setDefaultCommand(arm.setGoal(0));
     climb.setDefaultCommand(climb.climbUp());
-    algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeAngle(0));
+    algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
     algaeArm.setDefaultCommand(algaeArm.setGoal(0));
     floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
     
@@ -121,8 +124,11 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    
-        m_driverController.button(17).whileTrue(LazyLazyDrive());
+
+      m_operatorController.axisGreaterThan(1,0.3).whileTrue(
+              elevator.moveHeight(m_operatorController.getLeftY()));
+
+      m_driverController.button(17).whileTrue(LazyLazyDrive());
 
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
         m_driverController.button(9).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
@@ -140,26 +146,10 @@ public class RobotContainer {
                                                                         Meter.of(2.5)),
                                                                 Rotation2d.fromDegrees(125))));
 
-        m_driverController.button(6).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                                                                                (Meter.of(5),
-                                                                                Meter.of(3)),
-                                                                        Rotation2d.fromDegrees(-50))));
-
-         m_driverController.button(5).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                                                                        (Meter.of(6.1),
-                                                                        Meter.of(4)),
-                                                                Rotation2d.fromDegrees(125))));
-
-        m_driverController.button(4).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                                                                                (Meter.of(5.2),
-                                                                                Meter.of(5.2)),
-                                                                        Rotation2d.fromDegrees(-120))));
-
-
-        m_driverController.button(3).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                                                                                (Meter.of(3.3),
-                                                                                Meter.of(5.3)),
-                                                                        Rotation2d.fromDegrees(-50))));
+        m_driverController.button(6).whileTrue(driveToSetPoint(5, 3, -50));
+        m_driverController.button(5).whileTrue(driveToSetPoint(6.1, 4, 125));
+        m_driverController.button(4).whileTrue(driveToSetPoint(5.2, 5.2, -120));
+        m_driverController.button(3).whileTrue(driveToSetPoint(3.3, 5.3, -50));
         //Processor
         m_driverController.button(2).whileTrue(driveToProcessor());  
         //Human Playerstation                                                                                
@@ -176,9 +166,17 @@ public class RobotContainer {
             m_driverController.button(15).whileTrue(arm.setGoal(90));
             m_driverController.button(16).whileTrue(setElevArm(10, 70));
             elevator.atHeight(5, 0.1).whileTrue(Commands.print("I AM ALIVE, YAAA HAAAAA"));
-        
+
+            m_driverController.button(19).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOutakeSpeeds));
+            m_driverController.button(18).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeIntakeSpeeds));
+
+            m_driverController.button(20).whileTrue(algaeArm.setGoal(45));
+            m_driverController.button(21).whileTrue(algaeArm.setGoal(90));
+            m_driverController.button(22).whileTrue(climb.climbDown());
+            m_driverController.button(23).whileTrue(climb.climbUp());
+
           }
-        
+
         
           /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -189,7 +187,13 @@ public class RobotContainer {
     // An example command will be run in autonomous
     return drivebase.getAutonomousCommand("New Auto");
   }
-
+    public Command driveToSetPoint(double x, double y, double angle) {
+        return drivebase.driveToPose(
+        new Pose2d(new Translation2d
+        (Meter.of(x),
+        Meter.of(y)),
+        Rotation2d.fromDegrees(angle)));
+    }
   public Command driveToHumanPlayer1(){
     return drivebase.driveToPose(
     new Pose2d(new Translation2d

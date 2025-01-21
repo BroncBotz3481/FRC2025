@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase
@@ -164,6 +165,17 @@ public class ElevatorSubsystem extends SubsystemBase
     return run(() -> reachGoal(goal));
   }
 
+  public Command moveHeight(double speed) {
+    if (getHeight() < ElevatorConstants.kMaxElevatorHeightMeters) {
+      return run(() -> {
+        m_motor.set(speed);
+      });
+    } else{
+      return run(() -> {
+        m_motor.set(0);
+      });
+    }
+  }
   public Command setElevatorHeight(double height){
     return run(()-> {
 

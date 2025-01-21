@@ -17,9 +17,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
     }
 
-    public Command setAlgaeIntakeAngle(double degree){
-        return run(()->{});
-    }
+
     public Command setAlgaeIntakeRoller(double speed){
         return run(()->{});
     }

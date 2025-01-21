@@ -76,7 +76,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
               30,
               Units.radiansToDegrees(m_armSim.getAngleRads()),
               6,
-              new Color8Bit(Color.kYellow)));
+              new Color8Bit(Color.kGreenYellow)));
 
 
 
@@ -104,7 +104,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
 
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Arm Sim", m_mech2d);
-    m_armTower.setColor(new Color8Bit(Color.kBlue));
+    m_armTower.setColor(new Color8Bit(Color.kGreen));
 
 
 
@@ -184,6 +184,21 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   public void stop() {
     m_motor.set(0.0);
   }
+
+    public boolean algaeInLoadPosition() {
+      return false;
+    }
+
+    public boolean algaeLoaded() {
+      return false;
+    }
+
+    public boolean algaeInProcessorPosition() {
+      return false;
+    }
+
+    public boolean algaeInNetPosition() { return false;
+    }
 
 
 

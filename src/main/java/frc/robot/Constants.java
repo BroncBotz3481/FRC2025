@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
     public static final double DEADBAND = 0.05;
   }
   public static final double maxSpeed = 7;
@@ -74,4 +75,9 @@ public final class Constants {
     public static final double kElevatorMaxVelocity = 3.5;
     public static final double kElevatorMaxAcceleration = 2.5;
   }
+  public static class IntakeConstants{
+    public static final double AlgaeIntakeSpeeds = 0.8;
+    public static final double AlgaeOutakeSpeeds = -0.8;
+  }
+
 }
