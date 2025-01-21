@@ -41,7 +41,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
-      
+
   private final ElevatorSubsystem     elevator           = new ElevatorSubsystem();
   private final CoralArmSubsystem arm                = new CoralArmSubsystem();
   private final ClimberSubsystem climb = new ClimberSubsystem();
@@ -122,39 +122,7 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     
-        m_driverController.button(17).whileTrue(//Human player reload station
-          drivebase.driveToPose(
-          new Pose2d(new Translation2d
-          (Meter.of(1),
-          Meter.of(7)),
-    Rotation2d.fromDegrees(130)))
-        .andThen(
-          drivebase.driveToPose(//Coral side 1
-          new Pose2d(new Translation2d
-          (Meter.of(3.4),
-          Meter.of(5.1)),
-          Rotation2d.fromDegrees(-50)))
-        ).andThen(
-          drivebase.driveToPose(//Human Player station
-          new Pose2d(new Translation2d
-          (Meter.of(1),
-           Meter.of(7)),
-          Rotation2d.fromDegrees(130)))
-        ).andThen(
-          drivebase.driveToPose(//Set point
-          new Pose2d(new Translation2d
-          (Meter.of(4.3),
-          Meter.of(6.3)),
-          Rotation2d.fromDegrees(-50)))
-        ).andThen(
-          drivebase.driveToPose( //Coral 2
-          new Pose2d(new Translation2d
-         (Meter.of(5.2),
-         Meter.of(5.2)),
-         Rotation2d.fromDegrees(-120)))
-         )
-        
-        );
+        m_driverController.button(17).whileTrue(LazyLazyDrive());
 
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
         m_driverController.button(9).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
@@ -198,10 +166,7 @@ public class RobotContainer {
                                                                                 Meter.of(7.5)),
                                                                         Rotation2d.fromDegrees(90))));  
         //Human Playerstation                                                                                
-        m_driverController.button(1).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                                                                                (Meter.of(1),
-                                                                                Meter.of(7)),
-                                                                          Rotation2d.fromDegrees(130))));  
+        m_driverController.button(1).whileTrue(goToHumanPlayer1());  
                                                                                 
             // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
             // cancelling on release.
@@ -228,7 +193,49 @@ public class RobotContainer {
     return drivebase.getAutonomousCommand("New Auto");
   }
 
+  public Command goToHumanPlayer1(){
+    return drivebase.driveToPose(
+    new Pose2d(new Translation2d
+    (Meter.of(1),
+     Meter.of(7)),
+    Rotation2d.fromDegrees(130)));
+  }
+
    public ParallelCommandGroup setElevArm (double goal, double degree){
   return  new ParallelCommandGroup(elevator.setGoal(goal), arm.setGoal(degree));
  }
+   public ParallelCommandGroup LazyLazyDrive(){
+    return new ParallelCommandGroup(   
+      drivebase.driveToPose(
+      new Pose2d(new Translation2d
+      (Meter.of(1),
+      Meter.of(7)),
+Rotation2d.fromDegrees(130)))
+    .andThen(
+      drivebase.driveToPose(//Coral side 1
+      new Pose2d(new Translation2d
+      (Meter.of(3.4),
+      Meter.of(5.1)),
+      Rotation2d.fromDegrees(-50)))
+    ).andThen(
+      drivebase.driveToPose(//Human Player station
+      new Pose2d(new Translation2d
+      (Meter.of(1),
+       Meter.of(7)),
+      Rotation2d.fromDegrees(130)))
+    ).andThen(
+      drivebase.driveToPose(//Set point
+      new Pose2d(new Translation2d
+      (Meter.of(4.3),
+      Meter.of(6.3)),
+      Rotation2d.fromDegrees(-50)))
+    ).andThen(
+      drivebase.driveToPose( //Coral 2
+      new Pose2d(new Translation2d
+     (Meter.of(5.2),
+     Meter.of(5.2)),
+     Rotation2d.fromDegrees(-120)))
+     )
+    );
+   }
 }

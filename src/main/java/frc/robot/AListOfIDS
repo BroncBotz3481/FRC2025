@@ -1,0 +1,31 @@
+labeling motor IDS so no overlap
+1. FrontLeft Drive
+2. FrontLeft Angle
+3. FrontLeft Encoder
+4. FrontRight Drive
+5. FrontRight Angle
+6. FrontRight Encoder
+7. BackLeft Drive
+8. BackLeft Angle
+9. BackLeft Encoder
+10. BackRight Drive
+11. BackRight Angle
+12. BackRight Encoder
+13. ElevatorMotor
+14. CoralArmMotor
+15. AlgaeArmMotor
+16. 
+17. 
+18. 
+19.
+20. 
+21. 
+22.
+23. 
+24. 
+25. 
+26. 
+27. 
+28. 
+29. 
+30.
