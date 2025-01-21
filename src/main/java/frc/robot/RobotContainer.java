@@ -5,8 +5,12 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.AlgaeArmSubsystem;
+import frc.robot.subsystems.AlgaeIntakeSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.FloorIntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -37,8 +41,14 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+      
   private final ElevatorSubsystem     elevator           = new ElevatorSubsystem();
   private final CoralArmSubsystem arm                = new CoralArmSubsystem();
+  private final ClimberSubsystem climb = new ClimberSubsystem();
+  private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
+  private final AlgaeArmSubsystem algaeArm = new AlgaeArmSubsystem();
+  private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -46,6 +56,11 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
     elevator.setDefaultCommand(elevator.setGoal(0));
     arm.setDefaultCommand(arm.setGoal(0));
+    climb.setDefaultCommand(climb.climbUp());
+    algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeAngle(0));
+    algaeArm.setDefaultCommand(algaeArm.setGoal(0));
+    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
+    
     configureBindings();
     drivebase.setDefaultCommand(!RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
     NamedCommands.registerCommand("test", Commands.print("Hello World"));

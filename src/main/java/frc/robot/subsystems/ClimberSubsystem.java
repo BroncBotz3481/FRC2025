@@ -12,7 +12,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
 
     public ClimberSubsystem() {
-        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
+        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) Done
         //       in the constructor or in the robot coordination class, such as RobotContainer.
         //       Also, you can call addChild(name, sendableChild) to associate sendables with the subsystem
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
