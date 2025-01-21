@@ -161,12 +161,9 @@ public class RobotContainer {
                                                                                 Meter.of(5.3)),
                                                                         Rotation2d.fromDegrees(-50))));
         //Processor
-        m_driverController.button(2).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                                                                                (Meter.of(11.5),
-                                                                                Meter.of(7.5)),
-                                                                        Rotation2d.fromDegrees(90))));  
+        m_driverController.button(2).whileTrue(driveToProcessor());  
         //Human Playerstation                                                                                
-        m_driverController.button(1).whileTrue(goToHumanPlayer1());  
+        m_driverController.button(1).whileTrue(driveToHumanPlayer1());  
                                                                                 
             // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
             // cancelling on release.
@@ -193,12 +190,20 @@ public class RobotContainer {
     return drivebase.getAutonomousCommand("New Auto");
   }
 
-  public Command goToHumanPlayer1(){
+  public Command driveToHumanPlayer1(){
     return drivebase.driveToPose(
     new Pose2d(new Translation2d
     (Meter.of(1),
      Meter.of(7)),
     Rotation2d.fromDegrees(130)));
+  }
+
+  public Command driveToProcessor(){
+    return drivebase.driveToPose(
+    new Pose2d(new Translation2d
+    (Meter.of(11.5),
+    Meter.of(7.5)),
+    Rotation2d.fromDegrees(90)));
   }
 
    public ParallelCommandGroup setElevArm (double goal, double degree){
