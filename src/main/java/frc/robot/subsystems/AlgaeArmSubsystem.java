@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -24,6 +25,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
+
+import static frc.robot.Constants.ArmConstants.kAngleAllowableError;
 
 
 public class AlgaeArmSubsystem extends SubsystemBase {
@@ -177,7 +180,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   }
 
   public Command setAlgaeArmAngle(double degree){
-      return run(() -> setGoal(degree));
+      return setGoal(degree);
   }
 
 
@@ -193,11 +196,13 @@ public class AlgaeArmSubsystem extends SubsystemBase {
       return false;
     }
 
-    public boolean algaeInProcessorPosition() {
-      return false;
+    public boolean aroundAngle(double degree, double allowableError) {
+      //get current angle compare to aimed angle
+        return MathUtil.isNear(degree, m_encoder.getPosition(), allowableError);
     }
 
-    public boolean algaeInNetPosition() { return false;
+    public boolean aroundAngle(double degree){
+      return aroundAngle(degree, kAngleAllowableError);
     }
 
 

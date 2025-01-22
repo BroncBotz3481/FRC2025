@@ -1,12 +1,19 @@
 package frc.robot.systems;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class TargetingSystem {
 
+    private AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
     public double getTargetBranchHeightMeters() {
-        switch (targetBranchLevel)
-        {
+        switch (targetBranchLevel) {
 
             case L2 -> {
                 return Units.inchesToMeters(32);
@@ -20,7 +27,11 @@ public class TargetingSystem {
         }
         return 0;
     }
-    public double getTargetBranchAlgaeArmAngle() {return 0;}
+
+    public double getTargetBranchAlgaeArmAngle() {
+        return 0;
+    }
+
     public double getTargetBranchCoralArmAngle() {
         switch (targetBranchLevel) {
             case L2 -> {
@@ -46,13 +57,76 @@ public class TargetingSystem {
     }
 
     public void left() {
-        if(targetBranch == ReefBranch.H)
-        {
+        if (targetBranch == ReefBranch.H) {
             targetBranch = ReefBranch.I;
         }
     }
 
-    enum ReefBranch {
+    public Pose2d getTargetPose() {
+        if (DriverStation.getAlliance().isPresent()) {
+            if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                switch (targetBranch) {
+                    case A -> {
+                        fieldLayout.getTagPose(6)
+                                .get().toPose2d().plus(new Transform2d(Units.inchesToMeters(5), 0.01, Rotation2d.fromDegrees(30)));
+                    }
+                    case B -> {
+                        return new Pose2d(1,1,Rotation2d.fromDegrees(30));
+                    }
+                    case C -> {
+                    }
+                    case D -> {
+                    }
+                    case E -> {
+                    }
+                    case F -> {
+                    }
+                    case G -> {
+                    }
+                    case H -> {
+                    }
+                    case I -> {
+                    }
+                    case J -> {
+                    }
+                    case K -> {
+                    }
+                    case L -> {
+                    }
+                }
+            } else {
+                switch (targetBranch) {
+                    case A -> {
+                    }
+                    case B -> {
+                    }
+                    case C -> {
+                    }
+                    case D -> {
+                    }
+                    case E -> {
+                    }
+                    case F -> {
+                    }
+                    case G -> {
+                    }
+                    case H -> {
+                    }
+                    case I -> {
+                    }
+                    case J -> {
+                    }
+                    case K -> {
+                    }
+                    case L -> {
+                    }
+                }
+            }
+        }
+        return Pose2d.kZero;
+    }
+
+    public enum ReefBranch {
         A,
         B,
         C,
@@ -65,9 +139,11 @@ public class TargetingSystem {
         J,
         K,
         L
-    };
-    enum ReefBranchLevel
-    {
+    }
+
+    ;
+
+    public enum ReefBranchLevel {
         L2,
         L3,
         L4

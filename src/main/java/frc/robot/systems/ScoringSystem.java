@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
@@ -14,6 +15,8 @@ public class ScoringSystem {
     private ElevatorSubsystem m_elevator;
     private SwerveSubsystem m_swerve;
     private LoadingSystem m_loadingSystem;
+    private AlgaeArmSubsystem m_algaeArm;
+    private TargetingSystem m_targetSystem;
 
     public ScoringSystem(
             CoralArmSubsystem coralArm,
@@ -21,36 +24,42 @@ public class ScoringSystem {
             SwerveSubsystem swerve,
             AlgaeIntakeSubsystem algaeIntake,
             AlgaeArmSubsystem algaeArm,
-            LoadingSystem loading) {
+            LoadingSystem loading, TargetingSystem targeting) {
         m_coralArm = coralArm;
         m_elevator = elevator;
         m_swerve = swerve;
         m_algaeIntake = algaeIntake;
         m_loadingSystem = loading;
+        m_algaeArm = algaeArm;
+        m_targetSystem = targeting;
 
     }
-    public Command scoreCoral(){
+
+    public Command scoreCoral() {
         // Arm down, elevator down, drive backwards x in?
-        double coralArmAngleDegrees = 150;
-        double elevatorHeightMeters = -20;
+        double coralArmAngleDegrees = m_targetSystem.getTargetBranchCoralArmAngle();
+        double elevatorHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
 
         return m_coralArm.setCoralArmAngle(coralArmAngleDegrees)
                 .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
-                .andThen(m_swerve.scoreBackward().until(()->!m_coralArm.coralLoaded()));
+                .andThen(m_elevator.setElevatorHeight(elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight))
+                .andThen(m_swerve.scoreBackward().until(() -> !m_coralArm.coralLoaded()).withTimeout(3));
     }
 
-    public Command scoreAlgaeProcessor(){
+    public Command scoreAlgaeProcessor() {
 //set elevator height, set alage angle, spit out ball, drive pose?
         double swervingDistance = 10;
-        return m_loadingSystem.algaeLockProcessor()
-                .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
+        return m_loadingSystem.algaeLockProcessor()//use targetting sys?
+                .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds)
+                        .until(() -> !m_algaeArm.algaeLoaded()));
     }
-    public Command scoreAlgaeNet(){
+
+    public Command scoreAlgaeNet() {
         //set elevator height, set alage angle, spit out ball, drive pose?
 
         return m_loadingSystem.algaeLockNet()
                 .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
-                //testing-a different outake Speed for algae the net?
+        //testing-a different outake Speed for algae the net?
     }
 
 }

@@ -46,6 +46,7 @@ public final class Constants {
   public static final double kArmLength = Units.inchesToMeters(30);
   public static final double kMinAngleRads = Units.degreesToRadians(-75);
   public static final double kMaxAngleRads = Units.degreesToRadians(255);
+  public static final double kAngleAllowableError = 1;//degree
   
   }
 
@@ -74,6 +75,9 @@ public final class Constants {
 
     public static final double kElevatorMaxVelocity = 3.5;
     public static final double kElevatorMaxAcceleration = 2.5;
+
+    public static final double kElevatorAllowableError = 1;
+    public static final double kLowerToScoreHeight = Units.inchesToMeters(6);
   }
   public static class IntakeConstants{
     public static final double AlgaeIntakeSpeeds = 0.8;

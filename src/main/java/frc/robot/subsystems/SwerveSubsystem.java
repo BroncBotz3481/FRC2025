@@ -323,6 +323,6 @@ public Command driveToPose(Pose2d pose)
   }
 
     public Command scoreBackward() {
-        return Commands.none();
+        return run(()->{swerveDrive.drive(new Translation2d(Units.inchesToMeters(4), 0), 0, false, false);});
     }
 }
