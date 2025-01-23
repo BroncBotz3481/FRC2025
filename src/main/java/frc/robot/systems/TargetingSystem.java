@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants.targetingConstants;
 
 public class TargetingSystem {
 
@@ -68,14 +69,31 @@ public class TargetingSystem {
                 switch (targetBranch) {
                     case A -> {
                         fieldLayout.getTagPose(6)
-                                .get().toPose2d().plus(new Transform2d(Units.inchesToMeters(5), 0.01, Rotation2d.fromDegrees(30)));
+                                .get().toPose2d().plus(new Transform2d(
+                                    targetingConstants.positiveScootch,
+                                    targetingConstants.positiveScootch,
+                                    Rotation2d.fromDegrees(135)));
                     }
                     case B -> {
-                        return new Pose2d(1,1,Rotation2d.fromDegrees(30));
+                        fieldLayout.getTagPose(6)
+                                .get().toPose2d().plus(new Transform2d(
+                                    targetingConstants.negitiveScootch,
+                                    targetingConstants.positiveScootch,
+                                    Rotation2d.fromDegrees(135)));
                     }
                     case C -> {
+                        fieldLayout.getTagPose(7)
+                        .get().toPose2d().plus(new Transform2d(
+                            0,
+                            targetingConstants.positiveScootch,
+                            Rotation2d.fromDegrees(180)));
                     }
                     case D -> {
+                        fieldLayout.getTagPose(7)
+                        .get().toPose2d().plus(new Transform2d(
+                            0,
+                            targetingConstants.negitiveScootch,
+                            Rotation2d.fromDegrees(180)));
                     }
                     case E -> {
                     }
@@ -97,8 +115,18 @@ public class TargetingSystem {
             } else {
                 switch (targetBranch) {
                     case A -> {
+                        fieldLayout.getTagPose(22)
+                        .get().toPose2d().plus(new Transform2d(
+                            targetingConstants.positiveScootch,
+                            targetingConstants.positiveScootch,
+                            Rotation2d.fromDegrees(135)));
                     }
                     case B -> {
+                        fieldLayout.getTagPose(6)
+                        .get().toPose2d().plus(new Transform2d(
+                            targetingConstants.negitiveScootch,
+                            targetingConstants.positiveScootch,
+                            Rotation2d.fromDegrees(135)));
                     }
                     case C -> {
                     }

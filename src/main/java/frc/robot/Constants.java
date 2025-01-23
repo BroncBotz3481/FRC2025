@@ -27,6 +27,13 @@ public final class Constants {
   public static final int kEncoderBChannel = 1;
   public static final int kJoystickPort = 0;
 
+  public static class targetingConstants{
+    public static final double positiveScootch = Units.inchesToMeters(5);
+    public static final double negitiveScootch = Units.inchesToMeters(-5);
+    public static final double scootchBack = Units.inchesToMeters(12);
+  }
+  
+
   public static class ArmConstants{
 
   public static final String kArmPositionKey = "ArmPosition";

@@ -90,7 +90,8 @@ public class RobotContainer {
         floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
         configureBindings();
-        drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
+        //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
+        drivebase.setDefaultCommand(!RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
         NamedCommands.registerCommand("test", Commands.print("Hello World"));
     }
 
