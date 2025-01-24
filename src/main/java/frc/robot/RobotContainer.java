@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.units.Units;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -15,9 +17,17 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.systems.LoadingSystem;
 import frc.robot.systems.ScoringSystem;
 import frc.robot.systems.TargetingSystem;
+import frc.robot.systems.TargetingSystem.ReefBranch;
+import frc.robot.systems.TargetingSystem.ReefBranchLevel;
+import frc.robot.systems.field.FieldConstants;
+import frc.robot.systems.field.FieldConstants;
+import frc.robot.systems.field.FieldConstants.Reef;
+import frc.robot.systems.field.FieldConstants.ReefHeight;
 import swervelib.SwerveInputStream;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -89,6 +99,8 @@ public class RobotContainer {
         algaeArm.setDefaultCommand(algaeArm.setGoal(0));
         floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
+        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
+        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
         configureBindings();
         //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
         drivebase.setDefaultCommand(!RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
