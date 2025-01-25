@@ -80,7 +80,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TimingBudget     m_laserCanTimingBudget      = TimingBudget.TIMING_BUDGET_20MS;
     private final Alert            m_laserCanFailure           = new Alert("LaserCAN failed to configure.",
                                                                          AlertType.kError);
-    private final DigitalInput m_limitSwitchLow    = new DigitalInput(1);
+    private final DigitalInput m_limitSwitchLow    = new DigitalInput(9);
     private       DIOSim       m_limitSwitchLowSim = null;
 
     // Simulation classes help us simulate what's going on, including gravity.
