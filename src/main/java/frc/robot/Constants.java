@@ -53,7 +53,13 @@ public final class Constants {
   public static final double kArmLength = Units.inchesToMeters(30);
   public static final double kMinAngleRads = Units.degreesToRadians(-75);
   public static final double kMaxAngleRads = Units.degreesToRadians(255);
-  public static final double kAngleAllowableError = 1;//degree
+  
+  public static final double kArmkS = 0.0; // volts (V)
+  public static final double kArmkG = 0.762; // volts (V)
+  public static final double kArmkV = 0.762; // volt per velocity (V/(m/s))
+  public static final double kArmkA = 0.0; // volt per acceleration (V/(m/s²))
+
+  public static final double kAngleAllowableError = 1;//degree, for testing whether it's aroundAngle
   
   }
 
