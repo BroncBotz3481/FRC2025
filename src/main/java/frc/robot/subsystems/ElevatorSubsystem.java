@@ -4,6 +4,21 @@
 
 package frc.robot.subsystems;
 
+import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
+import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Second;
+
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
+import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
+import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -20,8 +35,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -31,8 +50,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.RobotMath.Elevator;
 
 import java.util.function.Supplier;
 
@@ -52,6 +71,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
     private final RelativeEncoder m_encoder = m_motor.getEncoder();
     private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_elevatorGearbox);
+
+    // Sensors
+    private final LaserCan         m_elevatorLaserCan          = new LaserCan(0);
+    private final LaserCanSim      m_elevatorLaserCanSim       = new LaserCanSim(0);
+    private final double           m_laserCanOffsetMillimeters = Inches.of(3).in(Millimeters);
+    private final RegionOfInterest m_laserCanROI               = new RegionOfInterest(0, 0, 16, 16);
+    private final TimingBudget     m_laserCanTimingBudget      = TimingBudget.TIMING_BUDGET_20MS;
+    private final Alert            m_laserCanFailure           = new Alert("LaserCAN failed to configure.",
+                                                                         AlertType.kError);
+    private final DigitalInput m_limitSwitchLow    = new DigitalInput(1);
+    private       DIOSim       m_limitSwitchLowSim = null;
 
     // Simulation classes help us simulate what's going on, including gravity.
     private final ElevatorSim m_elevatorSim =
@@ -79,22 +109,37 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
-        config.encoder
-                .positionConversionFactor(ElevatorConstants.kRotaionToMeters) // Converts Rotations to Meters
-                .velocityConversionFactor(ElevatorConstants.kRPMtoMPS); // Converts RPM to MPS
-        config.closedLoop
+        config
+                .smartCurrentLimit(40)
+                .closedLoopRampRate(0.25)
+                .closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .pid(ElevatorConstants.kElevatorKp, ElevatorConstants.kElevatorKi, ElevatorConstants.kElevatorKd)
+                .outputRange(-1, 1)
                 .maxMotion
-                .maxVelocity(ElevatorConstants.kElevatorMaxVelocity)
-                .maxAcceleration(ElevatorConstants.kElevatorMaxAcceleration)
-                .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal)
-                .allowedClosedLoopError(0.01);
+                .maxVelocity(Elevator.convertDistanceToRotations(Meters.of(1)).per(Second).in(RPM))
+                .maxAcceleration(Elevator.convertDistanceToRotations(Meters.of(2)).per(Second).per(Second)
+                                         .in(RPM.per(Second)));
         m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         // Publish Mechanism2d to SmartDashboard
         // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim
         SmartDashboard.putData("Elevator Sim", m_mech2d);
+
+        try
+        {
+        m_elevatorLaserCanSim.setRangingMode(RangingMode.LONG);
+        } catch (Exception e)
+        {
+        m_laserCanFailure.set(true);
+        }
+
+        if (RobotBase.isSimulation())
+        {
+        m_limitSwitchLowSim = new DIOSim(m_limitSwitchLow);
+        SmartDashboard.putData("Elevator Low Limit Switch", m_limitSwitchLow);
+        seedElevatorMotorPosition();
+        }
     }
 
     /**
@@ -109,23 +154,63 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_elevatorSim.update(0.020);
 
         // Finally, we set our simulated encoder's readings and simulated battery voltage
-        m_motorSim.iterate(m_elevatorSim.getVelocityMetersPerSecond(), RoboRioSim.getVInVoltage(), 0.020);
+        m_motorSim.iterate(Elevator.convertDistanceToRotations(Meters.of(m_elevatorSim.getVelocityMetersPerSecond())).per(Second).in(RPM),
+        RoboRioSim.getVInVoltage(), 0.020);
 
         // SimBattery estimates loaded battery voltages
         RoboRioSim.setVInVoltage(
                 BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+
+        // Update lasercan sim.
+        m_elevatorLaserCanSim.setMeasurementFullSim(new Measurement(
+            LASERCAN_STATUS_VALID_MEASUREMENT,
+            (int) (Math.floor(Meters.of(m_elevatorSim.getPositionMeters()).in(Millimeters)) +
+                m_laserCanOffsetMillimeters),
+            0,
+            true,
+            m_laserCanTimingBudget.asMilliseconds(),
+            m_laserCanROI
+        ));
     }
 
+     /**
+   * Seed the elevator motor encoder with the sensed position from the LaserCAN which tells us the height of the
+   * elevator.
+   */
+    public void seedElevatorMotorPosition()
+    {
+        if (RobotBase.isSimulation())
+        {
+        // Get values from Simulation
+        Measurement measurement = m_elevatorLaserCanSim.getMeasurement();
+        // Change distance field
+        measurement.distance_mm = (int) (Math.floor(Meters.of(m_elevatorSim.getPositionMeters()).in(Millimeters)) -
+                                        m_laserCanOffsetMillimeters);
+        // Update simulation distance field.
+        m_elevatorLaserCanSim.setMeasurementFullSim(measurement);
+
+        m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
+                                            m_elevatorLaserCanSim.getMeasurement().distance_mm + m_laserCanOffsetMillimeters))
+                                        .in(Rotations));
+        } else
+        {
+        m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
+                                            m_elevatorLaserCan.getMeasurement().distance_mm + m_laserCanOffsetMillimeters))
+                                        .in(Rotations));
+        }
+    }
     /**
      * Run control loop to reach and maintain goal.
      *
      * @param goal the position to maintain
      */
     public void reachGoal(double goal) {
-        m_controller.setReference(goal,
-                ControlType.kPosition,
-                ClosedLoopSlot.kSlot0,
-                m_feedforward.calculate(m_encoder.getVelocity()));
+        m_controller.setReference(Elevator.convertDistanceToRotations(Meters.of(goal)).in(Rotations),
+        ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0,
+        m_feedforward.calculate(
+            Elevator.convertRotationsToDistance(Rotations.of(m_encoder.getVelocity())).per(Minute)
+                    .in(MetersPerSecond)));
     }
 
 
@@ -135,7 +220,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @return Height in meters
      */
     public double getHeight() {
-        return m_encoder.getPosition();
+        return Elevator.convertRotationsToDistance(Rotations.of(m_encoder.getPosition())).in(Meters);
     }
 
     /**
@@ -147,8 +232,8 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public Trigger atHeight(double height, double tolerance) {
         return new Trigger(() -> MathUtil.isNear(height,
-                getHeight(),
-                tolerance));
+                                                getHeight(),
+                                                tolerance));
     }
 
     /**
