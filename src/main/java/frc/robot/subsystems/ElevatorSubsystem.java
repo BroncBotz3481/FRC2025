@@ -117,7 +117,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .pid(ElevatorConstants.kElevatorKp, ElevatorConstants.kElevatorKi, ElevatorConstants.kElevatorKd)
                 .outputRange(-1, 1)
                 .maxMotion
-                .maxVelocity(Elevator.convertDistanceToRotations(Meters.of(1)).per(Second).in(RPM))
+                .maxVelocity(Elevator.convertDistanceToRotations(Meters.of(3)).per(Second).in(RPM))
                 .maxAcceleration(Elevator.convertDistanceToRotations(Meters.of(2)).per(Second).per(Second)
                                          .in(RPM.per(Second)));
         m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -213,6 +213,28 @@ public class ElevatorSubsystem extends SubsystemBase {
                     .in(MetersPerSecond)));
     }
 
+    /**
+     * Set the goal of the elevator
+     *
+     * @param goal Goal in meters
+     * @return {@link edu.wpi.first.wpilibj2.command.Command}
+     */
+    public Command setGoal(double goal) {
+        return run(() -> reachGoal(goal));
+    }
+
+
+    /**
+     * Set the elevator goal and stop when it reaches its target.
+     *
+     * @param height Height in meters.
+     * @return Command which ends when the elevator is near the target height.
+     */
+    public Command setElevatorHeight(double height) {
+        return setGoal(height).until(() -> aroundHeight(height));
+    }
+
+    
 
     /**
      * Get the height in meters.
@@ -236,26 +258,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                                                 tolerance));
     }
 
-    /**
-     * Set the goal of the elevator
-     *
-     * @param goal Goal in meters
-     * @return {@link edu.wpi.first.wpilibj2.command.Command}
-     */
-    public Command setGoal(double goal) {
-        return run(() -> reachGoal(goal));
-    }
-
-
-    /**
-     * Set the elevator goal and stop when it reaches its target.
-     *
-     * @param height Height in meters.
-     * @return Command which ends when the elevator is near the target height.
-     */
-    public Command setElevatorHeight(double height) {
-        return setGoal(height).until(() -> aroundHeight(height));
-    }
 
     /**
      * Stop the control loop and motor output.

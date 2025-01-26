@@ -61,15 +61,15 @@ public class RobotContainer {
             new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    private final CoralArmSubsystem arm = new CoralArmSubsystem();
+    private final CoralArmSubsystem coralArm = new CoralArmSubsystem();
     private final ClimberSubsystem climb = new ClimberSubsystem();
     private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
     private final AlgaeArmSubsystem algaeArm = new AlgaeArmSubsystem();
     private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
 
-    private final LoadingSystem loadingSystem = new LoadingSystem(arm, algaeArm, elevator);
+    private final LoadingSystem loadingSystem = new LoadingSystem(coralArm, algaeArm, elevator);
     private final TargetingSystem targetingSystem = new TargetingSystem();
-    private final ScoringSystem scoringSystem = new ScoringSystem(arm, elevator, drivebase, algaeIntake, algaeArm, loadingSystem, targetingSystem);
+    private final ScoringSystem scoringSystem = new ScoringSystem(coralArm, elevator, drivebase, algaeIntake, algaeArm, loadingSystem, targetingSystem);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -81,22 +81,37 @@ public class RobotContainer {
     - Add all the buttons *get interns to do
 
     Fix Arm simulation, change angle of arm on start up, currently -90
-    set max min for arm, ask cad team?
-    Change height of elevator. max height of the barge. currently in meters change that
+    -difference between the goal and the actual location it reaches-because of consuming extra power?-pid tuning
+    -it takes really long to move each arm????But all three sim is working
+
+    set MAX MIN ANGLE for arm, ask cad team?-no limits
+    Change height of elevator.max height of the barge. currently in meters change that
+    HEIGHT AND ANGLE FOR EACH LEVEL(ARM LENGTH?)-no idea yet
+
+    (Bumpers: 6 inch
+    Elevator alone Min: 39.25
+    Unextended:41 1/2(from the ground)  Extended Elevator:71.094 so Second half of the elevator:29.594
+    For the net: extended elev + algaeAngle(val?)
+    
+    -start from horizontal(degrees)
+    -L4 +80 
 `   Copy Math class
     Copy code from yagsl test code.
 
     Add sensors
+   -for algae, using algaeInArm.get()?
+
+   FIX QUESTION AND ASK LIMITS
     */
 
     public RobotContainer() {
         // Configure the trigger bindings
         DriverStation.silenceJoystickConnectionWarning(true);
         elevator.setDefaultCommand(elevator.setGoal(0));
-        arm.setDefaultCommand(arm.setGoal(0));
+        coralArm.setDefaultCommand(coralArm.setGoal(-90));
         climb.setDefaultCommand(climb.climbUp());
         algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
-        algaeArm.setDefaultCommand(algaeArm.setGoal(0));
+        algaeArm.setDefaultCommand(algaeArm.setGoal(-90));
         floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
         targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
@@ -202,9 +217,9 @@ public class RobotContainer {
         m_driverController.button(11).whileTrue(elevator.setGoal(3));
         m_driverController.button(12).whileTrue(elevator.setGoal(6));
         m_driverController.button(13).whileTrue(elevator.setGoal(9));
-        m_driverController.button(14).whileTrue(arm.setGoal(45));
-        m_driverController.button(15).whileTrue(arm.setGoal(90));
-        m_driverController.button(16).whileTrue(setElevArm(10, 70));
+        m_driverController.button(14).whileTrue(coralArm.setGoal(45));
+        m_driverController.button(15).whileTrue(coralArm.setGoal(90));
+        m_driverController.button(16).whileTrue(setElevArm(9.5, 70));
         elevator.atHeight(5, 0.1).whileTrue(Commands.print("I AM ALIVE, YAAA HAAAAA"));
 
         m_driverController.button(19).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
@@ -271,7 +286,7 @@ public class RobotContainer {
     }
 
     public ParallelCommandGroup setElevArm(double goal, double degree) {
-        return new ParallelCommandGroup(elevator.setGoal(goal), arm.setGoal(degree));
+        return new ParallelCommandGroup(elevator.setGoal(goal), coralArm.setGoal(degree));
     }
 
 

@@ -86,7 +86,7 @@ public class CoralArmSubsystem extends SubsystemBase {
                     ArmConstants.kMaxAngleRads,
                     true,
                     0,
-                    ArmConstants.kArmEncoderDistPerPulse,
+                    0.02 / 4096.0,
                     0.0 // Add noise with a std-dev of 1 tick
             );
 
@@ -121,7 +121,7 @@ public class CoralArmSubsystem extends SubsystemBase {
         .pid(ArmConstants.kDefaultArmKp, ArmConstants.kArmKi, ArmConstants.kArmKd)
         .outputRange(-1, 1)
         .maxMotion
-        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(90)).per(Second).in(RPM))
+        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(140)).per(Second).in(RPM))
         .maxAcceleration(Arm.convertAngleToSensorUnits(Degrees.of(180)).per(Second).per(Second).in(RPM.per(Second)))
         .allowedClosedLoopError(Arm.convertAngleToSensorUnits(Degrees.of(1)).in(Rotations));
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -193,7 +193,7 @@ public class CoralArmSubsystem extends SubsystemBase {
 
 
     public Command setCoralArmAngle(double degree) {
-        return run(() -> setGoal(degree)).until(() -> aroundAngle(degree));
+        return  setGoal(degree).until(() -> aroundAngle(degree));
     }
 
     public void stop() {

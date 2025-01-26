@@ -41,18 +41,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.RobotMath.Arm;
 
-import static frc.robot.Constants.ArmConstants.kAngleAllowableError;
-
 
 public class AlgaeArmSubsystem extends SubsystemBase {
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   private final DCMotor m_armGearbox = DCMotor.getNEO(2);
 
-
-
-
- // The P gain for the PID controller that drives this arm.
+  // The P gain for the PID controller that drives this arm.
   private double m_armKp = ArmConstants.kDefaultArmKp;
   
   private final SparkMax                  m_motor      = new SparkMax(15, MotorType.kBrushless);
@@ -65,10 +60,10 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   private       DIOSim       m_limitSwitchHighSim = null;
   private final DigitalInput m_limitSwitchLow     = new DigitalInput(1);
   private       DIOSim       m_limitSwitchLowSim  = null;
-  private final DigitalInput m_coralInBin         = new DigitalInput(2);
-  private       DIOSim       m_coralInBinSim      = null;
-  private final DigitalInput m_coralInArm         = new DigitalInput(3);
-  private       DIOSim       m_coralInArmSim      = null;
+  private final DigitalInput m_algaeInBin         = new DigitalInput(2);
+  private       DIOSim       m_algaeInBinSim      = null;
+  private final DigitalInput m_algaeInArm         = new DigitalInput(3);
+  private       DIOSim       m_algaeInArmSim      = null;
   // Standard classes for controlling our arm
 
 
@@ -121,7 +116,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
         .pid(ArmConstants.kDefaultArmKp, ArmConstants.kArmKi, ArmConstants.kArmKd)
         .outputRange(-1, 1)
         .maxMotion
-        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(90)).per(Second).in(RPM))
+        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(140)).per(Second).in(RPM))//to overcome gravity??
         .maxAcceleration(Arm.convertAngleToSensorUnits(Degrees.of(180)).per(Second).per(Second).in(RPM.per(Second)))
         .allowedClosedLoopError(Arm.convertAngleToSensorUnits(Degrees.of(1)).in(Rotations));
     
@@ -131,17 +126,17 @@ public class AlgaeArmSubsystem extends SubsystemBase {
     SmartDashboard.putData("algaeArm Sim", m_mech2d);
     m_armTower.setColor(new Color8Bit(Color.kGreen));
 
-    //?coral
+    
     if (RobotBase.isSimulation())
     {
       m_limitSwitchLowSim = new DIOSim(m_limitSwitchLow);
       m_limitSwitchHighSim = new DIOSim(m_limitSwitchHigh);
-      m_coralInBinSim = new DIOSim(m_coralInBin);
-      m_coralInArmSim = new DIOSim(m_coralInArm);
-      SmartDashboard.putData("Coral Arm Limit Switch High", m_limitSwitchHigh);
-      SmartDashboard.putData("Coral Arm Limit Switch Low", m_limitSwitchLow);
-      SmartDashboard.putData("Coral Arm Coral in Bin", m_coralInBin);
-      SmartDashboard.putData("Coral Arm Coral in Arm", m_coralInArm);
+      m_algaeInBinSim = new DIOSim(m_algaeInBin);
+      m_algaeInArmSim = new DIOSim(m_algaeInArm);
+      SmartDashboard.putData("Algae Arm Limit Switch High", m_limitSwitchHigh);
+      SmartDashboard.putData("Algae Arm Limit Switch Low", m_limitSwitchLow);
+      SmartDashboard.putData("Algae Arm Algae in Bin", m_algaeInBin);
+      SmartDashboard.putData("Algae Arm Algae in Arm", m_algaeInArm);
     }
 
   }
@@ -178,7 +173,10 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   /** Run the control loop to reach and maintain the setpoint from the preferences. */
   public void reachSetpoint(double setPointDegree) {
     m_controller.setReference(Arm.convertAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations),
-                              ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, armFeedforward.calculate(m_algaeArmSim.getAngleRads(),m_algaeArmSim.getVelocityRadPerSec()));
+                              ControlType.kMAXMotionPositionControl, 
+                              ClosedLoopSlot.kSlot0, 
+                              armFeedforward.calculate(
+                              m_algaeArmSim.getAngleRads(),m_algaeArmSim.getVelocityRadPerSec()));
   }
 
   public double getAngle()
@@ -191,7 +189,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   }
 
   public Command setAlgaeArmAngle(double degree){
-      return setGoal(degree);
+      return setGoal(degree).until(()->aroundAngle(degree));
   }
 
 
@@ -213,7 +211,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
     }
 
     public boolean aroundAngle(double degree){
-      return aroundAngle(degree, kAngleAllowableError);
+      return aroundAngle(degree, ArmConstants.kAngleAllowableError);
     }
 
 
