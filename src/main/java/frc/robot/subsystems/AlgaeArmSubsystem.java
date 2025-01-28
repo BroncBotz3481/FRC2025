@@ -116,7 +116,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
         .pid(ArmConstants.kDefaultArmKp, ArmConstants.kArmKi, ArmConstants.kArmKd)
         .outputRange(-1, 1)
         .maxMotion
-        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(140)).per(Second).in(RPM))//to overcome gravity??
+        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(90)).per(Second).in(RPM))//to overcome gravity??
         .maxAcceleration(Arm.convertAngleToSensorUnits(Degrees.of(180)).per(Second).per(Second).in(RPM.per(Second)))
         .allowedClosedLoopError(Arm.convertAngleToSensorUnits(Degrees.of(1)).in(Rotations));
     
@@ -198,11 +198,11 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   }
 
     public boolean algaeInLoadPosition() {
-      return false;
+      return m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
     }
 
     public boolean algaeLoaded() {
-      return false;
+      return m_algaeInBin.get()|| m_algaeInArm.get();
     }
 
     public boolean aroundAngle(double degree, double allowableError) {

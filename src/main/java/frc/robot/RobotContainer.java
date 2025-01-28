@@ -84,7 +84,7 @@ public class RobotContainer {
     -difference between the goal and the actual location it reaches-because of consuming extra power?-pid tuning
     -it takes really long to move each arm????But all three sim is working
 
-    set MAX MIN ANGLE for arm, ask cad team?-no limits
+    set MAX MIN ANGLE for arm, ask cad team?-no limits (360 degrees 
     Change height of elevator.max height of the barge. currently in meters change that
     HEIGHT AND ANGLE FOR EACH LEVEL(ARM LENGTH?)-no idea yet
 
@@ -100,6 +100,7 @@ public class RobotContainer {
 
     Add sensors
    -for algae, using algaeInArm.get()?
+   
 
    FIX QUESTION AND ASK LIMITS
     */

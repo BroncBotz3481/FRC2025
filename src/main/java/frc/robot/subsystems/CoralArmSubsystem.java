@@ -57,17 +57,16 @@ public class CoralArmSubsystem extends SubsystemBase {
     private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
     private final RelativeEncoder m_encoder = m_motor.getEncoder();
 
-    private final DigitalInput coralLoaded = new DigitalInput(8); // Digital Input returns true or false
-    private final DIOSim coralLoadedSim = new DIOSim(coralLoaded); // Sim Digital Input for robot.
+    
+    
     //sim
-
     // Sensors
     private final DigitalInput m_limitSwitchHigh    = new DigitalInput(4);
     private       DIOSim       m_limitSwitchHighSim = null;
     private final DigitalInput m_limitSwitchLow     = new DigitalInput(5);
     private       DIOSim       m_limitSwitchLowSim  = null;
-    private final DigitalInput m_coralInBin         = new DigitalInput(6);
-    private       DIOSim       m_coralInBinSim      = null;
+    private final DigitalInput m_coralInBin         = new DigitalInput(6);// Digital Input returns true or false
+    private       DIOSim       m_coralInBinSim      = null;                         // Sim Digital Input for robot.
     private final DigitalInput m_coralInArm         = new DigitalInput(7);
     private       DIOSim       m_coralInArmSim      = null;
     // Standard classes for controlling our arm
@@ -87,7 +86,7 @@ public class CoralArmSubsystem extends SubsystemBase {
                     true,
                     0,
                     0.02 / 4096.0,
-                    0.0 // Add noise with a std-dev of 1 tick
+                    0.0// Add noise with a std-dev of 1 tick
             );
 
     ArmFeedforward armFeedforward = new ArmFeedforward(ArmConstants.kArmkS, ArmConstants.kArmkG, ArmConstants.kArmkV, ArmConstants.kArmkA);
@@ -121,8 +120,8 @@ public class CoralArmSubsystem extends SubsystemBase {
         .pid(ArmConstants.kDefaultArmKp, ArmConstants.kArmKi, ArmConstants.kArmKd)
         .outputRange(-1, 1)
         .maxMotion
-        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(140)).per(Second).in(RPM))
-        .maxAcceleration(Arm.convertAngleToSensorUnits(Degrees.of(180)).per(Second).per(Second).in(RPM.per(Second)))
+        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(100)).per(Second).in(RPM))
+        .maxAcceleration(Arm.convertAngleToSensorUnits(Degrees.of(80)).per(Second).per(Second).in(RPM.per(Second)))
         .allowedClosedLoopError(Arm.convertAngleToSensorUnits(Degrees.of(1)).in(Rotations));
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -207,9 +206,9 @@ public class CoralArmSubsystem extends SubsystemBase {
     //    System.out.println(Units.radiansToDegrees(m_coralArmSim.getAngleRads()));
     }
    
-    public boolean coralInLoadPosition() {return false;}//Sim
+    public boolean coralInLoadPosition() {return m_coralInArm.get()&&aroundAngle(240);}//Sim
 
-    public boolean coralLoaded() {return coralLoaded.get();}//Sim
+    public boolean coralLoaded() {return m_coralInBin.get()||m_coralInArm.get();}//Sim//?
 
 
     /**

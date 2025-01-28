@@ -40,9 +40,9 @@ public final class Constants {
   public static final String kArmPKey = "ArmP";
 
   // The P gain for the PID controller that drives this arm.
-  public static final double kDefaultArmKp = 50.0;
+  public static final double kDefaultArmKp = 80.0;
   public static final double kArmKi = 0.0;
-  public static final double kArmKd = 0.0;
+  public static final double kArmKd = 0.5;
 
   // distance per pulse = (angle per revolution) / (pulses per revolution)
   //  = (2 * PI rads) / (4096 pulses)
@@ -81,8 +81,8 @@ public final class Constants {
 
 
    // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-    public static final double kMinElevatorHeightMeters = 0.0;
-    public static final double kMaxElevatorHeightMeters = 10.25;
+    public static final double kMinElevatorHeightMeters = 0;//min height / 10
+    public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(39.25+29.594);
 
     //public static final double kElevatorMaxVelocity = 3.5;
     //public static final double kElevatorMaxAcceleration = 2.5;
