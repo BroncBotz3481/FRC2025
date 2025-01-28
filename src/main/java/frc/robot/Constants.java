@@ -82,7 +82,7 @@ public final class Constants {
 
    // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
     public static final double kMinElevatorHeightMeters = 0;//min height / 10
-    public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(39.25+29.594);
+    public static final double kMaxElevatorHeightMeters = 10.25;
 
     //public static final double kElevatorMaxVelocity = 3.5;
     //public static final double kElevatorMaxAcceleration = 2.5;
