@@ -62,8 +62,10 @@ public final class Constants {
   public static final double kArmkA = 0.0; // volt per acceleration (V/(m/s²))
 
   public static final double kAngleAllowableError = 1;//degree, for testing whether it's aroundAngle
+
   
   }
+  
 
   public static class ElevatorConstants
   {
@@ -96,6 +98,14 @@ public final class Constants {
   public static class IntakeConstants{
     public static final double AlgaeIntakeSpeeds = 0.8;
     public static final double AlgaeOuttakeSpeeds = -0.8;
+
+    public static final int coralWristMotorID = 16;
+    public static final int coralRollerMotorID = 17;
+    public static final double defaultrRollerSpeed = 0;
+    public static final double kIntakeReduction = 0;
+    public static double kMinAngleRads;
+    public static double kMaxAngleRads;
+    public static double kIntakeLength;
   }
 
 }
