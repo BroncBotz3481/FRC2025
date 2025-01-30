@@ -35,7 +35,9 @@ public final class Constants {
   
 
   public static class ArmConstants{
-
+  public static int coralArmMotorID = 14;
+  public static int algaeArmMotorID = 15;
+  
   public static final String kArmPositionKey = "ArmPosition";
   public static final String kArmPKey = "ArmP";
 
@@ -65,6 +67,7 @@ public final class Constants {
 
   public static class ElevatorConstants
   {
+    public static int elevatorMotorID = 13;
 
     public static final double kElevatorKp = 5;
     public static final double kElevatorKi = 0;

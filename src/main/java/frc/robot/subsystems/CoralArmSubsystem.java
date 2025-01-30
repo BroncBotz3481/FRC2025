@@ -52,7 +52,7 @@ public class CoralArmSubsystem extends SubsystemBase {
     // The P gain for the PID controller that drives this arm.
     private double m_armKp = ArmConstants.kDefaultArmKp;
 
-    private final SparkMax m_motor = new SparkMax(14, MotorType.kBrushless);
+    private final SparkMax m_motor = new SparkMax(ArmConstants.coralArmMotorID, MotorType.kBrushless);
     private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
     private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
     private final RelativeEncoder m_encoder = m_motor.getEncoder();
