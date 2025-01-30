@@ -200,8 +200,8 @@ public class RobotContainer {
                 Commands.runOnce(() -> targetingSystem.setTarget(
                         TargetingSystem.ReefBranch.D,
                         TargetingSystem.ReefBranchLevel.L4))
-                        .andThen(Commands.deferredProxy(()-> drivebase.driveToPose(targetingSystem.getTargetPose())))
-                        .andThen(Commands.deferredProxy(scoringSystem::scoreCoral)));
+                        .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+                        .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
 
         m_driverController.button(5).whileTrue(driveToSetPoint(6.1, 4, 125));
         m_driverController.button(4).whileTrue(driveToSetPoint(5.2, 5.2, -120));

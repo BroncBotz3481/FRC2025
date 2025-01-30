@@ -325,4 +325,8 @@ public Command driveToPose(Pose2d pose)
     public Command scoreBackward() {
         return run(()->{swerveDrive.drive(new Translation2d(Units.inchesToMeters(4), 0), 0, false, false);});
     }
+
+    public Command lockPos() {
+      return run(swerveDrive::lockPose);
+    }
 }

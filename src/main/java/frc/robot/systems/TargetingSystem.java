@@ -19,7 +19,7 @@ public class TargetingSystem
   private AprilTagFieldLayout fieldLayout              = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   private ReefBranch          targetBranch;
   private ReefBranchLevel     targetBranchLevel;
-  private Transform2d         robotBranchScoringOffset = new Transform2d(Inches.of(12).in(Meters),
+  private Transform2d         robotBranchScoringOffset = new Transform2d(Inches.of(24).in(Meters),
                                                                          Inches.of(0).in(Meters),
                                                                          Rotation2d.fromDegrees(0));
 

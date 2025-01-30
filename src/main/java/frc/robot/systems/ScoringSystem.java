@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.*;
+import swervelib.SwerveDrive;
 
 import javax.swing.*;
 
@@ -43,7 +44,7 @@ public class ScoringSystem {
         return m_coralArm.setCoralArmAngle(coralArmAngleDegrees)
                 .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
                 .andThen(m_elevator.setElevatorHeight(elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight))
-                .andThen(m_swerve.scoreBackward().until(() -> !m_coralArm.coralLoaded()).withTimeout(3));
+                .andThen(m_swerve.lockPos());
     }
 
     public Command scoreAlgaeProcessor() {
