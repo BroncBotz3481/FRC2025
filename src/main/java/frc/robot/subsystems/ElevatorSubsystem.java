@@ -13,6 +13,8 @@ import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
@@ -35,10 +37,16 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -48,14 +56,25 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.RobotMath.Elevator;
 
 import java.util.function.Supplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
+
+    
+  public final Trigger atMin = new Trigger(() -> getHeight().isNear(ElevatorConstants.kMinElevatorHeight,
+  Inches.of(3)));
+public final Trigger atMax = new Trigger(() -> getHeight().isNear(ElevatorConstants.kMaxElevatorHeight,
+  Inches.of(3)));
 
     // This gearbox represents a gearbox containing 1 Neo
     private final DCMotor m_elevatorGearbox = DCMotor.getNEO(1);
@@ -85,17 +104,23 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // Simulation classes help us simulate what's going on, including gravity.
     private final ElevatorSim m_elevatorSim =
-            new ElevatorSim(
-                    m_elevatorGearbox,
-                    ElevatorConstants.kElevatorGearing,
-                    ElevatorConstants.kCarriageMass,
-                    ElevatorConstants.kElevatorDrumRadius,
-                    ElevatorConstants.kMinElevatorHeightMeters,
-                    ElevatorConstants.kMaxElevatorHeightMeters,
-                    true,
-                    0,
-                    0.01,
-                    0.0);
+    new ElevatorSim(
+        m_elevatorGearbox,
+        ElevatorConstants.kElevatorGearing,
+        ElevatorConstants.kCarriageMass,
+        ElevatorConstants.kElevatorDrumRadius,
+        ElevatorConstants.kMinElevatorHeight.in(Meters),
+        ElevatorConstants.kMaxElevatorHeight.in(Meters),
+        true,
+        ElevatorConstants.kStartingHeightSim.in(Meters),
+        0.01,
+        0.0);
+
+        private final MutVoltage        m_appliedVoltage = Volts.mutable(0);
+        // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+        private final MutDistance       m_distance       = Meters.mutable(0);
+        // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+        private final MutLinearVelocity m_velocity       = MetersPerSecond.mutable(0);
 
     // Create a Mechanism2d visualization of the elevator
     private final Mechanism2d m_mech2d = new Mechanism2d(20, 12);//height of the barge. currently in meters change that
@@ -103,7 +128,27 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final MechanismLigament2d m_elevatorMech2d =
             m_mech2dRoot.append(
                     new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
-
+        private final SysIdRoutine      m_sysIdRoutine   =
+      new SysIdRoutine(
+          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+          new SysIdRoutine.Config(Volts.per(Second).of(ElevatorConstants.kElevatorRampRate),
+                                  Volts.of(9),
+                                  Seconds.of(10)),
+          new SysIdRoutine.Mechanism(
+              // Tell SysId how to plumb the driving voltage to the motor(s).
+              m_motor::setVoltage,
+              // Tell SysId how to record a frame of data for each motor on the mechanism being
+              // characterized.
+              log -> {
+                // Record a frame for the shooter motor.
+                log.motor("elevator")
+                   .voltage(
+                       m_appliedVoltage.mut_replace(
+                           m_motor.getAppliedOutput() * RobotController.getBatteryVoltage(), Volts))
+                   .linearPosition(m_distance.mut_replace(getHeight()))
+                   .linearVelocity(m_velocity.mut_replace(getVelocity()));
+              },
+              this));
     /**
      * Subsystem constructor.
      */
@@ -171,6 +216,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             m_laserCanTimingBudget.asMilliseconds(),
             m_laserCanROI
         ));
+          Constants.kElevatorTower.setLength(getHeight().in(Meters));
+    Constants.kElevatorCarriage.setPosition(ArmConstants.kArmLength, getHeight().in(Meters));
     }
 
      /**
@@ -200,30 +247,43 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
     /**
-     * Run control loop to reach and maintain goal.
-     *
-     * @param goal the position to maintain
-     */
-    public void reachGoal(double goal) {
-        m_controller.setReference(Elevator.convertDistanceToRotations(Meters.of(goal)).in(Rotations),
-        ControlType.kMAXMotionPositionControl,
-        ClosedLoopSlot.kSlot0,
-        m_feedforward.calculate(
-            Elevator.convertRotationsToDistance(Rotations.of(m_encoder.getVelocity())).per(Minute)
-                    .in(MetersPerSecond)));
-    }
+   * Run control loop to reach and maintain goal.
+   *
+   * @param goal the position to maintain
+   */
+  public void reachGoal(double goal)
+  {
+    m_controller.setReference(Elevator.convertDistanceToRotations(Meters.of(goal)).in(Rotations),
+                              ControlType.kMAXMotionPositionControl,
+                              ClosedLoopSlot.kSlot0,
+                              m_feedforward.calculate(getVelocity().in(MetersPerSecond)));
+  }
+ 
+   /**
+   * Runs the SysId routine to tune the Arm
+   *
+   * @return SysId Routine command
+   */
+  public Command runSysIdRoutine()
+  {
+    return (m_sysIdRoutine.dynamic(Direction.kForward).until(atMax))
+            .andThen(m_sysIdRoutine.dynamic(Direction.kReverse).until(atMin))
+            .andThen(m_sysIdRoutine.quasistatic(Direction.kForward).until(atMax))
+            .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse).until(atMin))
+            .andThen(Commands.print("DONE"));
+  }
 
     /**
-     * Set the goal of the elevator
-     *
-     * @param goal Goal in meters
-     * @return {@link edu.wpi.first.wpilibj2.command.Command}
-     */
-    public Command setGoal(double goal) {
-        return run(() -> reachGoal(goal));
-    }
+   * Get Elevator Velocity
+   *
+   * @return Elevator Velocity
+   */
+  public LinearVelocity getVelocity()
+  {
+    return Elevator.convertRotationsToDistance(Rotations.of(m_encoder.getVelocity())).per(Minute);
+  }
 
-
+  
     /**
      * Set the elevator goal and stop when it reaches its target.
      *
@@ -233,53 +293,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command setElevatorHeight(double height) {
         return setGoal(height).until(() -> aroundHeight(height));
     }
-
-    
-
-    /**
-     * Get the height in meters.
-     *
-     * @return Height in meters
-     */
-    public double getHeight() {
-        return Elevator.convertRotationsToDistance(Rotations.of(m_encoder.getPosition())).in(Meters);
-    }
-
-    /**
-     * A trigger for when the height is at an acceptable tolerance.
-     *
-     * @param height    Height in Meters
-     * @param tolerance Tolerance in meters.
-     * @return {@link Trigger}
-     */
-    public Trigger atHeight(double height, double tolerance) {
-        return new Trigger(() -> MathUtil.isNear(height,
-                                                getHeight(),
-                                                tolerance));
-    }
-
-
-    /**
-     * Stop the control loop and motor output.
-     */
-    public void stop() {
-        m_motor.set(0.0);
-    }
-
-    /**
-     * Update telemetry, including the mechanism visualization.
-     */
-    public void updateTelemetry() {
-        // Update elevator visualization with position
-        m_elevatorMech2d.setLength(RobotBase.isSimulation() ? m_elevatorSim.getPositionMeters() : m_encoder.getPosition());
-    }
-
-    @Override
-    public void periodic() {
-        updateTelemetry();
-    }
-
-    /**
+        /**
      * Gets the height of the elevator and compares it to the given height with the given tolerance.
      *
      * @param height         Height in meters
@@ -298,6 +312,73 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     public boolean aroundHeight(double height) {
         return aroundHeight(height, Units.inchesToMeters(ElevatorConstants.kElevatorAllowableError));
+    }
+
+    /**
+   * Get the height of the Elevator
+   *
+   * @return Height of the elevator
+   */
+  public Distance getHeight()
+  {
+    return Elevator.convertRotationsToDistance(Rotations.of(m_encoder.getPosition()));
+  }
+
+  
+  /**
+   * Get the height in meters.
+   *
+   * @return Height in meters
+   */
+  public double getHeightMeters()
+  {
+    return Elevator.convertRotationsToDistance(Rotations.of(m_encoder.getPosition())).in(Meters);
+  }
+
+    /**
+   * A trigger for when the height is at an acceptable tolerance.
+   *
+   * @param height    Height in Meters
+   * @param tolerance Tolerance in meters.
+   * @return {@link Trigger}
+   */
+  public Trigger atHeight(double height, double tolerance)
+  {
+    return new Trigger(() -> MathUtil.isNear(height,
+                                             getHeightMeters(),
+                                             tolerance));
+  }
+
+    /**
+   * Set the goal of the elevator
+   *
+   * @param goal Goal in meters
+   * @return {@link edu.wpi.first.wpilibj2.command.Command}
+   */
+  public Command setGoal(double goal)
+  {
+    return run(() -> reachGoal(goal));
+  }
+    
+  /**
+   * Stop the control loop and motor output.
+   */
+  public void stop()
+  {
+    m_motor.set(0.0);
+  }
+
+     /**
+     * Update telemetry, including the mechanism visualization.
+     */
+    public void updateTelemetry() {
+        // Update elevator visualization with position
+        m_elevatorMech2d.setLength(RobotBase.isSimulation() ? m_elevatorSim.getPositionMeters() : m_encoder.getPosition());
+    }
+
+    @Override
+    public void periodic() {
+        updateTelemetry();
     }
 
 

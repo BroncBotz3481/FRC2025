@@ -4,7 +4,22 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.RobotMath.Elevator;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This
@@ -16,6 +31,36 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants
 {
+
+    public static final Mechanism2d         sideRobotView = new Mechanism2d(ArmConstants.kArmLength * 2,
+                                                                          ElevatorConstants.kMaxElevatorHeight.in(
+                                                                              Meters) +
+                                                                          ArmConstants.kArmLength);
+  public static final MechanismRoot2d     kElevatorCarriage;
+  public static final MechanismLigament2d kArmMech;
+  public static final MechanismLigament2d kElevatorTower;
+
+  static
+  {
+    kElevatorCarriage = Constants.sideRobotView.getRoot("ElevatorCarriage",
+                                                        ArmConstants.kArmLength,
+                                                        ElevatorConstants.kStartingHeightSim.in(
+                                                    Meters));
+    kArmMech = kElevatorCarriage.append(
+        new MechanismLigament2d(
+            "Arm",
+            ArmConstants.kArmLength,
+            ArmConstants.kArmStartingAngle.in(Degrees),
+            6,
+            new Color8Bit(Color.kYellow)));
+    kElevatorTower = kElevatorCarriage.append(new MechanismLigament2d(
+        "Elevator",
+        ElevatorConstants.kStartingHeightSim.in(Meters),
+        -90,
+        6,
+        new Color8Bit(Color.kRed)));
+  }
+
 
   public static class OperatorConstants
   {
@@ -31,6 +76,8 @@ public final class Constants
   public static final int kEncoderAChannel = 0;
   public static final int kEncoderBChannel = 1;
   public static final int kJoystickPort    = 0;
+
+  public static final TimeUnit Second = null;
 
   public static class targetingConstants
   {
@@ -76,6 +123,7 @@ public final class Constants
     public static final double kArmReduction = 200;
     public static final double kArmMass      = 8.0; // Kilograms
     public static final double kArmLength    = Units.inchesToMeters(30);
+    public static final Angle   kArmStartingAngle               = Radians.of(0);
     public static final double kMinAngleRads = Units.degreesToRadians(-75);
     public static final double kMaxAngleRads = Units.degreesToRadians(255);
 
@@ -110,19 +158,27 @@ public final class Constants
 
 
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-    public static final double kMinElevatorHeightMeters = 0;//min height / 10
-    public static final double kMaxElevatorHeightMeters = 10.25;
+    public static final Distance kLaserCANOffset    = Inches.of(3);
+    public static final Distance kStartingHeightSim = Meters.of(0);
+    public static final Distance kMinElevatorHeight = Meters.of(0.0);
+    public static final Distance kMaxElevatorHeight = Meters.of(10.25);
 
     //public static final double kElevatorMaxVelocity = 3.5;
     //public static final double kElevatorMaxAcceleration = 2.5;
 
     public static final double kElevatorAllowableError = 1;
     public static final double kLowerToScoreHeight     = Units.inchesToMeters(6);
-  }
 
+    
+    public static double kElevatorRampRate = 1;
+    public static int    kElevatorCurrentLimit = 40;
+    public static double kMaxVelocity = Elevator.convertDistanceToRotations(Meters.of(1)).per(Second).in(RPM);
+    public static double kMaxAcceleration = Elevator.convertDistanceToRotations(Meters.of(2)).per(Second).per(Second)
+                                                    .in(RPM.per(Second));
+  }
+  
   public static class IntakeConstants
   {
-
     public static final double AlgaeIntakeSpeeds  = 0.8;
     public static final double AlgaeOuttakeSpeeds = -0.8;
 

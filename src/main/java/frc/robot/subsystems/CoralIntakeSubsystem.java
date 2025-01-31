@@ -52,7 +52,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public CoralIntakeSubsystem()
   {
-
+      
   }
 
 
