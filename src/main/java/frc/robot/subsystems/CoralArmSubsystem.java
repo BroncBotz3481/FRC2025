@@ -1,12 +1,16 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -17,15 +21,25 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -38,8 +52,12 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.RobotMath.Arm;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants;
+import frc.robot.Constants.CoralArmConstants;
+import frc.robot.RobotMath.CoralArm;
 
 
 
@@ -48,141 +66,221 @@ public class CoralArmSubsystem extends SubsystemBase {
     // The arm gearbox represents a gearbox containing two Vex 775pro motors.
     private final DCMotor m_armGearbox = DCMotor.getNEO(2);
 
+    public final Trigger atMin = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralMinAngle));
+    public final Trigger atMax = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralMaxAngle));
 
-    // The P gain for the PID controller that drives this arm.
-    private double m_armKp = ArmConstants.kDefaultArmKp;
-
-    private final SparkMax m_motor = new SparkMax(ArmConstants.coralArmMotorID, MotorType.kBrushless);
-    private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
+    private final SparkMax                  m_motor      = new SparkMax(CoralArmConstants.coralArmMotorID, MotorType.kBrushless);
     private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
-    private final RelativeEncoder m_encoder = m_motor.getEncoder();
+    private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
+    private final AbsoluteEncoder           m_absEncoder = m_motor.getAbsoluteEncoder();
 
-    
-    
-    //sim
-    // Sensors
-    private final DigitalInput m_limitSwitchHigh    = new DigitalInput(4);
-    private       DIOSim       m_limitSwitchHighSim = null;
-    private final DigitalInput m_limitSwitchLow     = new DigitalInput(5);
-    private       DIOSim       m_limitSwitchLowSim  = null;
-    private final DigitalInput m_coralInBin         = new DigitalInput(6);// Digital Input returns true or false
-    private       DIOSim       m_coralInBinSim      = null;                         // Sim Digital Input for robot.
-    private final DigitalInput m_coralInArm         = new DigitalInput(7);
-    private       DIOSim       m_coralInArmSim      = null;
     // Standard classes for controlling our arm
-
+    private final ProfiledPIDController m_pidController;
+    private final ArmFeedforward        m_feedforward = new ArmFeedforward(CoralArmConstants.kCoralArmkS,
+                                                                         CoralArmConstants.kCoralArmkG,
+                                                                         CoralArmConstants.kCoralArmKv,
+                                                                         CoralArmConstants.kCoralArmKa);
+    // SysId Routine and seutp
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+    private final MutVoltage         m_appliedVoltage = Volts.mutable(0);
+    // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+    private final MutAngle           m_angle          = Rotations.mutable(0);
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+    private final MutAngularVelocity m_velocity       = RPM.mutable(0);
+    // SysID Routine
+    private final SysIdRoutine       m_sysIdRoutine   =
+        new SysIdRoutine(
+          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+          new SysIdRoutine.Config(Volts.per(Second).of(CoralArmConstants.kCoralArmRampRate), Volts.of(1), Seconds.of(30)),
+          new SysIdRoutine.Mechanism(
+              // Tell SysId how to plumb the driving voltage to the motor(s).
+              m_motor::setVoltage,
+              // Tell SysId how to record a frame of data for each motor on the mechanism being
+              // characterized.
+              log -> {
+                // Record a frame for the shooter motor.
+                log.motor("arm")
+                   .voltage(
+                       m_appliedVoltage.mut_replace(m_motor.getAppliedOutput() *
+                                                    RobotController.getBatteryVoltage(), Volts))
+                   .angularPosition(m_angle.mut_replace(m_encoder.getPosition(), Rotations))
+                   .angularVelocity(m_velocity.mut_replace(m_encoder.getVelocity(), RPM));
+//                .angularPosition(m_angle.mut_replace(getAngle()))
+//                .angularVelocity(m_velocity.mut_replace(getVelocity()));
+              },
+              this));
 
     // Simulation classes help us simulate what's going on, including gravity.
-    // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
-    // to 255 degrees (rotated down in the back).
-    private final SingleJointedArmSim m_coralArmSim =
-            new SingleJointedArmSim(
-                    m_armGearbox,
-                    ArmConstants.kArmReduction,
-                    SingleJointedArmSim.estimateMOI(ArmConstants.kArmLength, ArmConstants.kArmMass),
-                    ArmConstants.kArmLength,
-                    ArmConstants.kMinAngleRads,
-                    ArmConstants.kMaxAngleRads,
-                    true,
-                    0,
-                    0.02 / 4096.0,
-                    0.0// Add noise with a std-dev of 1 tick
-            );
-
-    ArmFeedforward armFeedforward = new ArmFeedforward(ArmConstants.kArmkS, ArmConstants.kArmkG, ArmConstants.kArmkV, ArmConstants.kArmkA);
-
-
-    // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-    private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-    private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
-    private final MechanismLigament2d m_armTower =
-            m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
-    private final MechanismLigament2d m_arm =
-            m_armPivot.append(
-                    new MechanismLigament2d(
-                            "Arm",
-                            30,
-                            Units.radiansToDegrees(m_coralArmSim.getAngleRads()),
-                            6,
-                            new Color8Bit(Color.kYellow)));
+  // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
+  // to 255 degrees (rotated down in the back).
+  private final SingleJointedArmSim m_armSim   =
+  new SingleJointedArmSim(
+      m_armGearbox,
+      CoralArmConstants.kCoralArmReduction,
+      SingleJointedArmSim.estimateMOI(CoralArmConstants.kCoralArmLength, CoralArmConstants.kCoralArmMass),
+      CoralArmConstants.kCoralArmLength,
+      CoralArmConstants.kCoralMinAngle.in(Radians),
+      CoralArmConstants.kCoralMaxAngle.in(Radians),
+      true,
+      CoralArmConstants.kCoralArmStartingAngle.in(Radians),
+      0.02 / 4096.0,
+      0.0 // Add noise with a std-dev of 1 tick
+  );
+private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
+// Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
 
 
     /**
      * Subsystem constructor.
      */
-    public CoralArmSubsystem() {
-        SparkMaxConfig config = new SparkMaxConfig();
-        config
-        .smartCurrentLimit(40)
-        .closedLoopRampRate(0.25)
+     public CoralArmSubsystem()
+  {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config
+        .smartCurrentLimit(CoralArmConstants.kCoralArmStallCurrentLimitAmps)
+        .closedLoopRampRate(CoralArmConstants.kCoralArmRampRate)
+        .idleMode(IdleMode.kBrake)
+        .inverted(CoralArmConstants.kCoralArmInverted)
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(ArmConstants.kDefaultArmKp, ArmConstants.kArmKi, ArmConstants.kArmKd)
+        .pid(CoralArmConstants.kCoralArmKp, CoralArmConstants.kCoralArmKi, CoralArmConstants.kCoralArmKd)
         .outputRange(-1, 1)
         .maxMotion
-        .maxVelocity(Arm.convertAngleToSensorUnits(Degrees.of(100)).per(Second).in(RPM))
-        .maxAcceleration(Arm.convertAngleToSensorUnits(Degrees.of(80)).per(Second).per(Second).in(RPM.per(Second)))
-        .allowedClosedLoopError(Arm.convertAngleToSensorUnits(Degrees.of(1)).in(Rotations));
+        .maxVelocity(CoralArmConstants.kCoralArmMaxVelocityRPM)
+        .maxAcceleration(CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond)
+        .allowedClosedLoopError(CoralArmConstants.kCoralArmAllowedClosedLoopError.in(Rotations));
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    synchronizeAbsoluteEncoder();
 
-        // Put Mechanism 2d to SmartDashboard
-        SmartDashboard.putData("coralArm Sim", m_mech2d);
-        m_armTower.setColor(new Color8Bit(Color.kBlue));
+    // PID Controller
+    m_pidController = new ProfiledPIDController(CoralArmConstants.kCoralArmKp,
+                                                CoralArmConstants.kCoralArmKi,
+                                                CoralArmConstants.kCoralArmKd,
+                                                new Constraints(CoralArmConstants.kCoralArmMaxVelocityRPM,
+                                                                CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond));
+    m_pidController.setTolerance(0.01);
 
-    if (RobotBase.isSimulation())
-    {
-      m_limitSwitchLowSim = new DIOSim(m_limitSwitchLow);
-      m_limitSwitchHighSim = new DIOSim(m_limitSwitchHigh);
-      m_coralInBinSim = new DIOSim(m_coralInBin);
-      m_coralInArmSim = new DIOSim(m_coralInArm);
-      SmartDashboard.putData("Coral Arm Limit Switch High", m_limitSwitchHigh);
-      SmartDashboard.putData("Coral Arm Limit Switch Low", m_limitSwitchLow);
-      SmartDashboard.putData("Coral Arm Coral in Bin", m_coralInBin);
-      SmartDashboard.putData("Coral Arm Coral in Arm", m_coralInArm);
-    }
-    }
+
+
+  }
 
 
     /**
-     * Update the simulation model.
-     */
-    public void simulationPeriodic() {
-        // In this method, we update our simulation of what our arm is doing
-        // First, we set our "inputs" (voltages)
-        m_coralArmSim.setInput(m_motorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
+   * Update the simulation model.
+   */
+  public void simulationPeriodic()
+  {
+    // In this method, we update our simulation of what our arm is doing
+    // First, we set our "inputs" (voltages)
+    m_armSim.setInput(m_motorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
 
-        // Next, we update it. The standard loop time is 20ms.
-        m_coralArmSim.update(0.020);
+    // Next, we update it. The standard loop time is 20ms.
+    m_armSim.update(0.020);
 
-        // Finally, we set our simulated encoder's readings and simulated battery voltage
-        //m_encoderSim.setDistance(m_coralArmSim.getAngleRads());
-        m_motorSim.iterate(
-            RotationsPerSecond.of(Arm.convertAngleToSensorUnits(Radians.of(m_coralArmSim.getVelocityRadPerSec())).in(Rotations))
-                              .in(RPM),
-            RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
-            0.02); // Time interval, in Seconds
-    
-        // SimBattery estimates loaded battery voltages
-        RoboRioSim.setVInVoltage(
-                BatterySim.calculateDefaultBatteryLoadedVoltage(m_coralArmSim.getCurrentDrawAmps()));
+    m_motorSim.iterate(
+        RotationsPerSecond.of(CoralArm.convertCoralAngleToSensorUnits(Radians.of(m_armSim.getVelocityRadPerSec())).in(Rotations))
+                          .in(RPM),
+        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
+        0.02); // Time interval, in Seconds
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(Radians.of(m_armSim.getAngleRads())).in(Rotations));
 
-        // Update the Mechanism Arm angle based on the simulated arm angle
-        m_arm.setAngle(Units.radiansToDegrees(m_coralArmSim.getAngleRads()));
+    // SimBattery estimates loaded battery voltages
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
 
+    // Update the Mechanism Arm angle based on the simulated arm angle
+    Constants.kCoralArmMech.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
+
+  }
+
+   /**
+   * Near the maximum Angle of the arm within X degrees.
+   *
+   * @param toleranceDegrees Degrees close to maximum of the Arm.
+   * @return is near the maximum of the arm.
+   */
+  public boolean nearMax(double toleranceDegrees)
+  {
+    return getAngle().isNear(CoralArmConstants.kCoralMaxAngle, Units.degreesToRadians(toleranceDegrees));
+
+  }
+
+  /**
+   * Near the minimum angle of the Arm in within X degrees.
+   *
+   * @param toleranceDegrees Tolerance of the Arm.
+   * @return is near the minimum of the arm.
+   */
+  public boolean nearMin(double toleranceDegrees)
+  {
+    return getAngle().isNear(CoralArmConstants.kCoralMaxAngle, Units.degreesToRadians(toleranceDegrees));
+
+  }
+
+  /**
+   * Synchronizes the NEO encoder with the attached Absolute Encoder.
+   */
+  public void synchronizeAbsoluteEncoder()
+  {
+    m_encoder.setPosition(Rotations.of(m_absEncoder.getPosition()).minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)
+                                   .in(Rotations));
+  }
+
+  /**
+   * Runs the SysId routine to tune the Arm
+   *
+   * @return SysId Routine command
+   */
+  public Command runSysIdRoutine()
+  {
+    return m_sysIdRoutine.dynamic(Direction.kForward).until(atMax)
+                         .andThen(m_sysIdRoutine.dynamic(Direction.kReverse)).until(atMin)
+                         .andThen(m_sysIdRoutine.quasistatic(Direction.kForward)).until(atMax)
+                         .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse)).until(atMin);
+  }
+
+   /**
+   * Run the control loop to reach and maintain the setpoint from the preferences.
+   */
+  public void reachSetpoint(double setPointDegree)
+  {
+    double  goalPosition = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations);
+    boolean rioPID       = true;
+    if (rioPID)
+    {
+      double pidOutput     = m_pidController.calculate(m_encoder.getPosition(), goalPosition);
+      State  setpointState = m_pidController.getSetpoint();
+      m_motor.setVoltage(pidOutput +
+                         m_feedforward.calculate(setpointState.position,
+                                                 setpointState.velocity)
+                        );
+    } else
+    {
+      m_controller.setReference(goalPosition,
+                                ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
     }
-
+  }
 
     /**
-     * Run the control loop to reach and maintain the setpoint from the preferences.
-     */
-    public void reachSetpoint(double setPointDegree) {//goal-in degrees?or rad
-        m_controller.setReference(Arm.convertAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations),
-        ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, armFeedforward.calculate(m_coralArmSim.getAngleRads(),m_coralArmSim.getVelocityRadPerSec()));
+   * Get the Angle of the Arm.
+   *
+   * @return Angle of the Arm.
+   */
+    public Angle getAngle()
+    {
+        m_angle.mut_replace(CoralArm.convertSensorUnitsToCoralAngle(m_angle.mut_replace(m_encoder.getPosition(), Rotations)));
+        return m_angle;
     }
 
-    public double getAngle()
+    /**
+     * Get the velocity of Arm.
+     *
+     * @return Velocity of the Arm.
+     */
+    public AngularVelocity getVelocity()
     {
-      return Arm.convertSensorUnitsToAngle(Rotations.of(m_encoder.getPosition())).in(Degrees);
+        return m_velocity.mut_replace(CoralArm.convertSensorUnitsToCoralAngle(Rotations.of(m_encoder.getVelocity())).per(Minute));
     }
 
 
@@ -206,9 +304,13 @@ public class CoralArmSubsystem extends SubsystemBase {
     //    System.out.println(Units.radiansToDegrees(m_coralArmSim.getAngleRads()));
     }
    
-    public boolean coralInLoadPosition() {return m_coralInArm.get()&&aroundAngle(240);}//Sim
+    public boolean coralInLoadPosition() {
+        return false;//m_coralInArm.get()&&aroundAngle(240);
+    }//Sim
 
-    public boolean coralLoaded() {return m_coralInBin.get()||m_coralInArm.get();}//Sim//?
+    public boolean coralLoaded() {
+        return false;//m_coralInBin.get()||m_coralInArm.get();
+    }//Sim
 
 
     /**
@@ -223,7 +325,7 @@ public class CoralArmSubsystem extends SubsystemBase {
     }
 
     public boolean aroundAngle(double degree) {
-        return aroundAngle(degree, ArmConstants.kAngleAllowableError);
+        return aroundAngle(degree, CoralArmConstants.kCoralAngleAllowableError);
     }
 
   /*
