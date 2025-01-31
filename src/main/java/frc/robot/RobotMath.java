@@ -6,13 +6,14 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AlgaeArmConstants;
+import frc.robot.Constants.CoralArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class RobotMath
 {
 
-  public static class Arm
+  public static class AlgaeArm
   {
 
     /**
@@ -21,9 +22,9 @@ public class RobotMath
      * @param measurement Angle, to convert.
      * @return {@link Angle} equivalent to rotations of the motor.
      */
-    public static Angle convertAngleToSensorUnits(Angle measurement)
+    public static Angle convertAlgaeAngleToSensorUnits(Angle measurement)
     {
-      return Rotations.of(measurement.in(Rotations) * ArmConstants.kArmReduction);
+      return Rotations.of(measurement.in(Rotations) * AlgaeArmConstants.kAlgaeArmReduction);
     }
 
     /**
@@ -32,9 +33,35 @@ public class RobotMath
      * @param measurement Motor roations
      * @return Usable angle.
      */
-    public static Angle convertSensorUnitsToAngle(Angle measurement)
+    public static Angle convertSensorUnitsToAlgaeAngle(Angle measurement)
     {
-      return Rotations.of(measurement.in(Rotations) / ArmConstants.kArmReduction);
+      return Rotations.of(measurement.in(Rotations) / AlgaeArmConstants.kAlgaeArmReduction);
+
+    }
+  }
+  public static class CoralArm
+  {
+
+    /**
+     * Convert {@link Angle} into motor {@link Angle}
+     *
+     * @param measurement Angle, to convert.
+     * @return {@link Angle} equivalent to rotations of the motor.
+     */
+    public static Angle convertCoralAngleToSensorUnits(Angle measurement)
+    {
+      return Rotations.of(measurement.in(Rotations) * CoralArmConstants.kCoralArmReduction);
+    }
+
+    /**
+     * Convert motor rotations {@link Angle} into usable {@link Angle}
+     *
+     * @param measurement Motor roations
+     * @return Usable angle.
+     */
+    public static Angle convertSensorUnitsToCoralAngle(Angle measurement)
+    {
+      return Rotations.of(measurement.in(Rotations) / CoralArmConstants.kCoralArmReduction);
 
     }
   }
