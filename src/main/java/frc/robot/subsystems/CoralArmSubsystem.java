@@ -318,11 +318,11 @@ private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGea
     }
    
     public boolean coralInLoadPosition() {
-        return false;//m_coralInArm.get()&&aroundAngle(240);
+        return true;//m_coralInArm.get()&&aroundAngle(240);
     }//Sim
 
     public boolean coralLoaded() {
-        return false;//m_coralInBin.get()||m_coralInArm.get();
+        return true;//m_coralInBin.get()||m_coralInArm.get();
     }//Sim
 
 

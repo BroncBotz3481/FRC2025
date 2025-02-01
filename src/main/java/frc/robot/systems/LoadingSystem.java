@@ -18,11 +18,11 @@ public class LoadingSystem {
         m_algaeArm = algaeArm;
         m_elevator = elevator;
     }
-
+    //????
     public Command coralLoad() {
-        double coralArmLoadingAngleDegrees = 90;
-        double coralElevatorHighHeightMeters = 3;
-        double coralElevatorLowHeightMeters = 1;//?put the c
+        double coralArmLoadingAngleDegrees = 45;
+        double coralElevatorHighHeightMeters = 0.5;
+        double coralElevatorLowHeightMeters = 0;
         return m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
                 .andThen(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees))
                 .andThen(Commands.waitUntil(m_coralArm::coralInLoadPosition))
@@ -33,9 +33,9 @@ public class LoadingSystem {
 
     public Command algaeLoad() {
         // Put algae arm out, roll in
-        double algaeArmLoadingAngleDegrees = 80;
-        double algaeElevatorHighHeightMeters = 3;
-        double algaeElevatorLowHeightMeters = 1;
+        double algaeArmLoadingAngleDegrees = 45;
+        double algaeElevatorHighHeightMeters = 2.0;
+        double algaeElevatorLowHeightMeters = 0;
 
         return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
                 .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees))

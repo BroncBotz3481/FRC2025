@@ -123,7 +123,7 @@ public final class Constants {
 
     public static final double  kAlgaeArmReduction                   = 200;
     public static final double  kAlgaeArmMass                        = 8.0; // Kilograms
-    public static final double  kAlgaeArmLength                      = Inches.of(72).in(Meters);
+    public static final double  kAlgaeArmLength                      = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle               = Degrees.of(0);
     public static final Angle   kAlgaeArmMinAngle                    = Degrees.of(-75);
     public static final Angle   kAlgaeArmMaxAngle                    = Degrees.of(255);
@@ -160,7 +160,7 @@ public final class Constants {
   
       public static final double  kCoralArmReduction                   = 200;
       public static final double  kCoralArmMass                        = 8.0; // Kilograms
-      public static final double  kCoralArmLength                      = Inches.of(72).in(Meters);
+      public static final double  kCoralArmLength                      = Inches.of(31).in(Meters);
       public static final Angle   kCoralArmStartingAngle               = Degrees.of(0);
       public static final Angle   kCoralArmMinAngle                    = Degrees.of(-75);
       public static final Angle   kCoralArmMaxAngle                    = Degrees.of(255);
@@ -240,9 +240,10 @@ public final class Constants {
     public static final int    coralRollerMotorID  = 17;
     public static final double defaultrRollerSpeed = 0;
     public static final double kIntakeReduction    = 0;
-    public static       double kMinAngleRads;
-    public static       double kMaxAngleRads;
-    public static       double kIntakeLength;
+    public static       double kMinAngleRads ;
+    public static       double kMaxAngleRads ;
+    public static       double kIntakeLength = Inches.of(10).in(Meters) ;
+    public static double kWristReduction = 1;
   }
 
 }

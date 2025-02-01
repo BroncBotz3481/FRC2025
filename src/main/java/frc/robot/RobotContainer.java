@@ -109,7 +109,7 @@ public class RobotContainer {
     public RobotContainer() {
         // Configure the trigger bindings
         DriverStation.silenceJoystickConnectionWarning(true);
-        elevator.setDefaultCommand(elevator.setGoal(4));
+        elevator.setDefaultCommand(elevator.setGoal(0));
         coralArm.setDefaultCommand(coralArm.setGoal(-90));
         climb.setDefaultCommand(climb.climbUp());
         algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
@@ -222,7 +222,7 @@ public class RobotContainer {
         m_driverController.button(12).whileTrue(elevator.setGoal(6));
         m_driverController.button(12).whileTrue(algaeArm.setGoal(45));
         m_driverController.button(12).whileTrue(coralArm.setGoal(75));
-        m_driverController.button(15).whileTrue(loadingSystem.coralLoad());
+        m_driverController.button(15).whileTrue(loadingSystem.algaeLoad());
 
 
         m_driverController.button(13).whileTrue(elevator.setGoal(9));

@@ -315,11 +315,11 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   }
 
   public boolean algaeInLoadPosition() {
-    return false;//m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
+    return true;//m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
   }
 
   public boolean algaeLoaded() {
-    return false;//m_algaeInBin.get()|| m_algaeInArm.get();
+    return true;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean aroundAngle(double degree, double allowableError) {

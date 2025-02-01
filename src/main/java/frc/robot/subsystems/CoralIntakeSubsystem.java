@@ -13,16 +13,20 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
 
+import static edu.wpi.first.units.Units.Radians;
+
 public class CoralIntakeSubsystem extends SubsystemBase
 {
 
-  private final DCMotor m_wristGearbox = DCMotor.getNEO(3);
+  private final DCMotor m_wristGearbox = DCMotor.getNEO(1);
 
   private final SparkMax m_wristMotor  = new SparkMax(IntakeConstants.coralWristMotorID, MotorType.kBrushless);
   private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.coralRollerMotorID, MotorType.kBrushless);
@@ -49,7 +53,20 @@ public class CoralIntakeSubsystem extends SubsystemBase
   private final SparkMaxSim             m_wristMotorSim      = new SparkMaxSim(m_wristMotor, m_wristMotorGearbox);
   private final SparkMaxSim             m_rollerMotorSim     = new SparkMaxSim(m_rollerMotor, m_rollerMotorGearbox);
 
-
+//  private final SingleJointedArmSim m_wristSim   =
+//          new SingleJointedArmSim(
+//                  m_wristGearbox,
+//                  Constants.IntakeConstants.kWristReduction,
+//                  SingleJointedArmSim.estimateMOI(Constants.CoralArmConstants.kCoralArmLength, Constants.CoralArmConstants.kCoralArmMass),
+//                  Constants.CoralArmConstants.kCoralArmLength,
+//                  Constants.CoralArmConstants.kCoralArmMinAngle.in(Radians),
+//                  Constants.CoralArmConstants.kCoralArmMaxAngle.in(Radians),
+//                  true,
+//                  Constants.CoralArmConstants.kCoralArmStartingAngle.in(Radians),
+//                  0.02 / 4096.0,
+//                  0.0 // Add noise with a std-dev of 1 tick
+//          );
+  //private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
   public CoralIntakeSubsystem()
   {
       
