@@ -36,6 +36,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -178,7 +179,8 @@ public class RobotContainer {
      */
     private void configureBindings() {
         // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-
+        // Put Mechanism 2d to SmartDashboard
+        SmartDashboard.putData("Side View", Constants.sideRobotView);
 
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
         m_driverController.button(9).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
@@ -215,12 +217,9 @@ public class RobotContainer {
         // cancelling on release.
 
 
-        m_driverController.button(11).whileTrue(elevator.setGoal(3));
-        m_driverController.button(12).whileTrue(elevator.setGoal(6));
+        m_driverController.button(11).whileTrue(elevator.setGoal(3).alongWith(coralArm.setGoal(90)));
+        m_driverController.button(12).whileTrue(elevator.setGoal(6).alongWith(algaeArm.setGoal(45)));
         m_driverController.button(13).whileTrue(elevator.setGoal(9));
-        m_driverController.button(14).whileTrue(coralArm.setGoal(45));
-        m_driverController.button(15).whileTrue(coralArm.setGoal(90));
-        m_driverController.button(16).whileTrue(setElevArm(9.5, 70));
         elevator.atHeight(5, 0.1).whileTrue(Commands.print("I AM ALIVE, YAAA HAAAAA"));
 
         m_driverController.button(19).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
