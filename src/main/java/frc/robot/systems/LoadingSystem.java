@@ -25,7 +25,7 @@ public class LoadingSystem {
         double coralElevatorLowHeightMeters = 0;
         return m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
                 .andThen(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees))
-                .andThen(Commands.waitUntil(m_coralArm::coralInLoadPosition))
+                .andThen(Commands.waitUntil(m_coralArm::coralInLoadPosition))//
                 .andThen(m_elevator.setElevatorHeight(coralElevatorLowHeightMeters))
                 .andThen(Commands.waitUntil(m_coralArm::coralLoaded))
                 .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters));

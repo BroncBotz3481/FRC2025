@@ -199,9 +199,9 @@ public class RobotContainer {
                 Rotation2d.fromDegrees(125))));
 
         m_driverController.button(6).whileTrue(
-                Commands.runOnce(() -> targetingSystem.setTarget(
+              targetingSystem.setTargetCommand(
                         TargetingSystem.ReefBranch.D,
-                        TargetingSystem.ReefBranchLevel.L4))
+                        TargetingSystem.ReefBranchLevel.L4)
                         .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
                         .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
 

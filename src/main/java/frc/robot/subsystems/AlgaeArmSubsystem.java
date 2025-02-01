@@ -83,6 +83,8 @@ public class AlgaeArmSubsystem extends SubsystemBase {
                                                                          AlgaeArmConstants.kAlgaeArmKa);
   private DigitalInput armLoaded = new DigitalInput(1);
   private DIOSim armLoadedSim = new DIOSim(armLoaded);
+  private DigitalInput armInLoadedPosition = new DigitalInput(2);
+  private DIOSim armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
 
   // SysId Routine and seutp
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
@@ -318,11 +320,12 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   }
 
   public boolean algaeInLoadPosition() {
-    return armLoaded.get();//m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
+      System.out.println(armInLoadedPosition.get()+"");
+    return armInLoadedPosition.get();//m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
   }
 
   public boolean algaeLoaded() {
-    return true;//m_algaeInBin.get()|| m_algaeInArm.get();
+    return armLoaded.get();//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean aroundAngle(double degree, double allowableError) {

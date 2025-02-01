@@ -133,6 +133,8 @@ private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGea
 // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
 private DigitalInput armLoaded = new DigitalInput(4);
 private DIOSim armLoadedSim = new DIOSim(armLoaded);
+private DigitalInput armInLoadedPosition = new DigitalInput(5);
+private DIOSim armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
 
 
     /**
@@ -320,11 +322,12 @@ private DIOSim armLoadedSim = new DIOSim(armLoaded);
     }
    
     public boolean coralInLoadPosition() {
-        return armLoaded.get();//m_coralInArm.get()&&aroundAngle(240);
+
+        return armInLoadedPosition.get();//m_coralInArm.get()&&aroundAngle(240);
     }//Sim
 
     public boolean coralLoaded() {
-        return true;//m_coralInBin.get()||m_coralInArm.get();
+        return armLoaded.get();//m_coralInBin.get()||m_coralInArm.get();
     }//Sim
 
 
