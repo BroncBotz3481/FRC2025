@@ -6,9 +6,10 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants.Reef;
 import frc.robot.systems.field.FieldConstants.ReefHeight;
@@ -75,6 +76,11 @@ public class TargetingSystem
     this.targetBranchLevel = targetBranchLevel;
   }
 
+  public Command setTargetCommand(ReefBranch targetBranch, ReefBranchLevel targetBranchLevel)
+  {
+    return Commands.runOnce(() -> setTarget(targetBranch, targetBranchLevel));
+  }
+
   public void left()
   {
     if (targetBranch == ReefBranch.H)
@@ -86,9 +92,11 @@ public class TargetingSystem
   public Pose2d getTargetPose()
   {
     Pose2d scoringPose = Pose2d.kZero;
-    if(targetBranch != null)
+    if (targetBranch != null)
+    {
       scoringPose = Reef.branchPositions.get(targetBranch.ordinal()).get(ReefHeight.L2).toPose2d()
-                                                      .plus(robotBranchScoringOffset);
+                                        .plus(robotBranchScoringOffset);
+    }
     return AllianceFlipUtil.apply(scoringPose);
   }
 
