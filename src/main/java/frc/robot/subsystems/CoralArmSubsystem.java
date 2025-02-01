@@ -131,6 +131,8 @@ public class CoralArmSubsystem extends SubsystemBase {
   );
 private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
 // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+private DigitalInput armLoaded = new DigitalInput(4);
+private DIOSim armLoadedSim = new DIOSim(armLoaded);
 
 
     /**
@@ -318,7 +320,7 @@ private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGea
     }
    
     public boolean coralInLoadPosition() {
-        return true;//m_coralInArm.get()&&aroundAngle(240);
+        return armLoaded.get();//m_coralInArm.get()&&aroundAngle(240);
     }//Sim
 
     public boolean coralLoaded() {
