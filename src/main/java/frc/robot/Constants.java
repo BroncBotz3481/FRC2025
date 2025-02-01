@@ -124,9 +124,9 @@ public final class Constants {
     public static final double  kAlgaeArmReduction                   = 200;
     public static final double  kAlgaeArmMass                        = 8.0; // Kilograms
     public static final double  kAlgaeArmLength                      = Inches.of(72).in(Meters);
-    public static final Angle   kAlgaeArmStartingAngle               = Radians.of(0);
-    public static final Angle   kAlgaeMinAngle                       = Radians.of(Units.degreesToRadians(-75));
-    public static final Angle   kAlgaeMaxAngle                       = Radians.of(Units.degreesToRadians(255));
+    public static final Angle   kAlgaeArmStartingAngle               = Degrees.of(0);
+    public static final Angle   kAlgaeArmMinAngle                    = Degrees.of(-75);
+    public static final Angle   kAlgaeArmMaxAngle                    = Degrees.of(255);
     public static final double  kAlgaeArmRampRate                    = 0.5;
     public static final Angle   kAlgaeArmOffsetToHorizantalZero      = Rotations.of(0);
     public static final boolean kAlgaeArmInverted                    = false;
@@ -161,9 +161,9 @@ public final class Constants {
       public static final double  kCoralArmReduction                   = 200;
       public static final double  kCoralArmMass                        = 8.0; // Kilograms
       public static final double  kCoralArmLength                      = Inches.of(72).in(Meters);
-      public static final Angle   kCoralArmStartingAngle               = Radians.of(0);
-      public static final Angle   kCoralMinAngle                       = Radians.of(Units.degreesToRadians(-75));
-      public static final Angle   kCoralMaxAngle                       = Radians.of(Units.degreesToRadians(255));
+      public static final Angle   kCoralArmStartingAngle               = Degrees.of(0);
+      public static final Angle   kCoralArmMinAngle                    = Degrees.of(-75);
+      public static final Angle   kCoralArmMaxAngle                    = Degrees.of(255);
       public static final double  kCoralArmRampRate                    = 0.5;
       public static final Angle   kCoralArmOffsetToHorizantalZero      = Rotations.of(0);
       public static final boolean kCoralArmInverted                    = false;

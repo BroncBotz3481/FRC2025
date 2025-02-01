@@ -57,16 +57,18 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeArmConstants;
+import frc.robot.Constants.CoralArmConstants;
 import frc.robot.RobotMath.AlgaeArm;
+import frc.robot.RobotMath.CoralArm;
 
 
 public class AlgaeArmSubsystem extends SubsystemBase {
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor m_armGearbox = DCMotor.getNEO(2);
+  private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 
-  public final Trigger atMin = new Trigger(() -> getAngle().lte(AlgaeArmConstants.kAlgaeMinAngle));
-  public final Trigger atMax = new Trigger(() -> getAngle().gte(AlgaeArmConstants.kAlgaeMaxAngle));
+  public final Trigger atMin = new Trigger(() -> getAngle().lte(AlgaeArmConstants.kAlgaeArmMinAngle.plus(Degrees.of(5))));
+  public final Trigger atMax = new Trigger(() -> getAngle().gte(AlgaeArmConstants.kAlgaeArmMaxAngle.minus(Degrees.of(5))));
 
   private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID, MotorType.kBrushless);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
@@ -119,8 +121,8 @@ public class AlgaeArmSubsystem extends SubsystemBase {
       AlgaeArmConstants.kAlgaeArmReduction,
       SingleJointedArmSim.estimateMOI(AlgaeArmConstants.kAlgaeArmLength, AlgaeArmConstants.kAlgaeArmMass),
       AlgaeArmConstants.kAlgaeArmLength,
-      AlgaeArmConstants.kAlgaeMinAngle.in(Radians),
-      AlgaeArmConstants.kAlgaeMaxAngle.in(Radians),
+      AlgaeArmConstants.kAlgaeArmMinAngle.in(Radians),
+      AlgaeArmConstants.kAlgaeArmMaxAngle.in(Radians),
       true,
       AlgaeArmConstants.kAlgaeArmStartingAngle.in(Radians),
       0.02 / 4096.0,
@@ -202,8 +204,13 @@ public class AlgaeArmSubsystem extends SubsystemBase {
    * @return is near the maximum of the arm.
    */
   public boolean nearMax(double toleranceDegrees)
-  {
-    return getAngle().isNear(AlgaeArmConstants.kAlgaeMaxAngle, Units.degreesToRadians(toleranceDegrees));
+  { 
+    if (getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees)))
+    {
+      System.out.println("Current angle: " + getAngle().in(Degrees));
+      System.out.println("At max:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees)));
+    }
+    return getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees));
 
   }
 
@@ -215,7 +222,12 @@ public class AlgaeArmSubsystem extends SubsystemBase {
    */
   public boolean nearMin(double toleranceDegrees)
   {
-    return getAngle().isNear(AlgaeArmConstants.kAlgaeMaxAngle, Units.degreesToRadians(toleranceDegrees));
+    if (getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees)))
+    {
+      System.out.println("Current angle: " + getAngle().in(Degrees));
+      System.out.println("At min:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees)));
+    }
+    return getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees));
 
   }
 
@@ -236,10 +248,11 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   public Command runSysIdRoutine()
   {
     return m_sysIdRoutine.dynamic(Direction.kForward).until(atMax)
-                         .andThen(m_sysIdRoutine.dynamic(Direction.kReverse)).until(atMin)
-                         .andThen(m_sysIdRoutine.quasistatic(Direction.kForward)).until(atMax)
-                         .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse)).until(atMin);
+                         .andThen(m_sysIdRoutine.dynamic(Direction.kReverse).until(atMin))
+                         .andThen(m_sysIdRoutine.quasistatic(Direction.kForward).until(atMax))
+                         .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse).until(atMin));
   }
+
 
  public void reachSetpoint(double setPointDegree)
   {
@@ -267,8 +280,8 @@ public class AlgaeArmSubsystem extends SubsystemBase {
    */
   public Angle getAngle()
   {
-      m_angle.mut_replace(AlgaeArm.convertAlgaeAngleToSensorUnits(m_angle.mut_replace(m_encoder.getPosition(), Rotations)));
-      return m_angle;
+    m_angle.mut_replace(AlgaeArm.convertSensorUnitsToAlgaeAngle(m_angle.mut_replace(m_encoder.getPosition(), Rotations)));
+    return m_angle;
   }
 
   /**

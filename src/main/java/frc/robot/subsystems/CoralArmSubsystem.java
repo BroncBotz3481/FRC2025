@@ -56,7 +56,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
+import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.Constants.CoralArmConstants;
+import frc.robot.RobotMath.AlgaeArm;
 import frc.robot.RobotMath.CoralArm;
 
 
@@ -64,10 +66,11 @@ import frc.robot.RobotMath.CoralArm;
 public class CoralArmSubsystem extends SubsystemBase {
 
     // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-    private final DCMotor m_armGearbox = DCMotor.getNEO(2);
+    private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 
-    public final Trigger atMin = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralMinAngle));
-    public final Trigger atMax = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralMaxAngle));
+
+  public final Trigger atMin = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralArmMinAngle.plus(Degrees.of(5))));
+  public final Trigger atMax = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralArmMaxAngle.minus(Degrees.of(5))));
 
     private final SparkMax                  m_motor      = new SparkMax(CoralArmConstants.coralArmMotorID, MotorType.kBrushless);
     private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
@@ -91,7 +94,7 @@ public class CoralArmSubsystem extends SubsystemBase {
     private final SysIdRoutine       m_sysIdRoutine   =
         new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(Volts.per(Second).of(CoralArmConstants.kCoralArmRampRate), Volts.of(1), Seconds.of(30)),
+          new SysIdRoutine.Config(Volts.per(Second).of(CoralArmConstants.kCoralArmRampRate), Volts.of(1), Seconds.of(5)),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motor(s).
               m_motor::setVoltage,
@@ -119,8 +122,8 @@ public class CoralArmSubsystem extends SubsystemBase {
       CoralArmConstants.kCoralArmReduction,
       SingleJointedArmSim.estimateMOI(CoralArmConstants.kCoralArmLength, CoralArmConstants.kCoralArmMass),
       CoralArmConstants.kCoralArmLength,
-      CoralArmConstants.kCoralMinAngle.in(Radians),
-      CoralArmConstants.kCoralMaxAngle.in(Radians),
+      CoralArmConstants.kCoralArmMinAngle.in(Radians),
+      CoralArmConstants.kCoralArmMaxAngle.in(Radians),
       true,
       CoralArmConstants.kCoralArmStartingAngle.in(Radians),
       0.02 / 4096.0,
@@ -201,8 +204,13 @@ private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGea
    * @return is near the maximum of the arm.
    */
   public boolean nearMax(double toleranceDegrees)
-  {
-    return getAngle().isNear(CoralArmConstants.kCoralMaxAngle, Units.degreesToRadians(toleranceDegrees));
+  { 
+    if (getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees)))
+    {
+      System.out.println("Current angle: " + getAngle().in(Degrees));
+      System.out.println("At max:" + getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees)));
+    }
+    return getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees));
 
   }
 
@@ -214,7 +222,12 @@ private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGea
    */
   public boolean nearMin(double toleranceDegrees)
   {
-    return getAngle().isNear(CoralArmConstants.kCoralMaxAngle, Units.degreesToRadians(toleranceDegrees));
+    if (getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees)))
+    {
+      System.out.println("Current angle: " + getAngle().in(Degrees));
+      System.out.println("At min:" + getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees)));
+    }
+    return getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees));
 
   }
 
@@ -235,9 +248,9 @@ private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGea
   public Command runSysIdRoutine()
   {
     return m_sysIdRoutine.dynamic(Direction.kForward).until(atMax)
-                         .andThen(m_sysIdRoutine.dynamic(Direction.kReverse)).until(atMin)
-                         .andThen(m_sysIdRoutine.quasistatic(Direction.kForward)).until(atMax)
-                         .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse)).until(atMin);
+                         .andThen(m_sysIdRoutine.dynamic(Direction.kReverse).until(atMin))
+                         .andThen(m_sysIdRoutine.quasistatic(Direction.kForward).until(atMax))
+                         .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse).until(atMin));
   }
 
    /**
@@ -261,16 +274,16 @@ private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGea
                                 ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
     }
   }
-
-    /**
-   * Get the Angle of the Arm.
-   *
-   * @return Angle of the Arm.
-   */
+  
+  /**
+     * Get the Angle of the Arm.
+     *
+     * @return Angle of the Arm.
+     */
     public Angle getAngle()
     {
-        m_angle.mut_replace(CoralArm.convertSensorUnitsToCoralAngle(m_angle.mut_replace(m_encoder.getPosition(), Rotations)));
-        return m_angle;
+      m_angle.mut_replace(CoralArm.convertSensorUnitsToCoralAngle(m_angle.mut_replace(m_encoder.getPosition(), Rotations)));
+      return m_angle;
     }
 
     /**

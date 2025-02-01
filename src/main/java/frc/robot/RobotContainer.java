@@ -109,7 +109,7 @@ public class RobotContainer {
     public RobotContainer() {
         // Configure the trigger bindings
         DriverStation.silenceJoystickConnectionWarning(true);
-        elevator.setDefaultCommand(elevator.setGoal(0));
+        elevator.setDefaultCommand(elevator.setGoal(4));
         coralArm.setDefaultCommand(coralArm.setGoal(-90));
         climb.setDefaultCommand(climb.climbUp());
         algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
@@ -217,9 +217,16 @@ public class RobotContainer {
         // cancelling on release.
 
 
-        m_driverController.button(11).whileTrue(elevator.setGoal(3).alongWith(coralArm.setGoal(90)));
-        m_driverController.button(12).whileTrue(elevator.setGoal(6).alongWith(algaeArm.setGoal(45)));
+        m_driverController.button(11).whileTrue(elevator.setGoal(3));
+        m_driverController.button(11).whileTrue(coralArm.setGoal(90));
+        m_driverController.button(12).whileTrue(elevator.setGoal(6));
+        m_driverController.button(12).whileTrue(algaeArm.setGoal(45));
+        m_driverController.button(12).whileTrue(coralArm.setGoal(75));
+        m_driverController.button(15).whileTrue(loadingSystem.coralLoad());
+
+
         m_driverController.button(13).whileTrue(elevator.setGoal(9));
+        m_driverController.button(14).whileTrue(coralArm.runSysIdRoutine());
         elevator.atHeight(5, 0.1).whileTrue(Commands.print("I AM ALIVE, YAAA HAAAAA"));
 
         m_driverController.button(19).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
