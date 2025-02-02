@@ -1,20 +1,35 @@
 package frc.robot.subsystems;
 
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CoralArmConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
@@ -49,10 +64,28 @@ public class CoralIntakeSubsystem extends SubsystemBase
   private final SparkMaxSim             m_wristMotorSim      = new SparkMaxSim(m_wristMotor, m_wristMotorGearbox);
   private final SparkMaxSim             m_rollerMotorSim     = new SparkMaxSim(m_rollerMotor, m_rollerMotorGearbox);
 
+  private final Mechanism2d wristMechanism = new Mechanism2d(10,10);
+  private final MechanismRoot2d wristMech = wristMechanism.getRoot("Wrist", 5, 0);
+  private final MechanismLigament2d wristArm = wristMech.append(new MechanismLigament2d("Wrist Arm",4,90));
 
   public CoralIntakeSubsystem()
   {
-
+    SparkMaxConfig cfg = new SparkMaxConfig();
+    cfg
+        .smartCurrentLimit(40) // Move to Constants
+        .closedLoopRampRate(0.25) // Move to Constants
+        .idleMode(IdleMode.kBrake)
+        .inverted(false)
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(0.01, 0, 0) // Change meee
+        .outputRange(-1, 1);
+//        .maxMotion
+//        .maxVelocity(CoralArmConstants.kCoralArmMaxVelocityRPM) // Change me
+//        .maxAcceleration(CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond) // Change me
+//        .allowedClosedLoopError(CoralArmConstants.kCoralArmAllowedClosedLoopError.in(Rotations)); // Change me
+    m_wristMotor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    SmartDashboard.putData("Wrist", wristMechanism);
   }
 
 
@@ -89,7 +122,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     m_wristAbsEncoderSim.setPosition(m_wristEncoder.getPosition());
-
+    wristArm.setAngle(Rotations.of(m_wristEncoder.getPosition()).in(Degrees));
   }
 
   public Command setCoralIntakeRoller(double speed)
@@ -102,6 +135,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
   public Command setWristAngle(double angle)
   {
     return run(() -> {
+      wristController.setReference(Degrees.of(angle).in(Rotations), ControlType.kPosition);
     });
   }
 }

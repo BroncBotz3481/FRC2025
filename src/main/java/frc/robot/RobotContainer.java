@@ -23,6 +23,7 @@ import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
+import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.FloorIntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -52,6 +53,7 @@ public class RobotContainer
   private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
   private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
+  private final CoralIntakeSubsystem coralIntake = new CoralIntakeSubsystem();
 
   private final TargetingSystem targetingSystem = new TargetingSystem();
   private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator);
@@ -163,6 +165,8 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     m_driverController.button(1).whileTrue(loadingSystem.algaeLoad());
+    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30));
+    m_driverController.button(3).whileTrue(coralIntake.setWristAngle(90));
 
         /*
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
