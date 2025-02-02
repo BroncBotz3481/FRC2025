@@ -13,15 +13,11 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
-
-import static edu.wpi.first.units.Units.Radians;
 
 public class CoralIntakeSubsystem extends SubsystemBase
 {
@@ -56,7 +52,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public CoralIntakeSubsystem()
   {
-      
+
   }
 
 
@@ -75,18 +71,21 @@ public class CoralIntakeSubsystem extends SubsystemBase
     // Finally, we set our simulated encoder's readings and simulated battery voltage
     //m_encoderSim.setDistance(m_coralArmSim.getAngleRads());
     m_wristMotorSim.iterate(m_wristSim.getAngularVelocityRPM(),
-        RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
-        0.02); // Time interval, in Seconds
+                            RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
+                            0.02); // Time interval, in Seconds
 
     m_wristMotorSim.iterate(m_wristSim.getAngularVelocityRPM(),
                             RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
                             0.02);
-    m_rollerMotorSim.iterate(m_rollerSim.getAngularVelocityRPM(),RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
+    m_rollerMotorSim.iterate(m_rollerSim.getAngularVelocityRPM(),
+                             RoboRioSim.getVInVoltage(),
+                             // Simulated battery voltage, in Volts
                              0.02);
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(m_rollerSim.getCurrentDrawAmps()+m_wristSim.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(
+            m_rollerSim.getCurrentDrawAmps() + m_wristSim.getCurrentDrawAmps()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     m_wristAbsEncoderSim.setPosition(m_wristEncoder.getPosition());

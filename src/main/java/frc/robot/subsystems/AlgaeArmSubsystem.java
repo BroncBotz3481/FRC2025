@@ -23,14 +23,12 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -38,18 +36,11 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -57,84 +48,81 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeArmConstants;
-import frc.robot.Constants.CoralArmConstants;
 import frc.robot.RobotMath.AlgaeArm;
-import frc.robot.RobotMath.CoralArm;
 
 
-public class AlgaeArmSubsystem extends SubsystemBase {
+public class AlgaeArmSubsystem extends SubsystemBase
+{
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   private final DCMotor m_armGearbox = DCMotor.getNEO(1);
-
-  public final Trigger atMin = new Trigger(() -> getAngle().lte(AlgaeArmConstants.kAlgaeArmMinAngle.plus(Degrees.of(5))));
-  public final Trigger atMax = new Trigger(() -> getAngle().gte(AlgaeArmConstants.kAlgaeArmMaxAngle.minus(Degrees.of(5))));
-
-  private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID, MotorType.kBrushless);
+  private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
+                                                                      MotorType.kBrushless);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
+  // SysID Routine
+  private final SysIdRoutine       m_sysIdRoutine   =
+      new SysIdRoutine(
+          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+          new SysIdRoutine.Config(Volts.per(Second).of(AlgaeArmConstants.kAlgaeArmRampRate),
+                                  Volts.of(1),
+                                  Seconds.of(30)),
+          new SysIdRoutine.Mechanism(
+              // Tell SysId how to plumb the driving voltage to the motor(s).
+              m_motor::setVoltage,
+              // Tell SysId how to record a frame of data for each motor on the mechanism being
+              // characterized.
+              log -> {
+                // Record a frame for the shooter motor.
+                log.motor("arm")
+                   .voltage(
+                       m_appliedVoltage.mut_replace(m_motor.getAppliedOutput() *
+                                                    RobotController.getBatteryVoltage(), Volts))
+                   .angularPosition(m_angle.mut_replace(m_encoder.getPosition(), Rotations))
+                   .angularVelocity(m_velocity.mut_replace(m_encoder.getVelocity(), RPM));
+//                .angularPosition(m_angle.mut_replace(getAngle()))
+//                .angularVelocity(m_velocity.mut_replace(getVelocity()));
+              },
+              this));
   private final AbsoluteEncoder           m_absEncoder = m_motor.getAbsoluteEncoder();
-
   // Standard classes for controlling our arm
   private final ProfiledPIDController m_pidController;
-  private final ArmFeedforward        m_feedforward = new ArmFeedforward(AlgaeArmConstants.kAlgaeArmkS,
-                                                                         AlgaeArmConstants.kAlgaeArmkG,
-                                                                         AlgaeArmConstants.kAlgaeArmKv,
-                                                                         AlgaeArmConstants.kAlgaeArmKa);
-  private DigitalInput armLoaded = new DigitalInput(1);
-  private DIOSim armLoadedSim = new DIOSim(armLoaded);
-  private DigitalInput armInLoadedPosition = new DigitalInput(2);
-  private DIOSim armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
-
+  private final ArmFeedforward        m_feedforward          = new ArmFeedforward(AlgaeArmConstants.kAlgaeArmkS,
+                                                                                  AlgaeArmConstants.kAlgaeArmkG,
+                                                                                  AlgaeArmConstants.kAlgaeArmKv,
+                                                                                  AlgaeArmConstants.kAlgaeArmKa);
   // SysId Routine and seutp
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage         m_appliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
   private final MutAngle           m_angle          = Rotations.mutable(0);
+  public final Trigger atMin
+                             = new Trigger(() -> getAngle().lte(AlgaeArmConstants.kAlgaeArmMinAngle.plus(Degrees.of(5))));
+  public final Trigger atMax
+                             = new Trigger(() -> getAngle().gte(AlgaeArmConstants.kAlgaeArmMaxAngle.minus(Degrees.of(5))));
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
   private final MutAngularVelocity m_velocity       = RPM.mutable(0);
-  // SysID Routine
-  private final SysIdRoutine       m_sysIdRoutine   =
-      new SysIdRoutine(
-        // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-        new SysIdRoutine.Config(Volts.per(Second).of(AlgaeArmConstants.kAlgaeArmRampRate), Volts.of(1), Seconds.of(30)),
-        new SysIdRoutine.Mechanism(
-            // Tell SysId how to plumb the driving voltage to the motor(s).
-            m_motor::setVoltage,
-            // Tell SysId how to record a frame of data for each motor on the mechanism being
-            // characterized.
-            log -> {
-              // Record a frame for the shooter motor.
-              log.motor("arm")
-                  .voltage(
-                      m_appliedVoltage.mut_replace(m_motor.getAppliedOutput() *
-                                                  RobotController.getBatteryVoltage(), Volts))
-                  .angularPosition(m_angle.mut_replace(m_encoder.getPosition(), Rotations))
-                  .angularVelocity(m_velocity.mut_replace(m_encoder.getVelocity(), RPM));
-//                .angularPosition(m_angle.mut_replace(getAngle()))
-//                .angularVelocity(m_velocity.mut_replace(getVelocity()));
-            },
-            this));
-
-
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim   =
-  new SingleJointedArmSim(
-      m_armGearbox,
-      AlgaeArmConstants.kAlgaeArmReduction,
-      SingleJointedArmSim.estimateMOI(AlgaeArmConstants.kAlgaeArmLength, AlgaeArmConstants.kAlgaeArmMass),
-      AlgaeArmConstants.kAlgaeArmLength,
-      AlgaeArmConstants.kAlgaeArmMinAngle.in(Radians),
-      AlgaeArmConstants.kAlgaeArmMaxAngle.in(Radians),
-      true,
-      AlgaeArmConstants.kAlgaeArmStartingAngle.in(Radians),
-      0.02 / 4096.0,
-      0.0 // Add noise with a std-dev of 1 tick
-  );
-
-  private final SparkMaxSim         m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
+  private final SingleJointedArmSim m_armSim =
+      new SingleJointedArmSim(
+          m_armGearbox,
+          AlgaeArmConstants.kAlgaeArmReduction,
+          SingleJointedArmSim.estimateMOI(AlgaeArmConstants.kAlgaeArmLength, AlgaeArmConstants.kAlgaeArmMass),
+          AlgaeArmConstants.kAlgaeArmLength,
+          AlgaeArmConstants.kAlgaeArmMinAngle.in(Radians),
+          AlgaeArmConstants.kAlgaeArmMaxAngle.in(Radians),
+          true,
+          AlgaeArmConstants.kAlgaeArmStartingAngle.in(Radians),
+          0.02 / 4096.0,
+          0.0 // Add noise with a std-dev of 1 tick
+      );
+  private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
+  private       DigitalInput          armLoaded              = new DigitalInput(1);
+  private       DIOSim                armLoadedSim           = new DIOSim(armLoaded);
+  private       DigitalInput          armInLoadedPosition    = new DigitalInput(2);
+  private       DIOSim                armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
 
 
@@ -166,13 +154,10 @@ public class AlgaeArmSubsystem extends SubsystemBase {
     m_pidController.setTolerance(0.01);
 
 
-
   }
 
 
-
-
- /**
+  /**
    * Update the simulation model.
    */
   public void simulationPeriodic()
@@ -185,7 +170,8 @@ public class AlgaeArmSubsystem extends SubsystemBase {
     m_armSim.update(0.020);
 
     m_motorSim.iterate(
-        RotationsPerSecond.of(AlgaeArm.convertAlgaeAngleToSensorUnits(Radians.of(m_armSim.getVelocityRadPerSec())).in(Rotations))
+        RotationsPerSecond.of(AlgaeArm.convertAlgaeAngleToSensorUnits(Radians.of(m_armSim.getVelocityRadPerSec()))
+                                      .in(Rotations))
                           .in(RPM),
         RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
         0.02); // Time interval, in Seconds
@@ -201,19 +187,20 @@ public class AlgaeArmSubsystem extends SubsystemBase {
 
   }
 
-  
-   /**
+
+  /**
    * Near the maximum Angle of the arm within X degrees.
    *
    * @param toleranceDegrees Degrees close to maximum of the Arm.
    * @return is near the maximum of the arm.
    */
   public boolean nearMax(double toleranceDegrees)
-  { 
+  {
     if (getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees)))
     {
       System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println("At max:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees)));
+      System.out.println(
+          "At max:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees)));
     }
     return getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees));
 
@@ -230,7 +217,8 @@ public class AlgaeArmSubsystem extends SubsystemBase {
     if (getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees)))
     {
       System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println("At min:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees)));
+      System.out.println(
+          "At min:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees)));
     }
     return getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees));
 
@@ -241,7 +229,8 @@ public class AlgaeArmSubsystem extends SubsystemBase {
    */
   public void synchronizeAbsoluteEncoder()
   {
-    m_encoder.setPosition(Rotations.of(m_absEncoder.getPosition()).minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero)
+    m_encoder.setPosition(Rotations.of(m_absEncoder.getPosition())
+                                   .minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero)
                                    .in(Rotations));
   }
 
@@ -259,7 +248,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
   }
 
 
- public void reachSetpoint(double setPointDegree)
+  public void reachSetpoint(double setPointDegree)
   {
     double  goalPosition = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations);
     boolean rioPID       = true;
@@ -285,7 +274,8 @@ public class AlgaeArmSubsystem extends SubsystemBase {
    */
   public Angle getAngle()
   {
-    m_angle.mut_replace(AlgaeArm.convertSensorUnitsToAlgaeAngle(m_angle.mut_replace(m_encoder.getPosition(), Rotations)));
+    m_angle.mut_replace(AlgaeArm.convertSensorUnitsToAlgaeAngle(m_angle.mut_replace(m_encoder.getPosition(),
+                                                                                    Rotations)));
     return m_angle;
   }
 
@@ -296,44 +286,52 @@ public class AlgaeArmSubsystem extends SubsystemBase {
    */
   public AngularVelocity getVelocity()
   {
-      return m_velocity.mut_replace(AlgaeArm.convertAlgaeAngleToSensorUnits(Rotations.of(m_encoder.getVelocity())).per(Minute));
+    return m_velocity.mut_replace(AlgaeArm.convertAlgaeAngleToSensorUnits(Rotations.of(m_encoder.getVelocity()))
+                                          .per(Minute));
   }
 
-  public Command setGoal(double degree){
+  public Command setGoal(double degree)
+  {
     return run(() -> reachSetpoint(degree));
   }
 
-  public Command setAlgaeArmAngle(double degree){
-      return setGoal(degree).until(()->aroundAngle(degree));
+  public Command setAlgaeArmAngle(double degree)
+  {
+    return setGoal(degree).until(() -> aroundAngle(degree));
   }
 
 
-  public void stop() {
+  public void stop()
+  {
     m_motor.set(0.0);
   }
 
   @Override
   public void periodic()
   {
-  //    System.out.println(getAngle());
-  //    System.out.println(Units.radiansToDegrees(m_AlgaeArmSim.getAngleRads()));
+    //    System.out.println(getAngle());
+    //    System.out.println(Units.radiansToDegrees(m_AlgaeArmSim.getAngleRads()));
   }
 
-  public boolean algaeInLoadPosition() {
-      System.out.println(armInLoadedPosition.get()+"");
+  public boolean algaeInLoadPosition()
+  {
+    System.out.println(armInLoadedPosition.get() + "");
     return armInLoadedPosition.get();//m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
   }
 
-  public boolean algaeLoaded() {
+  public boolean algaeLoaded()
+  {
     return armLoaded.get();//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
-  public boolean aroundAngle(double degree, double allowableError) {
+  public boolean aroundAngle(double degree, double allowableError)
+  {
     //get current angle compare to aimed angle
-      return MathUtil.isNear(degree, m_encoder.getPosition(), allowableError);
+    return MathUtil.isNear(degree, m_encoder.getPosition(), allowableError);
   }
 
-  public boolean aroundAngle(double degree){
+  public boolean aroundAngle(double degree)
+  {
     return aroundAngle(degree, AlgaeArmConstants.kAlgaeAngleAllowableError);
   }
 
@@ -349,5 +347,5 @@ public class AlgaeArmSubsystem extends SubsystemBase {
     m_controller.close();
     m_arm.close();
   }*/
-   
+
 }

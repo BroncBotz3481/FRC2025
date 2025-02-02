@@ -4,24 +4,10 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import frc.robot.Constants;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-
-import org.json.simple.parser.ParseException;
+import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -30,40 +16,44 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Timer;
-import swervelib.parser.SwerveParser;
-import swervelib.telemetry.SwerveDriveTelemetry;
-import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import swervelib.SwerveController;
-import swervelib.SwerveDrive;
-import swervelib.SwerveDriveTest;
-import swervelib.SwerveInputStream;
-import swervelib.SwerveModule;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.robot.Constants;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import org.json.simple.parser.ParseException;
+import swervelib.SwerveDrive;
+import swervelib.SwerveDriveTest;
+import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Volts;
+public class SwerveSubsystem extends SubsystemBase
+{
 
-public class SwerveSubsystem extends SubsystemBase {
-  /** Creates a new ExampleSubsystem. */
+  /**
+   * Creates a new ExampleSubsystem.
+   */
 
-  File directory = new File(Filesystem.getDeployDirectory(),"swerve");
-  SwerveDrive  swerveDrive;
+  File        directory = new File(Filesystem.getDeployDirectory(), "swerve");
+  SwerveDrive swerveDrive;
 
-  public SwerveSubsystem() {
+  public SwerveSubsystem()
+  {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-        try
+    try
     {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.maxSpeed,
                                                                   new Pose2d(new Translation2d(Meter.of(7.5),
@@ -83,7 +73,8 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command exampleMethodCommand() {
+  public Command exampleMethodCommand()
+  {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
@@ -97,32 +88,41 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @return value of some boolean subsystem state, such as a digital sensor.
    */
-  public boolean exampleCondition() {
+  public boolean exampleCondition()
+  {
     // Query some boolean state, such as a digital sensor.
     return false;
   }
 
   @Override
-  public void periodic() {
+  public void periodic()
+  {
     // This method will be called once per scheduler run
   }
 
   @Override
-  public void simulationPeriodic() {
+  public void simulationPeriodic()
+  {
     // This method will be called once per scheduler run during simulation
   }
 
-public SwerveDrive getSwerveDrive() {
+  public SwerveDrive getSwerveDrive()
+  {
     return swerveDrive;
-}
-public void driveFieldOriented(ChassisSpeeds velocity){
-  swerveDrive.driveFieldOriented(velocity);
-}
-public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity){
-  return run(() -> {
-    swerveDrive.driveFieldOriented(velocity.get());
-  });
-}
+  }
+
+  public void driveFieldOriented(ChassisSpeeds velocity)
+  {
+    swerveDrive.driveFieldOriented(velocity);
+  }
+
+  public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
+  {
+    return run(() -> {
+      swerveDrive.driveFieldOriented(velocity.get());
+    });
+  }
+
   /**
    * Setup AutoBuilder for PathPlanner.
    */
@@ -189,8 +189,8 @@ public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity){
       e.printStackTrace();
     }
   }
-  
- /**
+
+  /**
    * Get the path follower with events.
    *
    * @param pathName PathPlanner path name.
@@ -201,20 +201,19 @@ public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity){
     // Create a path following command using AutoBuilder. This will also trigger event markers.
     return new PathPlannerAuto(pathName);
   }
-  
 
-  
+
   public Command sysIdDriveMotorCommand()
   {
     return SwerveDriveTest.generateSysIdCommand(
         SwerveDriveTest.setDriveSysIdRoutine(
             new Config(),
-            this, swerveDrive, 12,true),
+            this, swerveDrive, 12, true),
         3.0, 5.0, 3.0);
   }
 
 
-public Command driveToPose(Pose2d pose)
+  public Command driveToPose(Pose2d pose)
   {
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
@@ -230,8 +229,7 @@ public Command driveToPose(Pose2d pose)
   }
 
 
-
-    /**
+  /**
    * Drive with {@link SwerveSetpointGenerator} from 254, implemented by PathPlanner.
    *
    * @param robotRelativeChassisSpeed Robot relative {@link ChassisSpeeds} to achieve.
@@ -266,8 +264,6 @@ public Command driveToPose(Pose2d pose)
   }
 
 
-
-  
   /**
    * Drive with 254's Setpoint generator; port written by PathPlanner.
    *
@@ -290,7 +286,7 @@ public Command driveToPose(Pose2d pose)
 
   }
 
-    /**
+  /**
    * Gets the current yaw angle of the robot, as reported by the swerve pose estimator in the underlying drivebase.
    * Note, this is not the raw gyro reading, this may be corrected from calls to resetOdometry().
    *
@@ -300,7 +296,8 @@ public Command driveToPose(Pose2d pose)
   {
     return getPose().getRotation();
   }
-    /**
+
+  /**
    * Gets the current pose (position and rotation) of the robot, as reported by odometry.
    *
    * @return The robot's pose
@@ -310,23 +307,33 @@ public Command driveToPose(Pose2d pose)
     return swerveDrive.getPose();
   }
 
-  public Command LineUpHP(){
-      return run(()->{});
+  public Command LineUpHP()
+  {
+    return run(() -> {
+    });
   }
 
-  public Command LineUpReef(){
-      return run(()->{});
+  public Command LineUpReef()
+  {
+    return run(() -> {
+    });
   }
 
-  public Command lineUpProcessor(){
-      return run(()->{});
+  public Command lineUpProcessor()
+  {
+    return run(() -> {
+    });
   }
 
-    public Command scoreBackward() {
-        return run(()->{swerveDrive.drive(new Translation2d(Units.inchesToMeters(4), 0), 0, false, false);});
-    }
+  public Command scoreBackward()
+  {
+    return run(() -> {
+      swerveDrive.drive(new Translation2d(Units.inchesToMeters(4), 0), 0, false, false);
+    });
+  }
 
-    public Command lockPos() {
-      return run(swerveDrive::lockPose);
-    }
+  public Command lockPos()
+  {
+    return run(swerveDrive::lockPose);
+  }
 }
