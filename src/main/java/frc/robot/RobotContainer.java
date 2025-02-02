@@ -53,6 +53,7 @@ public class RobotContainer
   private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
 
+  private final TargetingSystem targetingSystem = new TargetingSystem();
   private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
@@ -61,7 +62,6 @@ public class RobotContainer
                                                                     algaeArm,
                                                                     loadingSystem,
                                                                     targetingSystem);
-  private final TargetingSystem targetingSystem = new TargetingSystem();
   // The real world (whats that?)
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                                                                 () -> m_driverController.getLeftY() * -1,
@@ -162,6 +162,7 @@ public class RobotContainer
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
+    m_driverController.button(1).whileTrue(loadingSystem.algaeLoad());
 
         /*
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());

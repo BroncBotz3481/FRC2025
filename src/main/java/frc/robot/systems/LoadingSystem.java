@@ -41,7 +41,7 @@ public class LoadingSystem
     // Put algae arm out, roll in
     double algaeArmLoadingAngleDegrees   = 45;
     double algaeElevatorHighHeightMeters = 2.0;
-    double algaeElevatorLowHeightMeters  = 0;
+    double algaeElevatorLowHeightMeters  = 1.0;
 
     return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
                      .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees))

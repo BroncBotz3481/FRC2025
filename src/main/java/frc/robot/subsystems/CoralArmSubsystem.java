@@ -60,6 +60,16 @@ public class CoralArmSubsystem extends SubsystemBase
                                                                       MotorType.kBrushless);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
+  public final Trigger atMin = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralArmMinAngle.plus(Degrees.of(5))));
+  public final Trigger atMax = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralArmMaxAngle.minus(Degrees.of(5))));
+
+  // SysId Routine and seutp
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage            m_appliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutAngle              m_angle          = Rotations.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutAngularVelocity    m_velocity       = RPM.mutable(0);
   // SysID Routine
   private final SysIdRoutine          m_sysIdRoutine   =
       new SysIdRoutine(
@@ -91,17 +101,7 @@ public class CoralArmSubsystem extends SubsystemBase
                                                                             CoralArmConstants.kCoralArmkG,
                                                                             CoralArmConstants.kCoralArmKv,
                                                                             CoralArmConstants.kCoralArmKa);
-  // SysId Routine and seutp
-  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutVoltage            m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutAngle              m_angle          = Rotations.mutable(0);
-  public final Trigger atMin
-                             = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralArmMinAngle.plus(Degrees.of(5))));
-  public final Trigger atMax
-                             = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralArmMaxAngle.minus(Degrees.of(5))));
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutAngularVelocity    m_velocity       = RPM.mutable(0);
+
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
@@ -339,22 +339,12 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public boolean aroundAngle(double degree, double allowableError)
   {
-    return MathUtil.isNear(degree, m_encoder.getPosition(), allowableError);
+    return MathUtil.isNear(degree, getAngle().in(Degrees), allowableError);
   }
 
   public boolean aroundAngle(double degree)
   {
     return aroundAngle(degree, CoralArmConstants.kCoralAngleAllowableError);
   }
-
-  /*
-  public void close() {
-    m_motor.close();
-    m_encoder.close();
-    m_mech2d.close();
-    m_armPivot.close();
-    m_controller.close();
-    m_arm.close();
-  }*/
 
 }

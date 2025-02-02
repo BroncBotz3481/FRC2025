@@ -75,6 +75,14 @@ public class ElevatorSubsystem extends SubsystemBase
                                                                     Inches.of(3)));
   public final Trigger atMax = new Trigger(() -> getHeight().isNear(ElevatorConstants.kMaxElevatorHeight,
                                                                     Inches.of(3)));
+  // SysId Routine and seutp
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage        m_appliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutDistance       m_distance       = Meters.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutLinearVelocity m_velocity       = MetersPerSecond.mutable(0);
+
   // SysID Routine
   private final SysIdRoutine      m_sysIdRoutine   =
       new SysIdRoutine(
@@ -120,13 +128,6 @@ public class ElevatorSubsystem extends SubsystemBase
           ElevatorConstants.kStartingHeightSim.in(Meters),
           0.01,
           0.0);
-  // SysId Routine and seutp
-  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutVoltage        m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutDistance       m_distance       = Meters.mutable(0);
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutLinearVelocity m_velocity       = MetersPerSecond.mutable(0);
   // Standard classes for controlling our elevator
   ElevatorFeedforward m_feedforward =
       new ElevatorFeedforward(
@@ -364,7 +365,7 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public boolean aroundHeight(double height, double allowableError)
   {
-    return MathUtil.isNear(height, m_encoder.getPosition(), allowableError);
+    return MathUtil.isNear(height, getHeightMeters(), allowableError);
   }
 
   /**

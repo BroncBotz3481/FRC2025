@@ -54,14 +54,30 @@ import frc.robot.RobotMath.AlgaeArm;
 public class AlgaeArmSubsystem extends SubsystemBase
 {
 
+  public final Trigger atMin
+      = new Trigger(() -> getAngle().lte(AlgaeArmConstants.kAlgaeArmMinAngle.plus(Degrees.of(5))));
+  public final Trigger atMax
+      = new Trigger(() -> getAngle().gte(AlgaeArmConstants.kAlgaeArmMaxAngle.minus(Degrees.of(5))));
+
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor m_armGearbox = DCMotor.getNEO(1);
+  private final DCMotor                   m_armGearbox = DCMotor.getNEO(1);
   private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
                                                                       MotorType.kBrushless);
+  private       DigitalInput        armLoaded              = new DigitalInput(1);
+  private       DigitalInput        armInLoadedPosition    = new DigitalInput(2);
+
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
+
+  // SysId Routine and seutp
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutAngularVelocity    m_velocity       = RPM.mutable(0);
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage            m_appliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutAngle              m_angle          = Rotations.mutable(0);
   // SysID Routine
-  private final SysIdRoutine       m_sysIdRoutine   =
+  private final SysIdRoutine          m_sysIdRoutine   =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
           new SysIdRoutine.Config(Volts.per(Second).of(AlgaeArmConstants.kAlgaeArmRampRate),
@@ -84,28 +100,19 @@ public class AlgaeArmSubsystem extends SubsystemBase
 //                .angularVelocity(m_velocity.mut_replace(getVelocity()));
               },
               this));
-  private final AbsoluteEncoder           m_absEncoder = m_motor.getAbsoluteEncoder();
+  private final AbsoluteEncoder       m_absEncoder     = m_motor.getAbsoluteEncoder();
   // Standard classes for controlling our arm
   private final ProfiledPIDController m_pidController;
-  private final ArmFeedforward        m_feedforward          = new ArmFeedforward(AlgaeArmConstants.kAlgaeArmkS,
-                                                                                  AlgaeArmConstants.kAlgaeArmkG,
-                                                                                  AlgaeArmConstants.kAlgaeArmKv,
-                                                                                  AlgaeArmConstants.kAlgaeArmKa);
-  // SysId Routine and seutp
-  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutVoltage         m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutAngle           m_angle          = Rotations.mutable(0);
-  public final Trigger atMin
-                             = new Trigger(() -> getAngle().lte(AlgaeArmConstants.kAlgaeArmMinAngle.plus(Degrees.of(5))));
-  public final Trigger atMax
-                             = new Trigger(() -> getAngle().gte(AlgaeArmConstants.kAlgaeArmMaxAngle.minus(Degrees.of(5))));
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutAngularVelocity m_velocity       = RPM.mutable(0);
+  private final ArmFeedforward        m_feedforward    = new ArmFeedforward(AlgaeArmConstants.kAlgaeArmkS,
+                                                                            AlgaeArmConstants.kAlgaeArmkG,
+                                                                            AlgaeArmConstants.kAlgaeArmKv,
+                                                                            AlgaeArmConstants.kAlgaeArmKa);
+
+
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim =
+  private final SingleJointedArmSim m_armSim               =
       new SingleJointedArmSim(
           m_armGearbox,
           AlgaeArmConstants.kAlgaeArmReduction,
@@ -118,12 +125,9 @@ public class AlgaeArmSubsystem extends SubsystemBase
           0.02 / 4096.0,
           0.0 // Add noise with a std-dev of 1 tick
       );
-  private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_armGearbox);
-  private       DigitalInput          armLoaded              = new DigitalInput(1);
-  private       DIOSim                armLoadedSim           = new DIOSim(armLoaded);
-  private       DigitalInput          armInLoadedPosition    = new DigitalInput(2);
-  private       DIOSim                armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
-  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+  private final SparkMaxSim         m_motorSim             = new SparkMaxSim(m_motor, m_armGearbox);
+  private       DIOSim              armLoadedSim           = new DIOSim(armLoaded);
+  private       DIOSim              armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
 
 
   public AlgaeArmSubsystem()
@@ -315,7 +319,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeInLoadPosition()
   {
-    System.out.println(armInLoadedPosition.get() + "");
+    System.out.println(armInLoadedPosition.get());
     return armInLoadedPosition.get();//m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
   }
 
@@ -327,7 +331,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   public boolean aroundAngle(double degree, double allowableError)
   {
     //get current angle compare to aimed angle
-    return MathUtil.isNear(degree, m_encoder.getPosition(), allowableError);
+    return MathUtil.isNear(degree, getAngle().in(Degrees), allowableError);
   }
 
   public boolean aroundAngle(double degree)
