@@ -143,8 +143,9 @@ public class RobotContainer
     climb.setDefaultCommand(climb.climbUp());
     algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
     algaeArm.setDefaultCommand(algaeArm.setGoal(-90));
+    coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
     
-    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
+//    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
@@ -171,7 +172,7 @@ public class RobotContainer
     m_driverController.button(1).whileTrue(loadingSystem.algaeLoad());
 
     m_driverController.button(2).whileTrue(loadingSystem.coralLoad());
-    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
+//    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
 
 
 
@@ -182,7 +183,7 @@ public class RobotContainer
                 .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
                 .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
 
-    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
+//    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
     m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
 
         /*

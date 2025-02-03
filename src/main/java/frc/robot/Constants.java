@@ -35,15 +35,15 @@ import frc.robot.RobotMath.Elevator;
 public final class Constants
 {
 
-  public static final Mechanism2d         sideRobotView    = new Mechanism2d(AlgaeArmConstants.kAlgaeArmLength * 2,
-                                                                             ElevatorConstants.kMaxElevatorHeight.in(
-                                                                                 Meters) +
-                                                                             AlgaeArmConstants.kAlgaeArmLength);
+  public static final Mechanism2d         sideRobotView = new Mechanism2d(AlgaeArmConstants.kAlgaeArmLength * 2,
+                                                                          ElevatorConstants.kMaxElevatorHeight.in(
+                                                                              Meters) +
+                                                                          AlgaeArmConstants.kAlgaeArmLength);
   public static final MechanismRoot2d     kElevatorCarriage;
   public static final MechanismLigament2d kAlgaeArmMech;
   public static final MechanismLigament2d kCoralArmMech;
   public static final MechanismLigament2d kElevatorTower;
-  public static final double              maxSpeed         = 7;
+  public static final double              maxSpeed      = 7;
 
   static
   {
@@ -108,37 +108,37 @@ public final class Constants
   {
 
     // The P gain for the PID controller that drives this arm.
-    public static final double  kAlgaeArmKp                          = 2.0691;
-    public static final double  kAlgaeArmKi                          = 0;
-    public static final double  kAlgaeArmKd                          = 0.0;
-    public static final double  kAlgaeArmReduction                   = 200;
+    public static final double  kAlgaeArmKp                     = 2.0691;
+    public static final double  kAlgaeArmKi                     = 0;
+    public static final double  kAlgaeArmKd                     = 0.0;
+    public static final double  kAlgaeArmReduction              = 200;
     public static final Angle   kAlgaeArmAllowedClosedLoopError
-                                                                     = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
+                                                                = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
         0.01));
-    public static final double  kAlgaeArmMass                        = 8.0; // Kilograms
-    public static final double  kAlgaeArmLength                      = Inches.of(31).in(Meters);//.7meter
-    public static final Angle   kAlgaeArmStartingAngle               = Degrees.of(0);
-    public static final Angle   kAlgaeArmMinAngle                    = Degrees.of(-75);
-    public static final Angle   kAlgaeArmMaxAngle                    = Degrees.of(255);
-    public static final double  kAlgaeArmRampRate                    = 0.5;
-    public static final Angle   kAlgaeArmOffsetToHorizantalZero      = Rotations.of(0);
-    public static final boolean kAlgaeArmInverted                    = false;
+    public static final double  kAlgaeArmMass                   = 8.0; // Kilograms
+    public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
+    public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(0);
+    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-75);
+    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(255);
+    public static final double  kAlgaeArmRampRate               = 0.5;
+    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Rotations.of(0);
+    public static final boolean kAlgaeArmInverted               = false;
     public static final double  kAlgaeArmMaxVelocityRPM
-                                                                     = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
+                                                                = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
         90)).per(
         Second).in(RPM);
     public static final double  kAlgaeArmMaxAccelerationRPMperSecond
-                                                                     = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
-                                                                                   180)).per(
-                                                                                   Second).per(Second)
-                                                                               .in(RPM.per(Second));
-    public static final int     kAlgaeArmStallCurrentLimitAmps       = 40;
-    public static final double  kAlgaeArmkS                          = 0; // volts (V)
-    public static final double  kAlgaeArmkG                          = 0; // volts (V)
-    public static final double  kAlgaeArmKv                          = 0; // volts per velocity (V/RPM)
-    public static final double  kAlgaeArmKa                          = 0; // volts per acceleration (V/(RPM/s))
-    public static final double  kAlgaeAngleAllowableError            = 1;//degree, for testing whether it's aroundAngle
-    public static       int     algaeArmMotorID                      = 15;
+                                                                = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
+                                                                              180)).per(
+                                                                              Second).per(Second)
+                                                                          .in(RPM.per(Second));
+    public static final int     kAlgaeArmStallCurrentLimitAmps  = 40;
+    public static final double  kAlgaeArmkS                     = 0; // volts (V)
+    public static final double  kAlgaeArmkG                     = 0; // volts (V)
+    public static final double  kAlgaeArmKv                     = 0; // volts per velocity (V/RPM)
+    public static final double  kAlgaeArmKa                     = 0; // volts per acceleration (V/(RPM/s))
+    public static final double  kAlgaeAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
+    public static       int     algaeArmMotorID                 = 15;
 
   }
 
@@ -227,17 +227,18 @@ public final class Constants
 
     public static final int    coralWristMotorID   = 16;
     public static final int    coralRollerMotorID  = 17;
+    public static       int    algaeRollerMotorID  = 18;
     public static final double defaultrRollerSpeed = 0;
     public static final double kIntakeReduction    = 0;
- 
-    public static final int k_wristCurrentLimit = 40;
+
+    public static final int    k_wristCurrentLimit       = 40;
     public static final double k_wristClosedLoopRampRate = 0.25;
 
-    public static       Angle  kMinAngle           = Degrees.of(-20);
-    public static       Angle  kMaxAngle           = Degrees.of(220);
-    public static       double kIntakeLength       = Inches.of(10).in(Meters);
-    public static       double kWristReduction     = 1;
-    public static       double kIntakeMass         = 2.27; //kg
+    public static Angle  kMinAngle       = Degrees.of(-20);
+    public static Angle  kMaxAngle       = Degrees.of(220);
+    public static double kIntakeLength   = Inches.of(10).in(Meters);
+    public static double kWristReduction = 1;
+    public static double kIntakeMass     = 2.27; //kg
   }
 
 }

@@ -18,7 +18,7 @@ import frc.robot.Constants.WristConstants.RollerConstants;
 public class AlgaeIntakeSubsystem extends SubsystemBase
 {
 
-  private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.coralRollerMotorID, MotorType.kBrushless);
+  private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.algaeRollerMotorID, MotorType.kBrushless);
 
   private final DCMotor                 m_rollerMotorGearbox = DCMotor.getNEO(1);
 
