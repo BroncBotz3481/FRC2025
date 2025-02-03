@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.CoralIntakeSubsystem;;
 
 public class LoadingSystem
 {
@@ -12,15 +13,18 @@ public class LoadingSystem
   private CoralArmSubsystem m_coralArm;
   private AlgaeArmSubsystem m_algaeArm;
   private ElevatorSubsystem m_elevator;
+  private CoralIntakeSubsystem m_wrist;
 
 
   public LoadingSystem(CoralArmSubsystem coralArm,
                        AlgaeArmSubsystem algaeArm,
-                       ElevatorSubsystem elevator)
+                       ElevatorSubsystem elevator,
+                       CoralIntakeSubsystem coralIntake)
   {
     m_coralArm = coralArm;
     m_algaeArm = algaeArm;
     m_elevator = elevator;
+    m_wrist = coralIntake;
   }
 
   public Command coralLoad()
@@ -42,13 +46,15 @@ public class LoadingSystem
     double algaeArmLoadingAngleDegrees   = 45;
     double algaeElevatorHighHeightMeters = 2.0;
     double algaeElevatorLowHeightMeters  = 1.0;
+    double straightWristAngle  = 90;
 
     return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
                      .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees))
                      .andThen(Commands.waitUntil(m_algaeArm::algaeInLoadPosition))
                      .andThen(m_elevator.setElevatorHeight(algaeElevatorLowHeightMeters))
                      .andThen(Commands.waitUntil(m_algaeArm::algaeLoaded))
-                     .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters));
+                     .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters))
+                     ;
   }
 
   public Command coralLock()

@@ -229,6 +229,10 @@ public final class Constants
     public static final int    coralRollerMotorID  = 17;
     public static final double defaultrRollerSpeed = 0;
     public static final double kIntakeReduction    = 0;
+ 
+    public static final int k_wristCurrentLimit = 40;
+    public static final double k_wristClosedLoopRampRate = 0.25;
+
     public static       Angle  kMinAngle           = Degrees.of(-20);
     public static       Angle  kMaxAngle           = Degrees.of(220);
     public static       double kIntakeLength       = Inches.of(10).in(Meters);

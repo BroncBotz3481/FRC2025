@@ -56,7 +56,7 @@ public class RobotContainer
   private final CoralIntakeSubsystem coralIntake = new CoralIntakeSubsystem();
 
   private final TargetingSystem targetingSystem = new TargetingSystem();
-  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator);
+  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator, coralIntake);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
                                                                     drivebase,
@@ -141,6 +141,7 @@ public class RobotContainer
     climb.setDefaultCommand(climb.climbUp());
     algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
     algaeArm.setDefaultCommand(algaeArm.setGoal(-90));
+    
     floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
@@ -165,8 +166,10 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     m_driverController.button(1).whileTrue(loadingSystem.algaeLoad());
+    m_driverController.button(1).whileTrue(coralIntake.setWristAngle(90));
+    
     m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30));
-    m_driverController.button(3).whileTrue(coralIntake.setWristAngle(90));
+    m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150));
 
         /*
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());

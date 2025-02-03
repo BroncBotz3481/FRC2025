@@ -49,6 +49,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
   // Simulation stuff
   private final DCMotor                 m_wristMotorGearbox  = DCMotor.getNEO(1);
   private final DCMotor                 m_rollerMotorGearbox = DCMotor.getNEO(1);
+
   private final FlywheelSim             m_wristSim           = new FlywheelSim(
       LinearSystemId.createFlywheelSystem(
           m_wristMotorGearbox,
@@ -56,10 +57,12 @@ public class CoralIntakeSubsystem extends SubsystemBase
           WristConstants.kWristGearRatio),
       m_wristMotorGearbox,
       1.0 / 4096.0);
+
   private final FlywheelSim             m_rollerSim          = new FlywheelSim(LinearSystemId.createFlywheelSystem(
       m_rollerMotorGearbox,
       RollerConstants.kWristMomentOfInertia,
       RollerConstants.kWristGearRatio), m_rollerMotorGearbox, 1.0 / 4096.0);
+
   private final SparkAbsoluteEncoderSim m_wristAbsEncoderSim = new SparkAbsoluteEncoderSim(m_wristMotor);
   private final SparkMaxSim             m_wristMotorSim      = new SparkMaxSim(m_wristMotor, m_wristMotorGearbox);
   private final SparkMaxSim             m_rollerMotorSim     = new SparkMaxSim(m_rollerMotor, m_rollerMotorGearbox);
@@ -72,8 +75,8 @@ public class CoralIntakeSubsystem extends SubsystemBase
   {
     SparkMaxConfig cfg = new SparkMaxConfig();
     cfg
-        .smartCurrentLimit(40) // Move to Constants
-        .closedLoopRampRate(0.25) // Move to Constants
+        .smartCurrentLimit(IntakeConstants.k_wristCurrentLimit) // Move to Constants
+        .closedLoopRampRate(IntakeConstants.k_wristClosedLoopRampRate) // Move to Constants
         .idleMode(IdleMode.kBrake)
         .inverted(false)
         .closedLoop
@@ -125,9 +128,10 @@ public class CoralIntakeSubsystem extends SubsystemBase
     wristArm.setAngle(Rotations.of(m_wristEncoder.getPosition()).in(Degrees));
   }
 
-  public Command setCoralIntakeRoller(double speed)
+  public Command spitCoralOut(double speed, double angle)
   {
     return run(() -> {
+      wristController.setReference(Degrees.of(angle).in(Rotations), ControlType.kPosition);
       m_rollerMotor.set(speed * IntakeConstants.defaultrRollerSpeed);
     });
   }
@@ -138,5 +142,6 @@ public class CoralIntakeSubsystem extends SubsystemBase
       wristController.setReference(Degrees.of(angle).in(Rotations), ControlType.kPosition);
     });
   }
+  
 }
 
