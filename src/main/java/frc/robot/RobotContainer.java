@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import java.util.Set;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -165,11 +167,23 @@ public class RobotContainer
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
+
     m_driverController.button(1).whileTrue(loadingSystem.algaeLoad());
-    m_driverController.button(1).whileTrue(coralIntake.setWristAngle(90));
-    
-    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30));
-    m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150));
+
+    m_driverController.button(2).whileTrue(loadingSystem.coralLoad());
+    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
+
+
+
+    m_driverController.button(6).whileTrue(
+      targetingSystem.setTargetCommand(
+                TargetingSystem.ReefBranch.D,
+                TargetingSystem.ReefBranchLevel.L4)
+                .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+                .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
+
+    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
+    m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
 
         /*
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
