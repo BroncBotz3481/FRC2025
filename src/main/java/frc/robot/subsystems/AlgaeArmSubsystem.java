@@ -63,8 +63,8 @@ public class AlgaeArmSubsystem extends SubsystemBase
   private final DCMotor                   m_armGearbox = DCMotor.getNEO(1);
   private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
                                                                       MotorType.kBrushless);
-  private       DigitalInput        armLoaded              = new DigitalInput(1);
-  private       DigitalInput        armInLoadedPosition    = new DigitalInput(2);
+  private       DigitalInput        armLoaded              = new DigitalInput(2);
+  private       DigitalInput        armInLoadedPosition    = new DigitalInput(1);
 
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();

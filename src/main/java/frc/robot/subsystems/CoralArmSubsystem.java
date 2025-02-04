@@ -122,7 +122,7 @@ public class CoralArmSubsystem extends SubsystemBase
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
   private       DigitalInput        armLoaded              = new DigitalInput(4);
   private       DIOSim              armLoadedSim           = new DIOSim(armLoaded);
-  private       DigitalInput        armInLoadedPosition    = new DigitalInput(5);
+  private       DigitalInput        armInLoadedPosition    = new DigitalInput(3);
   private       DIOSim              armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
 
 

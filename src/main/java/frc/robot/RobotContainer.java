@@ -169,9 +169,9 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
 
-    m_driverController.button(1).whileTrue(loadingSystem.algaeLoad());
+    m_driverController.button(1).onTrue(loadingSystem.algaeLoad());
 
-    m_driverController.button(2).whileTrue(loadingSystem.coralLoad());
+    m_driverController.button(2).onTrue(loadingSystem.coralLoad());
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
 
 

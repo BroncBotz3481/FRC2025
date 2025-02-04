@@ -32,14 +32,15 @@ public class LoadingSystem
   public Command coralLoad()
   {
     double coralArmLoadingAngleDegrees   = 45;
-    double coralElevatorHighHeightMeters = 0.5;
-    double coralElevatorLowHeightMeters  = 0;
-    return (m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
-                      .andThen(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees))
+    double coralElevatorHighHeightMeters = 2.0;
+    double coralElevatorLowHeightMeters  = 1.0;
+    return  m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
+                      .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
+                      .until(() -> m_elevator.aroundHeight(coralElevatorHighHeightMeters))
                       .andThen(Commands.waitUntil(m_coralArm::coralInLoadPosition))
                       .andThen(m_elevator.setElevatorHeight(coralElevatorLowHeightMeters))
                       .andThen(Commands.waitUntil(m_coralArm::coralLoaded))
-                      .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters))).alongWith(m_wrist.setWristAngle(90));
+                      .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters));//.alongWith(m_wrist.setWristAngle(90));
   }
 
   public Command algaeLoad()
@@ -51,12 +52,13 @@ public class LoadingSystem
     double straightWristAngle            = 90;
 
     return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
-                     .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees))
-                     .andThen(Commands.waitUntil(m_algaeArm::algaeInLoadPosition))
+                     .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly())
+                     .until(() ->m_elevator.aroundHeight(algaeElevatorHighHeightMeters))//interupt the setElev Cmd while setAngle still running
+                     .andThen(Commands.waitUntil(m_algaeArm::algaeInLoadPosition))//.until(() ->m_algaeArm.algaeInLoadPosition()))
                      .andThen(m_elevator.setElevatorHeight(algaeElevatorLowHeightMeters))
                      .andThen(Commands.waitUntil(m_algaeArm::algaeLoaded))
-                     .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters))
-        ;
+                     .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters));
+
   }
 
   public Command coralLock()
@@ -64,37 +66,26 @@ public class LoadingSystem
     // Set arm to target angle, elev target height
     double coralArmLockingAngleDegrees      = 45;
     double coralElevatorLockingHeightMeters = 3;
-    return m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees)
-                     .alongWith(m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters));
+    return m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters)
+                     .andThen(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees).repeatedly());
   }
 
   public Command algaeLockProcessor()
   {
     // Set arm to target angle, elev target height
-    double algaeArmLockingProcessorAngleDegrees      = 240;
-    double algaeElevatorLockingProcessorHeightMeters = 2;
+    double algaeArmLockingProcessorAngleDegrees      = -45;
+    double algaeElevatorLockingProcessorHeightMeters = 1;
 
-    return m_algaeArm.setAlgaeArmAngle(algaeArmLockingProcessorAngleDegrees)
-                     .alongWith(m_elevator.setElevatorHeight(algaeElevatorLockingProcessorHeightMeters),
-                                Commands.waitUntil(() -> {
-                                  return
-                                      m_algaeArm.aroundAngle(algaeElevatorLockingProcessorHeightMeters) &&
-                                      m_elevator.aroundHeight(algaeElevatorLockingProcessorHeightMeters);
-                                }));
-
+    return m_elevator.setElevatorHeight(algaeElevatorLockingProcessorHeightMeters)
+                     .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLockingProcessorAngleDegrees).repeatedly());
   }
 
   public Command algaeLockNet()
   {
     // Set arm to target angle, elev target height
     double algaeArmLockingNetAngleDegrees      = 45;
-    double algaeElevatorLockingNetHeightMeters = 0.5;
-    return m_algaeArm.setAlgaeArmAngle(algaeArmLockingNetAngleDegrees)
-                     .alongWith(m_elevator.setElevatorHeight(algaeElevatorLockingNetHeightMeters),
-                                Commands.waitUntil(() -> {
-                                  return
-                                      m_algaeArm.aroundAngle(algaeArmLockingNetAngleDegrees) &&
-                                      m_elevator.aroundHeight(algaeElevatorLockingNetHeightMeters);
-                                }));
+    double algaeElevatorLockingNetHeightMeters = 4;
+    return m_elevator.setElevatorHeight(algaeElevatorLockingNetHeightMeters)
+                     .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLockingNetAngleDegrees).repeatedly());
   }
 }
