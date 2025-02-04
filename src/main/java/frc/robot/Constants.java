@@ -217,6 +217,7 @@ public final class Constants
                                                                    .per(
                                                                        Second)
                                                                    .in(RPM.per(Second));
+    public static final double   kElevatorUnextendedHeight    = Units.inchesToMeters(41.5);
   }
 
   public static class IntakeConstants

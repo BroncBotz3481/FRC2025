@@ -40,7 +40,7 @@ public class ScoringSystem
 
   public Command scoreCoral()
   {
-    // Arm down, elevator down, drive backwards x in?
+    // Arm down, elevator down, drive backwards x in
     double coralArmAngleDegrees = m_targetSystem.getTargetBranchCoralArmAngle();
     double elevatorHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
 
@@ -53,20 +53,26 @@ public class ScoringSystem
 
   public Command scoreAlgaeProcessor()
   {
-//set elevator height, set alage angle, spit out ball, drive pose?
-    double swervingDistance = 10;
-    return m_loadingSystem.algaeLockProcessor()//use targetting sys?
-                          .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds)
-                                                .until(() -> !m_algaeArm.algaeLoaded()));
+    //set elevator height, set algae angle, spit out ball, drive pose
+    double algaeArmAngleDegrees = -45;
+    double elevatorHeightMeters = 1.0;
+    return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
+            .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
+            .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
+            .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds)
+            .until(() -> !m_algaeArm.algaeLoaded()));
   }
 
   public Command scoreAlgaeNet()
   {
-    //set elevator height, set alage angle, spit out ball, drive pose?
-
-    return m_loadingSystem.algaeLockNet()
-                          .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
-    //testing-a different outake Speed for algae the net?
+    //set elevator height, set alage angle, spit out ball, drive pose
+    double algaeArmAngleDegrees = 45;
+    double elevatorHeightMeters = 4.0;
+    return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
+            .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
+            .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
+            .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds))
+            .until(() -> !m_algaeArm.algaeLoaded());
   }
 
 }

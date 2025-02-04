@@ -58,7 +58,7 @@ public class RobotContainer
   private final CoralIntakeSubsystem coralIntake = new CoralIntakeSubsystem();
 
   private final TargetingSystem targetingSystem = new TargetingSystem();
-  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator, coralIntake);
+  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator, coralIntake, targetingSystem);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
                                                                     drivebase,
@@ -144,6 +144,7 @@ public class RobotContainer
     algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
     algaeArm.setDefaultCommand(algaeArm.setGoal(-90));
     coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
+    targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
     
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
@@ -171,7 +172,7 @@ public class RobotContainer
 
     m_driverController.button(1).onTrue(loadingSystem.algaeLoad());
 
-    m_driverController.button(2).onTrue(loadingSystem.coralLoad());
+    m_driverController.button(2).onTrue(scoringSystem.scoreAlgaeNet());
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
 
 
