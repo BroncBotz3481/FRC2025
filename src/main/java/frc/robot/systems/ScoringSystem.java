@@ -44,11 +44,15 @@ public class ScoringSystem
     double coralArmAngleDegrees = m_targetSystem.getTargetBranchCoralArmAngle();
     double elevatorHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
 
-    return m_coralArm.setCoralArmAngle(coralArmAngleDegrees)
+    return m_coralArm.setCoralArmAngle(coralArmAngleDegrees).repeatedly()
+                    .alongWith(m_swerve.lockPos())
                      .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
+                     .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
                      .andThen(m_elevator.setElevatorHeight(
                          elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight))
-                     .andThen(m_swerve.lockPos());
+                      //.alongWith(m_coralArm.setCoralArmAngle(coralArmAngleDegrees)).repeatedly()
+                      .until(() -> m_elevator.aroundHeight(
+                         elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight));
   }
 
   public Command scoreAlgaeProcessor()

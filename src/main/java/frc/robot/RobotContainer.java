@@ -175,14 +175,21 @@ public class RobotContainer
     m_driverController.button(2).onTrue(scoringSystem.scoreAlgaeNet());
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
 
-
+    m_driverController.button(4).whileTrue(coralArm.setCoralArmAngle(90).repeatedly());
 
     m_driverController.button(6).whileTrue(
       targetingSystem.setTargetCommand(
                 TargetingSystem.ReefBranch.D,
                 TargetingSystem.ReefBranchLevel.L4)
                 .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-                .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
+                 .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase))));
+
+                  m_driverController.button(7).whileTrue(
+      targetingSystem.setTargetCommand(
+                TargetingSystem.ReefBranch.D,
+                TargetingSystem.ReefBranchLevel.L3)
+                .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+                 .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase))));
 
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
     m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
