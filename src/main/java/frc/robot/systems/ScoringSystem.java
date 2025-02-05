@@ -1,6 +1,9 @@
 package frc.robot.systems;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -44,15 +47,16 @@ public class ScoringSystem
     double coralArmAngleDegrees = m_targetSystem.getTargetBranchCoralArmAngle();
     double elevatorHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
 
-    return m_coralArm.setCoralArmAngle(coralArmAngleDegrees).repeatedly()
-                    .alongWith(m_swerve.lockPos())
-                     .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
-                     .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
-                     .andThen(m_elevator.setElevatorHeight(
-                         elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight))
-                      //.alongWith(m_coralArm.setCoralArmAngle(coralArmAngleDegrees)).repeatedly()
-                      .until(() -> m_elevator.aroundHeight(
-                         elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight));
+    return new ParallelDeadlineGroup(
+      m_elevator.setElevatorHeight(elevatorHeightMeters).withName("ScoreCoralElevatorHeight")
+    .andThen(Commands.print("Tell me why aint nothing but a mistake"))
+    .andThen(m_elevator.setElevatorHeight(
+        elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight).withName("ScoreCoralElevatorHeightLower"))
+     //.alongWith(m_coralArm.setCoralArmAngle(coralArmAngleDegrees)).repeatedly()
+        .andThen(Commands.print("Tell me why aint nothing but an heart ache")),
+      m_coralArm.setCoralArmAngle(coralArmAngleDegrees).withName("ScoreCoralArmAngle").repeatedly(),
+                    m_swerve.lockPos().withName("LockPose")
+                     );
   }
 
   public Command scoreAlgaeProcessor()

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -152,6 +153,7 @@ public class RobotContainer
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
     configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
+    SmartDashboard.putData(CommandScheduler.getInstance());
     drivebase.setDefaultCommand(
         !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
@@ -179,7 +181,7 @@ public class RobotContainer
 
     m_driverController.button(6).whileTrue(
       targetingSystem.setTargetCommand(
-                TargetingSystem.ReefBranch.D,
+                TargetingSystem.ReefBranch.J,
                 TargetingSystem.ReefBranchLevel.L4)
                 .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
                  .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase))));
@@ -189,7 +191,8 @@ public class RobotContainer
                 TargetingSystem.ReefBranch.D,
                 TargetingSystem.ReefBranchLevel.L3)
                 .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-                 .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase))));
+                 .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase)))
+                 .andThen(Commands.print("I AM ALIVE, YAAA HAAAAA")));
 
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
     m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
