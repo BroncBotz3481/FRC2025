@@ -80,16 +80,13 @@ public class ElevatorSubsystem extends SubsystemBase
           ElevatorConstants.kElevatorkA);
 
   public final  Trigger           atMin            = new Trigger(() -> MathUtil.isNear(getHeightMeters(),
-                                                                                       ElevatorConstants.kMinElevatorHeight.in(
-                                                                                           Meters),
-                                                                                       Inches.of(3)
-                                                                                             .in(Meters)));
-  public final  Trigger           atMax
-                                                   = new Trigger(() -> MathUtil.isNear(getHeightMeters(),
-                                                                                       ElevatorConstants.kMaxElevatorHeight.in(
-                                                                                           Meters),
-                                                                                       Inches.of(3)
-                                                                                             .in(Meters)));
+                                                                                       ElevatorConstants.kMinElevatorHeightMeters,
+                                                                                       Inches.of(3).in(Meters)
+                                                                                      ));
+  public final  Trigger           atMax            = new Trigger(() -> MathUtil.isNear(getHeightMeters(),
+                                                                                       ElevatorConstants.kMinElevatorHeightMeters,
+                                                                                       Inches.of(3).in(Meters)
+                                                                                      ));
   // SysId Routine and seutp
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage        m_appliedVoltage = Volts.mutable(0);
