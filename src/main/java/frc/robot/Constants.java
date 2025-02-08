@@ -211,7 +211,7 @@ public final class Constants
     public static final double   kElevatorAllowableError = 1;
     public static final double   kLowerToScoreHeight     = Units.inchesToMeters(6);
     public static       int      elevatorMotorID         = 13;
-    public static       double   kElevatorRampRate       = 0.25;
+    public static       double   kElevatorRampRate       = 0.1;
     public static       int      kElevatorCurrentLimit   = 40;
     public static double kMaxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
     public static double kMaxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
