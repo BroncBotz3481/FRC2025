@@ -186,7 +186,7 @@ public class CoralArmSubsystem extends SubsystemBase
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    Constants.kCoralArmMech.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
+    //Constants.kCoralArmMech.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
 
   }
 

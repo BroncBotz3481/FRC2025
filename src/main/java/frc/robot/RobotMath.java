@@ -9,6 +9,7 @@ import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.Constants.CoralArmConstants;
 import frc.robot.Constants.ElevatorConstants;
+import org.dyn4j.geometry.Rotation;
 
 public class RobotMath
 {
@@ -67,32 +68,18 @@ public class RobotMath
     }
   }
 
-  public static class Elevator
-  {
+  public static class Elevator{
 
-    /**
-     * Convert {@link Distance} into {@link Angle}
-     *
-     * @param distance Distance, usually Meters.
-     * @return {@link Angle} equivalent to rotations of the motor.
-     */
-    public static Angle convertDistanceToRotations(Distance distance)
-    {
-      return Rotations.of(distance.in(Meters) /
-                          (ElevatorConstants.kElevatorDrumRadius * 2 * Math.PI) *
-                          ElevatorConstants.kElevatorGearing);
+    public static Distance convertRotationsToDistance(Angle rotations){
+      return Meters.of(rotations.in(Rotations) *
+              (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius) / ElevatorConstants.kElevatorGearing);
     }
 
-    /**
-     * Convert {@link Angle} into {@link Distance}
-     *
-     * @param rotations Rotations of the motor
-     * @return {@link Distance} of the elevator.
-     */
-    public static Distance convertRotationsToDistance(Angle rotations)
-    {
-      return Meters.of((rotations.in(Rotations) / ElevatorConstants.kElevatorGearing) *
-                       (ElevatorConstants.kElevatorDrumRadius * 2 * Math.PI));
+    public static Angle convertDistanceToRotations(Distance distance){
+      return Rotations.of(distance.in(Meters) /
+              (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius) * ElevatorConstants.kElevatorGearing);
     }
   }
+
+
 }

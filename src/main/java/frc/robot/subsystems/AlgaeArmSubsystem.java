@@ -187,7 +187,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    Constants.kAlgaeArmMech.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
+    Constants.armMech.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
 
   }
 
