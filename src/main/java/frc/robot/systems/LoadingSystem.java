@@ -52,9 +52,8 @@ public class LoadingSystem
   {
     // Put algae arm out, roll in
     double algaeArmLoadingAngleDegrees   = 15;
-    double algaeElevatorHighHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
+    double algaeElevatorHighHeightMeters = 1;
     double algaeElevatorLowHeightMeters  = algaeElevatorHighHeightMeters - 0.25;//0.25-elev height change
-    double straightWristAngle            = 90;
 
     return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
                      .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly())

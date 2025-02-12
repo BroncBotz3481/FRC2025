@@ -80,8 +80,11 @@ public class ElevatorSubsystem extends SubsystemBase {
                     ElevatorConstants.kElevatorMaxHeightMeters,
                     true,
                     0.0,
-                    0.02,//
+                    0.02,
                     0.0);
+
+            m_limitSwitchLowSim = new DIOSim(m_limitSwitchLow);//
+            SmartDashboard.putData("Elevator Low limit Switch", m_limitSwitchLow);
         }
 
         try {
@@ -89,10 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         } catch (Exception e) {
             m_laserCanFailure.set(true);
         }
-        /*
-        m_limitSwitchLowSim = new DIOSim(m_limitSwitchLow);
-        SmartDashboard.putData("Elevator Low limit Switch", m_limitSwitchLow);
-        */
+
     }
 
     public void simulationPeriodic() {
@@ -177,6 +177,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic()
     {
-    }//
+    }
 }
 

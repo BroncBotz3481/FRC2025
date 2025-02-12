@@ -43,7 +43,7 @@ public final class Constants
             ElevatorConstants.kElevatorStartingAngle.in(Degrees),
             5,
             new Color8Bit(Color.kRed)));
-    armMech = elevatorMech.append((new MechanismLigament2d("Arm",
+    armMech = elevatorCarriage.append((new MechanismLigament2d("Arm",
             AlgaeArmConstants.kAlgaeArmLength,
             AlgaeArmConstants.kAlgaeArmStartingAngle.in(Degrees),
             5,
@@ -160,9 +160,9 @@ public final class Constants
   }
 
   public static class ElevatorConstants {
-    public static final double kElevatorKp = 15;//5
+    public static final double kElevatorKp = 5;//5
     public static final double kElevatorKi = 0;
-    public static final double kElevatorKd = 1.6047;//
+    public static final double kElevatorKd = 0;//
     public static final double kMaxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
     public static final double kMaxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
     public static final double kElevatorkS = 0.02;
@@ -179,7 +179,7 @@ public final class Constants
     public static final Distance kElevatorStartingHeightSim = Meters.of(0.0);
     public static final Angle kElevatorStartingAngle = Degrees.of(-90);
     public static final Distance kLaserCANOffset          = Inches.of(3);
-    public static final double kElevatorDefaultTolerance = Inches.of(1).in(Meters);//
+    public static final double kElevatorDefaultTolerance = Inches.of(1).in(Meters);
 
     public static double kLowerToScoreHeight =  Units.inchesToMeters(6);;
   }
