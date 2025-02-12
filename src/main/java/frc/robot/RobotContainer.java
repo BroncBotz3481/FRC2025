@@ -80,7 +80,7 @@ public class RobotContainer
                                                            .withControllerHeadingAxis(m_driverController::getRightX,
                                                                                       m_driverController::getRightY)
                                                            .headingWhile(true);
-
+  
   Command driveFieldOrientedDriectAngle = drivebase.driveFieldOriented(driveDirectAngle);
   Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
   Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
@@ -193,9 +193,10 @@ public class RobotContainer
       targetingSystem.setTargetCommand(
                 TargetingSystem.ReefBranch.J,
                 TargetingSystem.ReefBranchLevel.L3)
+                .andThen(Commands.print("Aim Correct"))
                 .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-                 .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase)))
-                 .andThen(Commands.print("I AM ALIVE, YAAA HAAAAA")));
+                .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase)))
+                .andThen(Commands.print("I AM ALIVE, YAAA HAAAAA")));
 
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
     m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
