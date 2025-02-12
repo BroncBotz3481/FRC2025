@@ -132,7 +132,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
   {
     return run(() -> {
       wristController.setReference(Degrees.of(angle).in(Rotations), ControlType.kPosition);
-      m_rollerMotor.set(speed * IntakeConstants.defaultrRollerSpeed);
+      m_rollerMotor.set(speed);
     });
   }
 

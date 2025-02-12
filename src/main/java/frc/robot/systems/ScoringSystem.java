@@ -5,9 +5,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
+import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -22,6 +24,7 @@ public class ScoringSystem
   private LoadingSystem        m_loadingSystem;
   private AlgaeArmSubsystem    m_algaeArm;
   private TargetingSystem      m_targetSystem;
+  private CoralIntakeSubsystem m_coralIntake;
 
   public ScoringSystem(
       CoralArmSubsystem coralArm,
@@ -29,7 +32,8 @@ public class ScoringSystem
       SwerveSubsystem swerve,
       AlgaeIntakeSubsystem algaeIntake,
       AlgaeArmSubsystem algaeArm,
-      LoadingSystem loading, TargetingSystem targeting)
+      LoadingSystem loading, TargetingSystem targeting,
+      CoralIntakeSubsystem coralIntake)
   {
     m_coralArm = coralArm;
     m_elevator = elevator;
@@ -38,6 +42,7 @@ public class ScoringSystem
     m_loadingSystem = loading;
     m_algaeArm = algaeArm;
     m_targetSystem = targeting;
+    m_coralIntake = coralIntake;
 
   }
 
@@ -49,6 +54,7 @@ public class ScoringSystem
 
     return new ParallelDeadlineGroup(
       m_elevator.setElevatorHeight(elevatorHeightMeters).withName("ScoreCoralElevatorHeight")
+      .andThen(m_coralIntake.spitCoralOut(IntakeConstants.defaultrRollerSpeed, 90))
     .andThen(Commands.print("Tell me why aint nothing but a mistake"))
     .andThen(m_elevator.setElevatorHeight(
         elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight).withName("ScoreCoralElevatorHeightLower"))

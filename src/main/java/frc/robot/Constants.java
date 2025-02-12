@@ -81,6 +81,8 @@ public final class Constants
 
     public static final int    kDriverControllerPort   = 0;
     public static final int    kOperatorControllerPort = 1;
+    public static final int    kOperatorController2Port = 2;
+    public static final int    kOperatorController3Port = 3;
     public static final double DEADBAND                = 0.05;
   }
 
