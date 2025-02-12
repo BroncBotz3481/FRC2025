@@ -14,6 +14,11 @@ import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants.Reef;
 import frc.robot.systems.field.FieldConstants.ReefHeight;
 
+//targetting system should be able to select either left or right side of the branch
+//then select what level we want
+// that go to the nearest side of the reef and load.
+
+
 public class TargetingSystem
 {
 
@@ -124,4 +129,7 @@ public class TargetingSystem
     L4
   }
 
+  public void autotarget(){
+
+  }
 }

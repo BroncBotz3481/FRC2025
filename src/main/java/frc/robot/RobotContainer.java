@@ -172,23 +172,26 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
 
-    m_driverController.button(1).onTrue(loadingSystem.algaeLoad());
+    // m_driverController.button(1).onTrue(loadingSystem.algaeLoad());
 
-    m_driverController.button(2).onTrue(scoringSystem.scoreAlgaeNet());
+    // m_driverController.button(2).onTrue(loadingSystem.coralLoad());
+
+    // m_driverController.button(3).onTrue(loadingSystem.algaeLockProcessor());
+
+    // m_driverController.button(4).onTrue(scoringSystem.scoreAlgaeNet());
+
+    // m_driverController.button(5).onTrue(scoringSystem.scoreAlgaeProcessor());
+
+    // m_driverController.button(6).onTrue(loadingSystem.coralLock());
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
+   
+      
 
-    m_driverController.button(4).whileTrue(coralArm.setCoralArmAngle(90).repeatedly());
-
-    m_driverController.button(6).whileTrue(
-      targetingSystem.setTargetCommand(
-                TargetingSystem.ReefBranch.J,
-                TargetingSystem.ReefBranchLevel.L4)
-                .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-                 .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase))));
+    
 
                   m_driverController.button(7).whileTrue(
       targetingSystem.setTargetCommand(
-                TargetingSystem.ReefBranch.D,
+                TargetingSystem.ReefBranch.J,
                 TargetingSystem.ReefBranchLevel.L3)
                 .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
                  .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase)))
@@ -271,6 +274,8 @@ public class RobotContainer
   {
     return me;
   }
+
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
