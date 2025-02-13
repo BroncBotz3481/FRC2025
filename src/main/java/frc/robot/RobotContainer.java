@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,6 +35,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.systems.LoadingSystem;
 import frc.robot.systems.ScoringSystem;
 import frc.robot.systems.TargetingSystem;
+import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
 
 /**
@@ -212,9 +214,29 @@ public class RobotContainer
 
     m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1());
     m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2());
+   
+    m_OperatorController1.button(17).whileTrue( //Dance
+    elevator.setElevatorHeight(Units.inchesToMeters(31)).repeatedly()
+    .alongWith(waveArms(80, 20))
+    .until(() ->coralArm.aroundAngle(80)).withTimeout(2)
+    .andThen(waveArms(20, 80))
+    .until(() ->algaeArm.aroundAngle(80)).withTimeout(2)
+    .until(() -> elevator.aroundHeight((Units.inchesToMeters(32))))
 
+   );
 
-    
+/*
+ *     .andThen(waveArms(80, 20))
+    .andThen(waveArms(20, 80))
+    .andThen(waveArms(80, 20))
+    .andThen(waveArms(20, 80))
+    .andThen(waveArms(20, 80))
+    .andThen(waveArms(90, 90))
+    .alongWith(drivebase.driveToPose(new Pose2d(new Translation2d(),
+                                                                  drivebase.getRotation()
+                                                                .minus(Rotation2d.fromDegrees(180)))))
+  );
+ */
       //             m_driverController.button(7).whileTrue(
       // targetingSystem.setTargetCommand(
       //           TargetingSystem.ReefBranch.J,
@@ -228,7 +250,7 @@ public class RobotContainer
 
 
 //    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
-    m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
+    //m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
 
         /*
         m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
@@ -305,7 +327,7 @@ public class RobotContainer
     return me;
   }
 
-  
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -364,5 +386,6 @@ public class RobotContainer
   }
 
 
+  
 
 }
