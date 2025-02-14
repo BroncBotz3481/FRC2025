@@ -154,7 +154,7 @@ public class TargetingSystem
                                                  .map(AllianceFlipUtil::apply)
                                                  .collect(Collectors.toList());
     }
-    Pose2d selectedTargetPose = AllianceFlipUtil.apply(currentPose.get().nearest(allianceRelativeReefBranches));
+    Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
     targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
     return selectedTargetPose;
   }
