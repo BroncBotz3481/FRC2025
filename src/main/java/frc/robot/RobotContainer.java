@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -36,6 +37,7 @@ import frc.robot.systems.LoadingSystem;
 import frc.robot.systems.ScoringSystem;
 import frc.robot.systems.TargetingSystem;
 import swervelib.SwerveController;
+import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
 
 /**
@@ -196,7 +198,7 @@ public class RobotContainer
     m_OperatorController1.button(8).onTrue(Commands.print("Cancel Selected Command"));
 
     m_OperatorController1.button(9).onTrue(Commands.print("Outtake Coral"));
-    m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());
+    m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// this does not set robot to loading pose
 
   
     m_OperatorController1.button(11).onTrue( 
@@ -207,23 +209,31 @@ public class RobotContainer
     m_OperatorController1.button(12).onTrue( 
       targetingSystem.setTargetCommand(
         TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad()));   
-    
-    m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeProcessor());
-    m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeNet());
+        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad())); 
+
+    m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
+    m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
+
 
     m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1());
     m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2());
    
-    m_OperatorController1.button(17).whileTrue( //Dance
-    elevator.setElevatorHeight(Units.inchesToMeters(31)).repeatedly()
-    .alongWith(waveArms(80, 20))
-    .until(() ->coralArm.aroundAngle(80)).withTimeout(2)
-    .andThen(waveArms(20, 80))
-    .until(() ->algaeArm.aroundAngle(80)).withTimeout(2)
-    .until(() -> elevator.aroundHeight((Units.inchesToMeters(32))))
+  //   m_OperatorController1.button(17).whileTrue( //Dance
+  //   elevator.setElevatorHeight(Units.inchesToMeters(31)).repeatedly()
+  //   .alongWith(waveArms(80, 20))
+  //   .until(() ->coralArm.aroundAngle(80)).withTimeout(2)
+  //   .andThen(waveArms(20, 80))
+  //   .until(() ->algaeArm.aroundAngle(80)).withTimeout(2)
+  //   .until(() -> elevator.aroundHeight((Units.inchesToMeters(32))))
 
-   );
+  //  );
+
+   
+   m_driverController.button(17).whileTrue(
+    targetingSystem.autoTargetCommand(drivebase::getPose)
+              .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+              .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
+
 
 /*
  *     .andThen(waveArms(80, 20))
@@ -268,13 +278,6 @@ public class RobotContainer
                 (Meter.of(3.5),
                         Meter.of(2.5)),
                 Rotation2d.fromDegrees(125))));
-
-        m_driverController.button(6).whileTrue(
-              targetingSystem.setTargetCommand(
-                        TargetingSystem.ReefBranch.D,
-                        TargetingSystem.ReefBranchLevel.L4)
-                        .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-                        .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
 
         m_driverController.button(5).whileTrue(driveToSetPoint(6.1, 4, 125));
         m_driverController.button(4).whileTrue(driveToSetPoint(5.2, 5.2, -120));
