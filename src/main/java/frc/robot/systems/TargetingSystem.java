@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,6 +14,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants.Reef;
 import frc.robot.systems.field.FieldConstants.ReefHeight;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 //targetting system should be able to select either left or right side of the branch
 //then select what level we want
@@ -28,6 +35,25 @@ public class TargetingSystem
   private Transform2d         robotBranchScoringOffset = new Transform2d(Inches.of(24).in(Meters),
                                                                          Inches.of(0).in(Meters),
                                                                          Rotation2d.fromDegrees(0));
+
+  private List<Pose2d>            reefBranches                 = null;
+  private List<Pose2d>            allianceRelativeReefBranches = null;
+  private Map<Pose2d, ReefBranch> reefPoseToBranchMap          = null;
+
+  public TargetingSystem()
+  {
+    reefBranches = new ArrayList<>();
+    reefPoseToBranchMap = new HashMap<>();
+    for (int branchPositionIndex = 0; branchPositionIndex < Reef.branchPositions.size(); branchPositionIndex++)
+    {
+      Map<ReefHeight, Pose3d> branchPosition = Reef.branchPositions.get(branchPositionIndex);
+      Pose2d                  targetPose     = AllianceFlipUtil.apply(branchPosition.get(ReefHeight.L4).toPose2d());
+      reefBranches.add(targetPose);
+      reefPoseToBranchMap.put(targetPose, ReefBranch.values()[branchPositionIndex]);
+      reefPoseToBranchMap.put(AllianceFlipUtil.flip(targetPose), ReefBranch.values()[branchPositionIndex]);
+    }
+  }
+
 
   public double getTargetBranchHeightMeters()
   {
@@ -86,6 +112,20 @@ public class TargetingSystem
     return Commands.runOnce(() -> setTarget(targetBranch, targetBranchLevel));
   }
 
+  public Command setBranchCommand(ReefBranch branch)
+  {
+    return Commands.runOnce(() -> {
+      targetBranch = branch;
+    });
+  }
+
+  public Command setBranchLevel(ReefBranchLevel level)
+  {
+    return Commands.runOnce(() -> {
+      targetBranchLevel = level;
+    });
+  }
+
   public void left()
   {
     if (targetBranch == ReefBranch.H)
@@ -103,6 +143,27 @@ public class TargetingSystem
                                         .plus(robotBranchScoringOffset);
     }
     return AllianceFlipUtil.apply(scoringPose);
+  }
+
+
+  public Pose2d autoTarget(Supplier<Pose2d> currentPose)
+  {
+    if (allianceRelativeReefBranches == null)
+    {
+      allianceRelativeReefBranches = reefBranches.stream()
+                                                 .map(AllianceFlipUtil::apply)
+                                                 .collect(Collectors.toList());
+    }
+    Pose2d selectedTargetPose = AllianceFlipUtil.apply(currentPose.get().nearest(allianceRelativeReefBranches));
+    targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
+    return selectedTargetPose;
+  }
+
+  public Command autoTargetCommand(Supplier<Pose2d> currentPose)
+  {
+    return Commands.runOnce(() -> {
+      autoTarget(currentPose);
+    });
   }
 
   public enum ReefBranch
@@ -129,7 +190,4 @@ public class TargetingSystem
     L4
   }
 
-  public void autotarget(){
-
-  }
 }

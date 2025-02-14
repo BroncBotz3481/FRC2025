@@ -28,7 +28,6 @@ public class Robot extends TimedRobot
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    DataLogManager.start();// REMEBER TO REMOVE WHEN ACTUAL BOT IS HERE 
     //DriverStation.startDataLog(DataLogManager.getLog());
   }
 
