@@ -2,11 +2,13 @@ package frc.robot.systems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.Constants.CoralArmConstants;
 
 ;
 
@@ -36,16 +38,14 @@ public class LoadingSystem
   public Command coralLoad()
   {
     double coralArmLoadingAngleDegrees   = 45;
+    double coralArmDefaultAngleDegrees   = -90;
     double coralElevatorHighHeightMeters = 2.0;
     double coralElevatorLowHeightMeters  = 1.0;
-    return  m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
+
+    //to maintain a certain height/angle
+    return  m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
                       .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
-                      .until(() -> m_elevator.aroundHeight(coralElevatorHighHeightMeters))
-                      .andThen(Commands.waitUntil(m_coralArm::coralInLoadPosition))
-                      .andThen(m_elevator.setElevatorHeight(coralElevatorLowHeightMeters))
-                      .andThen(Commands.waitUntil(m_coralArm::coralLoaded))
-                      .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters))
-                      .alongWith(m_wrist.setWristAngle(90));
+                      .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
   }
 
   public Command algaeLoad()
@@ -71,8 +71,9 @@ public class LoadingSystem
     // Set arm to target angle, elev target height
     double coralArmLockingAngleDegrees      = m_targetSystem.getTargetBranchCoralArmAngle();
     double coralElevatorLockingHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
-    return m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters)
-                     .andThen(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees).repeatedly());
+    return m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters).repeatedly()
+                     .alongWith(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees).repeatedly())
+                     .alongWith(m_wrist.setWristAngle(90).repeatedly());
   }
 
   public Command algaeLockProcessor()
