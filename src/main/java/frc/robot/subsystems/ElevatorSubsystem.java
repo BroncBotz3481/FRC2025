@@ -67,7 +67,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(40)
-                .closedLoopRampRate(ElevatorConstants.kElevatorRampRate);
+                .openLoopRampRate(ElevatorConstants.kElevatorRampRate);
 
         m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);//
 
@@ -120,9 +120,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                 m_laserCanROI
         ));
 
-
-        Constants.elevatorMech.setLength(getPositionMeters());
-        Constants.elevatorCarriage.setPosition(AlgaeArmConstants.kAlgaeArmLength, getPositionMeters());
+        //comment out for arm demo
+        //Constants.elevatorMech.setLength(getPositionMeters());
+        //Constants.elevatorCarriage.setPosition(AlgaeArmConstants.kAlgaeArmLength, getPositionMeters());
     }
 
     public double getPositionMeters() {

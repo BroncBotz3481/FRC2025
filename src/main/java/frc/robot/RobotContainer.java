@@ -132,8 +132,10 @@ public class RobotContainer
 
   public RobotContainer()
   {
-    elevator.setDefaultCommand(elevator.setElevatorHeight(0));
-    algaeArm.setDefaultCommand(algaeArm.setGoal(-90));
+
+    elevator.setDefaultCommand(elevator.setElevatorHeight(0.5));
+    algaeArm.setDefaultCommand(algaeArm.setGoal(-80));
+    //elevator.setDefaultCommand(elevator.setElevatorHeight(0));
     // Configure the trigger bindings
     /*
     DriverStation.silenceJoystickConnectionWarning(true);

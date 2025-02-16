@@ -89,14 +89,14 @@ public final class Constants
     public static final double  kAlgaeArmKp                     = 2.0691;
     public static final double  kAlgaeArmKi                     = 0;
     public static final double  kAlgaeArmKd                     = 0.0;
-    public static final double  kAlgaeArmReduction              = 200;
+    public static final double  kAlgaeArmReduction              = 81;
     public static final Angle   kAlgaeArmAllowedClosedLoopError
                                                                 = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
         0.01));
     public static final double  kAlgaeArmMass                   = 8.0; // Kilograms
     public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-75);
+    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-90);
     public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(255);
     public static final double  kAlgaeArmRampRate               = 0.5;
     public static final Angle   kAlgaeArmOffsetToHorizantalZero = Rotations.of(0);
@@ -112,9 +112,9 @@ public final class Constants
                                                                           .in(RPM.per(Second));
     public static final int     kAlgaeArmStallCurrentLimitAmps  = 40;
     public static final double  kAlgaeArmkS                     = 0; // volts (V)
-    public static final double  kAlgaeArmkG                     = 0; // volts (V)
-    public static final double  kAlgaeArmKv                     = 0; // volts per velocity (V/RPM)
-    public static final double  kAlgaeArmKa                     = 0; // volts per acceleration (V/(RPM/s))
+    public static final double  kAlgaeArmkG                     = 1.53; // volts (V)
+    public static final double  kAlgaeArmKv                     = 1.58; // volts per velocity (V/RPM)
+    public static final double  kAlgaeArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
     public static final double  kAlgaeAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
     public static       int     algaeArmMotorID                 = 15;
 
@@ -127,14 +127,14 @@ public final class Constants
     public static final double  kCoralArmKp                     = 2.0691;
     public static final double  kCoralArmKi                     = 0;
     public static final double  kCoralArmKd                     = 0.0;
-    public static final double  kCoralArmReduction              = 200;
+    public static final double  kCoralArmReduction              = 81;
     public static final Angle   kCoralArmAllowedClosedLoopError
                                                                 = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(
         0.01));
     public static final double  kCoralArmMass                   = 8.0; // Kilograms
     public static final double  kCoralArmLength                 = Inches.of(31).in(Meters);
     public static final Angle   kCoralArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kCoralArmMinAngle               = Degrees.of(-75);
+    public static final Angle   kCoralArmMinAngle               = Degrees.of(-90);
     public static final Angle   kCoralArmMaxAngle               = Degrees.of(255);
     public static final double  kCoralArmRampRate               = 0.5;
     public static final Angle   kCoralArmOffsetToHorizantalZero = Rotations.of(0);
@@ -150,9 +150,9 @@ public final class Constants
                                                                           .in(RPM.per(Second));
     public static final int     kCoralArmStallCurrentLimitAmps  = 40;
     public static final double  kCoralArmkS                     = 0; // volts (V)
-    public static final double  kCoralArmkG                     = 0; // volts (V)
-    public static final double  kCoralArmKv                     = 0; // volts per velocity (V/RPM)
-    public static final double  kCoralArmKa                     = 0; // volts per acceleration (V/(RPM/s))
+    public static final double  kCoralArmkG                     = 1.53; // volts (V)
+    public static final double  kCoralArmKv                     = 1.58; // volts per velocity (V/RPM)
+    public static final double  kCoralArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
     public static final double  kCoralAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
 
     // ID's
