@@ -204,12 +204,12 @@ public class RobotContainer
     m_OperatorController1.button(11).onTrue( 
       targetingSystem.setTargetCommand(
         TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L2).andThen(loadingSystem.algaeLoad()));
+        TargetingSystem.ReefBranchLevel.L2).andThen(loadingSystem.algaeLoad(42)));
         
     m_OperatorController1.button(12).onTrue( 
       targetingSystem.setTargetCommand(
         TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad())); 
+        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad(48))); 
 
     m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
     m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());

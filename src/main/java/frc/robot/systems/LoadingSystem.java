@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
@@ -48,11 +49,11 @@ public class LoadingSystem
                       .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
   }
 
-  public Command algaeLoad()
+  public Command algaeLoad(double elevatorHeight)
   {
     // Put algae arm out, roll in
     double algaeArmLoadingAngleDegrees   = 15;
-    double algaeElevatorHighHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
+    double algaeElevatorHighHeightMeters = Units.inchesToMeters(elevatorHeight);
     double algaeElevatorLowHeightMeters  = algaeElevatorHighHeightMeters - 0.25;//0.25-elev height change
     double straightWristAngle            = 90;
 
