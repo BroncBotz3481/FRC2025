@@ -12,10 +12,9 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.RobotMath.AlgaeArm;
-import frc.robot.RobotMath.CoralArm;
 
 import static edu.wpi.first.units.Units.*;
+import frc.robot.RobotMath.Arm;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This
@@ -28,27 +27,28 @@ import static edu.wpi.first.units.Units.*;
 
 public final class Constants
 {
-  public static final Mechanism2d sideView = new Mechanism2d(AlgaeArmConstants.kAlgaeArmLength * 2,
-          ElevatorConstants.kElevatorLength + AlgaeArmConstants.kAlgaeArmLength);
+  public static final Mechanism2d sideView = new Mechanism2d(ArmConstants.kArmLength * 2,
+          ArmConstants.kArmLength + ElevatorConstants.kElevatorLength);
   public static final MechanismRoot2d elevatorCarriage;
-  public static final MechanismLigament2d elevatorMech;
   public static final MechanismLigament2d armMech;
+  public static final MechanismLigament2d elevatorMech;
 
   static{
     elevatorCarriage = Constants.sideView.getRoot("Elevator Carriage",
-            AlgaeArmConstants.kAlgaeArmLength,
-            ElevatorConstants.kElevatorStartingHeightSim.in(Meters));
+                                                        ArmConstants.kArmLength,
+                                                        ElevatorConstants.kElevatorStartingHeightSim.in(Meters));
+    armMech = elevatorCarriage.append(new MechanismLigament2d("Arm",
+                                                        ArmConstants.kArmLength,
+                                                        ArmConstants.kArmStartingAngle.in(Degrees),
+                                                        6,
+                                                        new Color8Bit(Color.kOrange)));
     elevatorMech = elevatorCarriage.append(new MechanismLigament2d("Elevator",
-            ElevatorConstants.kElevatorLength,
-            ElevatorConstants.kElevatorStartingAngle.in(Degrees),
-            5,
-            new Color8Bit(Color.kRed)));
-    armMech = elevatorCarriage.append((new MechanismLigament2d("Arm",
-            AlgaeArmConstants.kAlgaeArmLength,
-            AlgaeArmConstants.kAlgaeArmStartingAngle.in(Degrees),
-            5,
-            new Color8Bit(Color.kBlue))));
+                                                        ElevatorConstants.kElevatorLength,
+                                                        ElevatorConstants.kElevatorStartingAngle.in(Degrees),
+                                                        6,
+                                                        new Color8Bit(Color.kRed)));
   }
+
 
 
   public static final double              maxSpeed      = 7;
@@ -82,82 +82,34 @@ public final class Constants
     }
   }
 
-  public static class AlgaeArmConstants
-  {
-
-    // The P gain for the PID controller that drives this arm.
-    public static final double  kAlgaeArmKp                     = 2.0691;
-    public static final double  kAlgaeArmKi                     = 0;
-    public static final double  kAlgaeArmKd                     = 0.0;
-    public static final double  kAlgaeArmReduction              = 81;
-    public static final Angle   kAlgaeArmAllowedClosedLoopError
-                                                                = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
-        0.01));
-    public static final double  kAlgaeArmMass                   = 8.0; // Kilograms
-    public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
-    public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-90);
-    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(255);
-    public static final double  kAlgaeArmRampRate               = 0.5;
-    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Rotations.of(0);
-    public static final boolean kAlgaeArmInverted               = false;
-    public static final double  kAlgaeArmMaxVelocityRPM
-                                                                = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
-        90)).per(
-        Second).in(RPM);
-    public static final double  kAlgaeArmMaxAccelerationRPMperSecond
-                                                                = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
-                                                                              180)).per(
-                                                                              Second).per(Second)
-                                                                          .in(RPM.per(Second));
-    public static final int     kAlgaeArmStallCurrentLimitAmps  = 40;
-    public static final double  kAlgaeArmkS                     = 0; // volts (V)
-    public static final double  kAlgaeArmkG                     = 1.53; // volts (V)
-    public static final double  kAlgaeArmKv                     = 1.58; // volts per velocity (V/RPM)
-    public static final double  kAlgaeArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
-    public static final double  kAlgaeAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
-    public static       int     algaeArmMotorID                 = 15;
+  public static class ArmConstants{
+    public static final int armMotorID = 15;
+    public static final double kArmkS = 0;    // Volts (V)
+    public static final double kArmkG = 1.53; // Volts (V)
+    public static final double kArmkV = 1.58; // Volts Per Velocity (V/(rad/s))
+    public static final double kArmkA = 0.08; // Volts Per Acceleration (V/(rad/s^2))
+    public static final double kArmkP = 0.5;//?
+    public static final double kArmkI = 0.0;
+    public static final double kArmkD = 0.0;
+    public static final double kArmReduction = 81;
+    public static final double kArmMaxVelocity = Arm.convertArmAngleToSensorUnits(Degrees.of(90))//?
+                                                .per(Second).in(RPM) ;
+    public static final double kArmMaxAcceleration = Arm.convertArmAngleToSensorUnits(Degrees.of(180))
+                                                    .per(Second).per(Second).in(RPM.per(Second)) ;
+    public static final int ArmStallCurrentLimit = 40;
+    public static final double ArmRampRate = 0.5;
+    public static final boolean ArmInverted = false;
+    public static final double kArmAllowedClosedLoopError = Arm.convertArmAngleToSensorUnits(Degrees.of(0.01)).in(Rotations);
+    public static final double kArmLength = Inches.of(31).in(Meters);
+    public static final double kArmMass = 8.0; // kg//?
+    public static final Angle kArmMinAngle = Degrees.of(-90);
+    public static final Angle kArmMaxAngle = Degrees.of(255);//?
+    public static final Angle kArmStartingAngle = Degrees.of(0);
+    public static final Angle kArmOffsetToHorizontalZero = Rotations.of(0);
+    public static final double kArmDefaultTolerance = 1;
 
   }
 
-  public static class CoralArmConstants
-  {
-
-    // The P gain for the PID controller that drives this arm.
-    public static final double  kCoralArmKp                     = 2.0691;
-    public static final double  kCoralArmKi                     = 0;
-    public static final double  kCoralArmKd                     = 0.0;
-    public static final double  kCoralArmReduction              = 81;
-    public static final Angle   kCoralArmAllowedClosedLoopError
-                                                                = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(
-        0.01));
-    public static final double  kCoralArmMass                   = 8.0; // Kilograms
-    public static final double  kCoralArmLength                 = Inches.of(31).in(Meters);
-    public static final Angle   kCoralArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kCoralArmMinAngle               = Degrees.of(-90);
-    public static final Angle   kCoralArmMaxAngle               = Degrees.of(255);
-    public static final double  kCoralArmRampRate               = 0.5;
-    public static final Angle   kCoralArmOffsetToHorizantalZero = Rotations.of(0);
-    public static final boolean kCoralArmInverted               = false;
-    public static final double  kCoralArmMaxVelocityRPM
-                                                                = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(
-        90)).per(
-        Second).in(RPM);
-    public static final double  kCoralArmMaxAccelerationRPMperSecond
-                                                                = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(
-                                                                              180)).per(
-                                                                              Second).per(Second)
-                                                                          .in(RPM.per(Second));
-    public static final int     kCoralArmStallCurrentLimitAmps  = 40;
-    public static final double  kCoralArmkS                     = 0; // volts (V)
-    public static final double  kCoralArmkG                     = 1.53; // volts (V)
-    public static final double  kCoralArmKv                     = 1.58; // volts per velocity (V/RPM)
-    public static final double  kCoralArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
-    public static final double  kCoralAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
-
-    // ID's
-    public static final int coralArmMotorID = 14;
-  }
 
   public static class ElevatorConstants {
     public static final double kElevatorKp = 5;//5

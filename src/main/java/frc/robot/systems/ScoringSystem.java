@@ -8,7 +8,7 @@ import frc.robot.subsystems.*;
 
 
 public class ScoringSystem
-{
+{/*
 
   private CoralArmSubsystem    m_coralArm;
   private AlgaeIntakeSubsystem m_algaeIntake;
@@ -76,6 +76,6 @@ public class ScoringSystem
             .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
             .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds))
             .until(() -> !m_algaeArm.algaeLoaded());
-  }
+  }*/
 
 }

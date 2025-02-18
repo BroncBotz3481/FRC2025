@@ -41,12 +41,11 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  private final ElevatorSubsystem      elevator          = new ElevatorSubsystem();
+  private final ArmSubsystem         arm              = new ArmSubsystem();
+  private final ElevatorSubsystem    elevator         = new ElevatorSubsystem();
 
-  private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
-  private final ClimberSubsystem     climb       = new ClimberSubsystem();
+  /*private final ClimberSubsystem     climb       = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
-  private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
   private final CoralIntakeSubsystem coralIntake = new CoralIntakeSubsystem();
 
@@ -60,7 +59,7 @@ public class RobotContainer
                                                                     algaeArm,
                                                                     loadingSystem,
                                                                     targetingSystem);
-
+*/
 
   // The real world (whats that?)
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
@@ -132,10 +131,8 @@ public class RobotContainer
 
   public RobotContainer()
   {
-
-    elevator.setDefaultCommand(elevator.setElevatorHeight(0.5));
-    algaeArm.setDefaultCommand(algaeArm.setGoal(-80));
-    //elevator.setDefaultCommand(elevator.setElevatorHeight(0));
+    arm.setDefaultCommand(arm.setArmAngle(-85));
+    elevator.setDefaultCommand(elevator.setElevatorHeight(0));
     // Configure the trigger bindings
     /*
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -150,6 +147,7 @@ public class RobotContainer
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
+
     SmartDashboard.putData("Side View", Constants.sideView);
     configureBindings();
 
@@ -169,11 +167,7 @@ public class RobotContainer
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // Put Mechanism 2d to SmartDashboard
-    m_driverController.button(1).whileTrue(elevator.setElevatorHeight(4));
-    m_driverController.button(2).whileTrue(loadingSystem.algaeLoad());
-
-
-
+    m_driverController.button(1).whileTrue(arm.setArmAngle(45));
 
 
   }

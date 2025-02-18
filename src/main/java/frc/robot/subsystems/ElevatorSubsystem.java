@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.AlgaeArmConstants;
+//import frc.robot.Constants.AlgaeArmConstants;
 import edu. wpi. first. math. trajectory. TrapezoidProfile.Constraints;
 import frc.robot.RobotMath.Elevator;
 

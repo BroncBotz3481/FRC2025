@@ -2,16 +2,13 @@ package frc.robot.systems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.AlgaeArmSubsystem;
-import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 ;
 
 public class LoadingSystem
-{
+{/*
 
   private CoralArmSubsystem    m_coralArm;
   private AlgaeArmSubsystem    m_algaeArm;
@@ -92,4 +89,5 @@ public class LoadingSystem
     return m_elevator.setElevatorHeight(algaeElevatorLockingNetHeightMeters)
                      .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLockingNetAngleDegrees).repeatedly());
   }
+  */
 }
