@@ -198,7 +198,7 @@ public class RobotContainer
     m_OperatorController1.button(8).onTrue(Commands.print("Cancel Selected Command"));
 
     m_OperatorController1.button(9).onTrue(Commands.print("Outtake Coral"));
-    m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// this does not set robot to loading pose
+    m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
   
     m_OperatorController1.button(11).onTrue( 

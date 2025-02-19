@@ -38,17 +38,23 @@ public class LoadingSystem
 
   public Command coralLoad()
   {
-    double coralArmLoadingAngleDegrees   = 45;
-    double coralArmDefaultAngleDegrees   = -90;
-    double coralElevatorHighHeightMeters = 2.0;
-    double coralElevatorLowHeightMeters  = 1.0;
+    double coralArmLoadingAngleDegrees   = -45;
+  
+    double coralElevatorHighHeightMeters = 0;
+  
+    return m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly()
+            .alongWith(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters),
+             m_wrist.setWristAngle(90).repeatedly())
+             .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
+
 
     //to maintain a certain height/angle
-    return  m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
-                      .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
-                      .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
+    // return  m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
+    //                   .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
+    //                   .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded())
+    //                   .andThen(Commands.print("YOu are a dork"));
   }
-
+//Fix this later
   public Command algaeLoad(double elevatorHeight)
   {
     // Put algae arm out, roll in
@@ -92,7 +98,7 @@ public class LoadingSystem
   {
     // Set arm to target angle, elev target height
     double algaeArmLockingNetAngleDegrees      = 45;
-    double algaeElevatorLockingNetHeightMeters = 4.0;
+    double algaeElevatorLockingNetHeightMeters = Constants.ElevatorConstants.kMaxElevatorHeightMeters;
     return m_elevator.setElevatorHeight(algaeElevatorLockingNetHeightMeters)
                      .andThen(m_algaeArm.setAlgaeArmAngle(algaeArmLockingNetAngleDegrees).repeatedly());
   }

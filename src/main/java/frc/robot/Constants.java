@@ -122,8 +122,8 @@ public final class Constants
     public static final double  kAlgaeArmMass                   = Units.lbsToKilograms(15); // Kilograms
     public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-90);
-    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(90);
+    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-45);
+    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(250);
     public static final double  kAlgaeArmRampRate               = 0.5;
     public static final Angle   kAlgaeArmOffsetToHorizantalZero = Rotations.of(0);
     public static final boolean kAlgaeArmInverted               = false;
@@ -160,7 +160,7 @@ public final class Constants
     public static final double  kCoralArmMass                   = Units.lbsToKilograms(15); // Kilograms
     public static final double  kCoralArmLength                 = Inches.of(31).in(Meters);
     public static final Angle   kCoralArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kCoralArmMinAngle               = Degrees.of(-90);
+    public static final Angle   kCoralArmMinAngle               = Degrees.of(-45);
     public static final Angle   kCoralArmMaxAngle               = Degrees.of(90);
     public static final double  kCoralArmRampRate               = 0.5;
     public static final Angle   kCoralArmOffsetToHorizantalZero = Rotations.of(0);
@@ -201,7 +201,7 @@ public final class Constants
     public static final double   kCarriageMass            = 4.0; // kg
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
     public static final double   kMinElevatorHeightMeters = 0;//min height / 10
-    public static final double   kMaxElevatorHeightMeters = 10.25;
+    public static final double   kMaxElevatorHeightMeters = Units.inchesToMeters(42);
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
     public static final Distance kLaserCANOffset          = Inches.of(3);
 

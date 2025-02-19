@@ -80,8 +80,8 @@ public class ScoringSystem
   public Command scoreAlgaeNet()
   {
     //set elevator height, set alage angle, spit out ball, drive pose
-    double algaeArmAngleDegrees = 45;
-    double elevatorHeightMeters = 4.0;
+    double algaeArmAngleDegrees = 48;
+    double elevatorHeightMeters = 42;
     return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
             .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
             .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
