@@ -253,5 +253,9 @@ public final class Constants
     public static double kWristReduction = 1;
     public static double kIntakeMass     = 2.27; //kg
   }
+  public static class ClimberConstants {
 
+    public static final int climberMotorID = 18;
+
+  }
 }

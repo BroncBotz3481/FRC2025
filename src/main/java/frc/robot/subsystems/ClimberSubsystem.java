@@ -1,8 +1,13 @@
 package frc.robot.subsystems;
 
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.IntakeConstants;
 
 public class ClimberSubsystem extends SubsystemBase
 {
@@ -11,7 +16,7 @@ public class ClimberSubsystem extends SubsystemBase
   // constructor must appear before the "INSTANCE" variable so that they are initialized
   // before the constructor is called when the "INSTANCE" variable initializes.
 
-
+ private final SparkMax m_ClimberMotor = new SparkMax(ClimberConstants.climberMotorID, MotorType.kBrushless);
   public ClimberSubsystem()
   {
     // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) Done

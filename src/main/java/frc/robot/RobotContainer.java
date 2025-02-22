@@ -156,10 +156,10 @@ public class RobotContainer
     // Configure the trigger bindings
     DriverStation.silenceJoystickConnectionWarning(true);
     elevator.setDefaultCommand(elevator.setGoal(0));
-    coralArm.setDefaultCommand(coralArm.setGoal(-90));
+    coralArm.setDefaultCommand(coralArm.setGoal(-45));
     climb.setDefaultCommand(climb.climbUp());
     algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
-    algaeArm.setDefaultCommand(algaeArm.setGoal(-90));
+    algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
     coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
     targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
     
