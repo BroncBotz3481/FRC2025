@@ -36,16 +36,19 @@ public class LoadingSystem
     m_targetSystem = targetSys;
   }
 
+  //For testing, set the sensor to low voltage first
   public Command coralLoad()
   {
     double coralArmLoadingAngleDegrees   = -45;
-  
-    double coralElevatorHighHeightMeters = 0;
-  
-    return m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly()
-            .alongWith(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters),
-             m_wrist.setWristAngle(90).repeatedly())
-             .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
+      //The elevator needs to rise first for the arm to come out
+    double coralElevatorHighHeightMeters = Units.inchesToMeters(40);
+
+    return m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
+            .andThen(Commands.waitUntil(() -> m_elevator.aroundHeight(coralElevatorHighHeightMeters)))
+            .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly())
+            .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
+            .alongWith(m_wrist.setWristAngle(90))
+            .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
 
 
     //to maintain a certain height/angle
@@ -53,6 +56,7 @@ public class LoadingSystem
     //                   .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
     //                   .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded())
     //                   .andThen(Commands.print("YOu are a dork"));
+    //.withTimeout()
   }
 //Fix this later
   public Command algaeLoad(double elevatorHeight)

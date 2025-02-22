@@ -38,35 +38,37 @@ public final class Constants
 {
 
   public static final Mechanism2d         sideRobotView = new Mechanism2d(AlgaeArmConstants.kAlgaeArmLength * 2,
-                                                                          ElevatorConstants.kMaxElevatorHeight.in(
-                                                                              Meters) +
-                                                                          AlgaeArmConstants.kAlgaeArmLength);
+                                                                          ElevatorConstants.kMaxElevatorHeight.in(Meters) +
+                                                                                 AlgaeArmConstants.kAlgaeArmLength +
+                                                                                 ElevatorConstants.kElevatorUnextendedHeight);
   public static final MechanismRoot2d     kElevatorCarriage;
+  public static final MechanismRoot2d     kElevatorJoint; // For fixed elevator
   public static final MechanismLigament2d kAlgaeArmMech;
   public static final MechanismLigament2d kCoralArmMech;
   public static final MechanismLigament2d kElevatorTower;
+  public static final MechanismLigament2d kElevatorFixed;
   public static final double              maxSpeed      = 7;
 
   static
   {
     kElevatorCarriage = Constants.sideRobotView.getRoot("ElevatorCarriage",
                                                         AlgaeArmConstants.kAlgaeArmLength,
-                                                        ElevatorConstants.kStartingHeightSim.in(
-                                                            Meters));//The pivot
+                                                     ElevatorConstants.kStartingHeightSim.in(Meters) +
+                                                        ElevatorConstants.kElevatorUnextendedHeight);//The pivot
     kAlgaeArmMech = kElevatorCarriage.append(
         new MechanismLigament2d(
             "AlgaeArm",
             AlgaeArmConstants.kAlgaeArmLength,
             AlgaeArmConstants.kAlgaeArmStartingAngle.in(Degrees),
             6,
-            new Color8Bit(Color.kYellow)));
+            new Color8Bit(Color.kGreen)));
     kCoralArmMech = kElevatorCarriage.append(
         new MechanismLigament2d(
             "CoraleArm",
             CoralArmConstants.kCoralArmLength,
             CoralArmConstants.kCoralArmStartingAngle.in(Degrees),
             6,
-            new Color8Bit(Color.kOrange)));
+            new Color8Bit(Color.kPurple)));
 
     kElevatorTower = kElevatorCarriage.append(new MechanismLigament2d(
         "Elevator",
@@ -74,6 +76,16 @@ public final class Constants
         -90,
         6,
         new Color8Bit(Color.kRed)));
+
+    kElevatorJoint = Constants.sideRobotView.getRoot("ElevatorJoint",
+            AlgaeArmConstants.kAlgaeArmLength,
+            ElevatorConstants.kElevatorUnextendedHeight);
+
+    kElevatorFixed = kElevatorJoint.append(new MechanismLigament2d("ElevatorFixed",
+            ElevatorConstants.kElevatorUnextendedHeight,
+            -90,
+            6,
+            new Color8Bit(Color.kPaleVioletRed)));
   }
 
   public static class OperatorConstants
@@ -122,7 +134,7 @@ public final class Constants
     public static final double  kAlgaeArmMass                   = Units.lbsToKilograms(15); // Kilograms
     public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-45);
+    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-75);
     public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(250);
     public static final double  kAlgaeArmRampRate               = 0.5;
     public static final Angle   kAlgaeArmOffsetToHorizantalZero = Rotations.of(0);
@@ -160,7 +172,7 @@ public final class Constants
     public static final double  kCoralArmMass                   = Units.lbsToKilograms(15); // Kilograms
     public static final double  kCoralArmLength                 = Inches.of(31).in(Meters);
     public static final Angle   kCoralArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kCoralArmMinAngle               = Degrees.of(-45);
+    public static final Angle   kCoralArmMinAngle               = Degrees.of(-75);
     public static final Angle   kCoralArmMaxAngle               = Degrees.of(90);
     public static final double  kCoralArmRampRate               = 0.5;
     public static final Angle   kCoralArmOffsetToHorizantalZero = Rotations.of(0);
@@ -198,7 +210,7 @@ public final class Constants
     public static final double   kElevatorkG              = 0.91274; // volts (V)
     public static final double   kElevatorGearing         = 10.0;
     public static final double   kElevatorDrumRadius      = Units.inchesToMeters(2.0);
-    public static final double   kCarriageMass            = 4.0; // kg
+    public static final double   kCarriageMass            = Units.lbsToKilograms(16); // kg
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
     public static final double   kMinElevatorHeightMeters = 0;//min height / 10
     public static final double   kMaxElevatorHeightMeters = Units.inchesToMeters(42);

@@ -209,7 +209,7 @@ public class ElevatorSubsystem extends SubsystemBase
 
     // Update elevator visualization with position
     Constants.kElevatorTower.setLength(getHeightMeters());
-    Constants.kElevatorCarriage.setPosition(AlgaeArmConstants.kAlgaeArmLength, getHeightMeters());
+    Constants.kElevatorCarriage.setPosition(AlgaeArmConstants.kAlgaeArmLength, getHeightMeters() + ElevatorConstants.kElevatorUnextendedHeight);
   }
 
   /**
