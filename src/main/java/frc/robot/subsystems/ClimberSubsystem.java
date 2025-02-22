@@ -16,7 +16,7 @@ public class ClimberSubsystem extends SubsystemBase
   // constructor must appear before the "INSTANCE" variable so that they are initialized
   // before the constructor is called when the "INSTANCE" variable initializes.
 
- private final SparkMax m_ClimberMotor = new SparkMax(ClimberConstants.climberMotorID, MotorType.kBrushless);
+ //private final SparkMax m_ClimberMotor = new SparkMax(ClimberConstants.climberMotorID, MotorType.kBrushless);
   public ClimberSubsystem()
   {
     // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) Done
