@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,9 +39,12 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.systems.LoadingSystem;
 import frc.robot.systems.ScoringSystem;
 import frc.robot.systems.TargetingSystem;
+import frc.robot.systems.field.AllianceFlipUtil;
+import frc.robot.systems.field.FieldConstants;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
+import frc.robot.systems.field.FieldConstants.CoralStation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -217,8 +221,8 @@ public class RobotContainer
     m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
 
 
-    m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1());
-    m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2());
+    m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1().repeatedly());
+    m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2().repeatedly());
    
   //   m_OperatorController1.button(17).whileTrue( //Dance
   //   elevator.setElevatorHeight(Units.inchesToMeters(31)).repeatedly()
@@ -235,6 +239,7 @@ public class RobotContainer
     targetingSystem.autoTargetCommand(drivebase::getPose)
               .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
               .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
+
   m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
 
 /*
@@ -357,19 +362,11 @@ public class RobotContainer
 
   public Command driveToHumanPlayer1()
   {
-    return drivebase.driveToPose(
-        new Pose2d(new Translation2d
-                       (Meter.of(1),
-                        Meter.of(7)),
-                   Rotation2d.fromDegrees(130)));
+    return drivebase.driveToPose(CoralStation.leftCenterFace);
   }
   public Command driveToHumanPlayer2()
   {
-    return drivebase.driveToPose(
-        new Pose2d(new Translation2d
-                       (Meter.of(1),
-                        Meter.of(1)),
-                   Rotation2d.fromDegrees(-130)));
+    return drivebase.driveToPose(CoralStation.rightCenterFace);
   }
 
   public Command driveToProcessor()

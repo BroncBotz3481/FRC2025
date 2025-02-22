@@ -74,14 +74,14 @@ public class FieldConstants
 
     public static final Pose2d leftCenterFace  =
         new Pose2d(
-            Units.inchesToMeters(33.526),
-            Units.inchesToMeters(291.176),
-            Rotation2d.fromDegrees(90 - 144.011));
+            Units.inchesToMeters(33.526 - 1),
+            Units.inchesToMeters(291.176 - 1),
+            Rotation2d.fromDegrees(90 - 144.011-180));
     public static final Pose2d rightCenterFace =
         new Pose2d(
-            Units.inchesToMeters(33.526),
-            Units.inchesToMeters(25.824),
-            Rotation2d.fromDegrees(144.011 - 90));
+            Units.inchesToMeters(33.526 + 1),
+            Units.inchesToMeters(25.824 + 1),
+            Rotation2d.fromDegrees(144.011 - 90-180));
   }
 
   public static class Reef
