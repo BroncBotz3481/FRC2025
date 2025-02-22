@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AlgaeArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -204,12 +206,12 @@ public class RobotContainer
     m_OperatorController1.button(11).onTrue( 
       targetingSystem.setTargetCommand(
         TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L2).andThen(loadingSystem.algaeLoad(42)));
+        TargetingSystem.ReefBranchLevel.L2).andThen(loadingSystem.algaeLoad(42, 14)));
         
     m_OperatorController1.button(12).onTrue( 
       targetingSystem.setTargetCommand(
         TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad(48))); 
+        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad(42, 44))); 
 
     m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
     m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
@@ -233,7 +235,7 @@ public class RobotContainer
     targetingSystem.autoTargetCommand(drivebase::getPose)
               .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
               .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
-
+  m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
 
 /*
  *     .andThen(waveArms(80, 20))

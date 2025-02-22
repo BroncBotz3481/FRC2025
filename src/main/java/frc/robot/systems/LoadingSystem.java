@@ -59,10 +59,10 @@ public class LoadingSystem
     //.withTimeout()
   }
 //Fix this later
-  public Command algaeLoad(double elevatorHeight)
+  public Command algaeLoad(double elevatorHeight, double angle)
   {
     // Put algae arm out, roll in
-    double algaeArmLoadingAngleDegrees   = 15;
+    double algaeArmLoadingAngleDegrees   = angle;
     double algaeElevatorHighHeightMeters = Units.inchesToMeters(elevatorHeight);
     double algaeElevatorLowHeightMeters  = algaeElevatorHighHeightMeters - 0.25;//0.25-elev height change
     double straightWristAngle            = 90;
