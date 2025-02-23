@@ -11,15 +11,15 @@ labeling motor IDS so no overlap
 10. BackRight Drive
 11. BackRight Angle
 12. BackRight Encoder
-13. ElevatorMotor
-14. CoralArmMotor
-15. AlgaeArmMotor
-16. CoralWristMotor
-17. coralRollerMotor
-18. algaeRollerMotor
-19. ClimberMotor
-20. 
-21. 
+13. ElevatorMotorLeft("ElevatorMotor")
+14. ElevatorMotorRight
+15. CoralArmMotor
+16. AlgaeArmMotor
+17. CoralWristMotor
+18. coralRollerMotor
+19. algaeRollerMotor
+20. ClimberMotorLeft("ClimberMotor")
+21. ClimberMotorRight
 22.
 23. 
 24. 

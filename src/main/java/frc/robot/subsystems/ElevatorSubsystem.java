@@ -61,9 +61,11 @@ public class ElevatorSubsystem extends SubsystemBase
 {
 
   // This gearbox represents a gearbox containing 1 Neo
-  private final DCMotor         m_elevatorGearbox = DCMotor.getNEO(1);
+  private final DCMotor         m_elevatorGearbox = DCMotor.getNEO(2);
   private final SparkMax        m_motor           = new SparkMax(ElevatorConstants.elevatorMotorID,
                                                                  MotorType.kBrushless);
+  private final SparkMax        m_motorRight      = new SparkMax(ElevatorConstants.elevatorMotorRightID, MotorType.kBrushless);
+
   private final RelativeEncoder m_encoder         = m_motor.getEncoder();
 
   // Closed Loop Controller + Feedback
@@ -142,7 +144,16 @@ public class ElevatorSubsystem extends SubsystemBase
     config
         .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
         .closedLoopRampRate(ElevatorConstants.kElevatorRampRate);
+
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkMaxConfig followerConfig = new SparkMaxConfig();
+    followerConfig
+            .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
+            .closedLoopRampRate(ElevatorConstants.kElevatorRampRate)
+            .follow(m_motor, false);
+
+    m_motorRight.configure(followerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Publish Mechanism2d to SmartDashboard
     // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim

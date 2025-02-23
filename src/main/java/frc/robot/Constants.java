@@ -154,7 +154,7 @@ public final class Constants
     public static final double  kAlgaeArmKv                     = 1.58; // volts per velocity (V/RPM)
     public static final double  kAlgaeArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
     public static final double  kAlgaeAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
-    public static       int     algaeArmMotorID                 = 15;
+    public static       int     algaeArmMotorID                 = 16;
 
   }
 
@@ -194,7 +194,7 @@ public final class Constants
     public static final double  kCoralAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
 
     // ID's
-    public static final int coralArmMotorID = 14;
+    public static final int coralArmMotorID = 15;
   }
 
 
@@ -209,7 +209,9 @@ public final class Constants
     public static final double   kElevatorkA              = 0.173; // volt per acceleration (V/(m/s²))
     public static final double   kElevatorkG              = 0.91274; // volts (V)
     public static final double   kElevatorGearing         = 10.0;
-    public static final double   kElevatorDrumRadius      = Units.inchesToMeters(2.0);
+    public static final double   kElevatorSproketTeeth    = 22;
+    public static final double   kElevatorPitch           = Units.inchesToMeters(0.25);
+    public static final double   kElevatorDrumRadius      = kElevatorSproketTeeth * kElevatorPitch / (2 * Math.PI);// radius = Circumference / (2 pi)
     public static final double   kCarriageMass            = Units.lbsToKilograms(16); // kg
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
     public static final double   kMinElevatorHeightMeters = 0;//min height / 10
@@ -225,6 +227,7 @@ public final class Constants
     public static final double   kElevatorAllowableError = Units.inchesToMeters(2);
     public static final double   kLowerToScoreHeight     = Units.inchesToMeters(6);
     public static       int      elevatorMotorID         = 13;
+    public static       int      elevatorMotorRightID       = 14;
     public static       double   kElevatorRampRate       = 0.1;
     public static       int      kElevatorCurrentLimit   = 40;
     public static double kMaxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
@@ -238,9 +241,9 @@ public final class Constants
     public static final double AlgaeIntakeSpeeds  = 0.8;
     public static final double AlgaeOuttakeSpeeds = -0.8;
 
-    public static final int    coralWristMotorID   = 16;
-    public static final int    coralRollerMotorID  = 17;
-    public static       int    algaeRollerMotorID  = 18;
+    public static final int    coralWristMotorID   = 17;
+    public static final int    coralRollerMotorID  = 18;
+    public static       int    algaeRollerMotorID  = 19;
     public static final double defaultrRollerSpeed = 0;
     public static final double kIntakeReduction    = 0;
 
@@ -255,7 +258,8 @@ public final class Constants
   }
   public static class ClimberConstants {
 
-    public static final int climberMotorID = 19;
+    public static final int climberMotorID = 20;
+    public static final int climberMotorRightID = 21;
     public static final double kClimbSpeed = 0.8;
 
   }
