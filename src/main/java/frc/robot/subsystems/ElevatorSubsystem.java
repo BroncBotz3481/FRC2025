@@ -369,7 +369,7 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public boolean aroundHeight(double height)
   {
-    return aroundHeight(height, Units.inchesToMeters(ElevatorConstants.kElevatorAllowableError));
+    return aroundHeight(height, ElevatorConstants.kElevatorAllowableError);
   }
 
 

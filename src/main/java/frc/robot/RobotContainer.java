@@ -77,7 +77,7 @@ public class RobotContainer
   private final CoralIntakeSubsystem coralIntake = new CoralIntakeSubsystem();
 
   private final TargetingSystem targetingSystem = new TargetingSystem();
-  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator, coralIntake, targetingSystem);
+  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator, coralIntake, targetingSystem, algaeIntake);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
                                                                     drivebase,
@@ -215,10 +215,12 @@ public class RobotContainer
     m_OperatorController1.button(12).onTrue( 
       targetingSystem.setTargetCommand(
         TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad(42, 44))); 
+        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad(42, 44)));
 
     m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
     m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
+
+    m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
 
     m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1().repeatedly());
@@ -241,6 +243,7 @@ public class RobotContainer
               .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
 
   m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
+  // Button 19 is used just for testing loading sys
 
 /*
  *     .andThen(waveArms(80, 20))
@@ -372,7 +375,7 @@ public class RobotContainer
   {
     if (AllianceFlipUtil.shouldFlip()){
       return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.rightCenterFace));
-  } else  {C
+  } else  {
       return drivebase.driveToPose((CoralStation.rightCenterFace));
   }
   }

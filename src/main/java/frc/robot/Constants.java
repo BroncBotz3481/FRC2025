@@ -222,7 +222,7 @@ public final class Constants
     public static final Distance kStartingHeightSim      = Meters.of(0);
     public static final Distance kMinElevatorHeight      = Meters.of(kMinElevatorHeightMeters);
     public static final Distance kMaxElevatorHeight      = Meters.of(kMaxElevatorHeightMeters);
-    public static final double   kElevatorAllowableError = 1;
+    public static final double   kElevatorAllowableError = Units.inchesToMeters(2);
     public static final double   kLowerToScoreHeight     = Units.inchesToMeters(6);
     public static       int      elevatorMotorID         = 13;
     public static       double   kElevatorRampRate       = 0.1;
