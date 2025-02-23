@@ -161,7 +161,7 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
     elevator.setDefaultCommand(elevator.setGoal(0));
     coralArm.setDefaultCommand(coralArm.setGoal(-45));
-    climb.setDefaultCommand(climb.climbUp());
+    climb.setDefaultCommand(climb.stop());
     algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
     algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
     coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
@@ -362,11 +362,19 @@ public class RobotContainer
 
   public Command driveToHumanPlayer1()
   {
-    return drivebase.driveToPose(CoralStation.leftCenterFace);
+    if (AllianceFlipUtil.shouldFlip()){
+        return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.leftCenterFace));
+    } else  {
+        return drivebase.driveToPose((CoralStation.leftCenterFace));
+    }
   }
   public Command driveToHumanPlayer2()
   {
-    return drivebase.driveToPose(CoralStation.rightCenterFace);
+    if (AllianceFlipUtil.shouldFlip()){
+      return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.rightCenterFace));
+  } else  {C
+      return drivebase.driveToPose((CoralStation.rightCenterFace));
+  }
   }
 
   public Command driveToProcessor()
