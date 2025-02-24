@@ -185,6 +185,7 @@ public class ElevatorSubsystem extends SubsystemBase
 
   }
 
+
   /**
    * Advance the simulation.
    */
@@ -244,9 +245,9 @@ public class ElevatorSubsystem extends SubsystemBase
                                     .in(Rotations));
     } else
     {
-      m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
-                                        m_elevatorLaserCan.getMeasurement().distance_mm + ElevatorConstants.kLaserCANOffset.in(Millimeters)))
-                                    .in(Rotations));
+   //   m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
+   //                                     m_elevatorLaserCan.getMeasurement().distance_mm + ElevatorConstants.kLaserCANOffset.in(Millimeters)))
+   //                                 .in(Rotations));
     }
   }
 
@@ -358,6 +359,7 @@ public class ElevatorSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+
   }
 
   /**
@@ -382,6 +384,8 @@ public class ElevatorSubsystem extends SubsystemBase
   {
     return aroundHeight(height, ElevatorConstants.kElevatorAllowableError);
   }
+
+
 
 
 }
