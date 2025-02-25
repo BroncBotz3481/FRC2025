@@ -177,7 +177,10 @@ public class RobotContainer
     m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
     m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
     m_driverController.button(3).whileTrue(elevator.setElevatorHeight(0.35).repeatedly());
-    elevator.setDefaultCommand(elevator.setPower(0));
+    m_driverController.button(4).whileTrue(elevator.setElevatorHeight(0.1).repeatedly());
+    m_driverController.button(5).whileTrue(elevator.setElevatorHeight(0.5).repeatedly());
+
+    elevator.setDefaultCommand(elevator.hold());
     // drivebase.setDefaultCommand(
     //     !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
     NamedCommands.registerCommand("test", Commands.print("Hello World"));

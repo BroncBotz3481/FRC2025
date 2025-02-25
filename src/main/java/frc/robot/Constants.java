@@ -201,12 +201,12 @@ public final class Constants
   public static class ElevatorConstants
   {
 
-    public static final double   kElevatorKp              = 53.47;
+    public static final double   kElevatorKp              = 70.887;
     public static final double   kElevatorKi              = 0;
-    public static final double   kElevatorKd              = 14.97;
+    public static final double   kElevatorKd              = 20.554;
     public static final double   kElevatorkS              = 0.26737; // volts (V)
     public static final double   kElevatorkV              = 9.9682;//10.773; // volt per velocity (V/(m/s))
-    public static final double   kElevatorkA              = 0.1931;//0.70109; // volt per acceleration (V/(m/s²))
+    public static final double   kElevatorkA              = 0.1931; // volt per acceleration (V/(m/s²))
     public static final double   kElevatorkG              = 0.39266; // volts (V)
     public static final double   kElevatorGearing         = 12.0;
     public static final double   kElevatorSproketTeeth    = 22;
@@ -224,7 +224,7 @@ public final class Constants
     public static final Distance kStartingHeightSim      = Meters.of(0);
     public static final Distance kMinElevatorHeight      = Meters.of(kMinElevatorHeightMeters);
     public static final Distance kMaxElevatorHeight      = Meters.of(kMaxElevatorHeightMeters);
-    public static final double   kElevatorAllowableError = Units.inchesToMeters(0.5);
+    public static final double   kElevatorAllowableError = Units.inchesToMeters(0.005);
     public static final double   kLowerToScoreHeight     = Units.inchesToMeters(6);
     public static       int      elevatorMotorID         = 13;
     public static final int leftLaserCAN                 = 23;

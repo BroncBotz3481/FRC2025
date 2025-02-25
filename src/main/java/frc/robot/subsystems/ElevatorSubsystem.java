@@ -349,7 +349,7 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public Command setElevatorHeight(double height)
   {
-    return setGoal(height).until(() -> aroundHeight(height));
+    return setGoal(height).beforeStarting(()->m_controller.reset(getHeightMeters())).until(() -> aroundHeight(height));
   }
 
 
@@ -406,6 +406,11 @@ public class ElevatorSubsystem extends SubsystemBase
 
 public Command setPower(double d) {
   return run(()->m_motor.set(d));
+}
+
+private double holdPoint = 0;
+public Command hold() {
+  return startRun(()->{holdPoint=getHeightMeters();m_controller.reset(holdPoint);},()->reachGoal(holdPoint));
 }
 
 
