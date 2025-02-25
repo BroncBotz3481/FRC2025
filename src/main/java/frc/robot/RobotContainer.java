@@ -176,7 +176,7 @@ public class RobotContainer
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Elevator Testing
-    boolean elevatorTesting = true;
+    boolean elevatorTesting = false;
     if(elevatorTesting)
     {
       m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
@@ -187,7 +187,10 @@ public class RobotContainer
       elevator.setDefaultCommand(elevator.hold());
     }
 
-    // m_driverController.button(1).whileTrue(algaeArm.setPower(0.01));
+    m_driverController.button(1).whileTrue(algaeArm.setPower(0.1));
+    m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
+    m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
+    algaeArm.setDefaultCommand(algaeArm.setPower(0));
 
 
     // drivebase.setDefaultCommand(

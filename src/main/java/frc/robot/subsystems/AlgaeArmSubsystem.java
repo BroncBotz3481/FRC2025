@@ -65,6 +65,8 @@ public class AlgaeArmSubsystem extends SubsystemBase
   private final DCMotor                   m_armGearbox = DCMotor.getNEO(1);
   private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
                                                                       MotorType.kBrushless);
+  private final AbsoluteEncoder       m_absEncoder     = m_motor.getAbsoluteEncoder();
+
   private       Canandcolor        armLoaded              = new Canandcolor(AlgaeArmConstants.algaeCanandColor);
 
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
@@ -81,7 +83,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   private final SysIdRoutine          m_sysIdRoutine   =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(Volts.per(Second).of(AlgaeArmConstants.kAlgaeArmRampRate),
+          new SysIdRoutine.Config(Volts.per(Second).of(1),
                                   Volts.of(1),
                                   Seconds.of(30)),
           new SysIdRoutine.Mechanism(
@@ -95,13 +97,12 @@ public class AlgaeArmSubsystem extends SubsystemBase
                    .voltage(
                        m_appliedVoltage.mut_replace(m_motor.getAppliedOutput() *
                                                     RobotController.getBatteryVoltage(), Volts))
-                   .angularPosition(m_angle.mut_replace(m_encoder.getPosition(), Rotations))
-                   .angularVelocity(m_velocity.mut_replace(m_encoder.getVelocity(), RPM));
-//                .angularPosition(m_angle.mut_replace(getAngle()))
-//                .angularVelocity(m_velocity.mut_replace(getVelocity()));
+                  //  .angularPosition(m_angle.mut_replace(m_absEncoder.getPosition(), Rotations))
+                  //  .angularVelocity(m_velocity.mut_replace(m_absEncoder.getVelocity(), RPM));
+               .angularPosition(m_angle.mut_replace(getAngle()))
+               .angularVelocity(m_velocity.mut_replace(getVelocity()));
               },
               this));
-  private final AbsoluteEncoder       m_absEncoder     = m_motor.getAbsoluteEncoder();
   // Standard classes for controlling our arm
   private final ProfiledPIDController m_pidController;
   private final ArmFeedforward        m_feedforward    = new ArmFeedforward(AlgaeArmConstants.kAlgaeArmkS,
@@ -136,7 +137,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
     config
         .smartCurrentLimit(AlgaeArmConstants.kAlgaeArmStallCurrentLimitAmps)
         .closedLoopRampRate(AlgaeArmConstants.kAlgaeArmRampRate)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .inverted(AlgaeArmConstants.kAlgaeArmInverted)
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -146,6 +147,8 @@ public class AlgaeArmSubsystem extends SubsystemBase
         .maxVelocity(AlgaeArmConstants.kAlgaeArmMaxVelocityRPM)
         .maxAcceleration(AlgaeArmConstants.kAlgaeArmMaxAccelerationRPMperSecond)
         .allowedClosedLoopError(AlgaeArmConstants.kAlgaeArmAllowedClosedLoopError.in(Rotations));
+    config.absoluteEncoder.inverted(true);
+
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     synchronizeAbsoluteEncoder();
 
@@ -233,9 +236,9 @@ public class AlgaeArmSubsystem extends SubsystemBase
    */
   public void synchronizeAbsoluteEncoder()
   {
-    m_encoder.setPosition(Rotations.of(m_absEncoder.getPosition())
-                                   .minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero)
-                                   .in(Rotations));
+    
+    m_encoder.setPosition(AlgaeArm.convertAlgaeAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
+                          .minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero)).in(Rotations));
   }
 
   /**
@@ -301,7 +304,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public Command setAlgaeArmAngle(double degree)
   {
-    return setGoal(degree).until(() -> aroundAngle(degree));
+    return setGoal(degree).beforeStarting(()->{m_pidController.reset(getAngle().in(Rotations));}).until(() -> aroundAngle(degree));
   }
 
 
@@ -313,7 +316,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    SmartDashboard.putNumber("Algae Arm Sensor (Rotations)",m_encoder.getPosition());
+    SmartDashboard.putNumber("Algae Arm Sensor (Rotations)", m_encoder.getPosition());
     SmartDashboard.putNumber("Algae Arm Angle (Degrees)",  getAngle().in(Degrees));
     SmartDashboard.putNumber("Algae Arm Angle Absolute (Degrees)",  Rotations.of(m_absEncoder.getPosition()).in(Degrees));
     //    System.out.println(getAngle());

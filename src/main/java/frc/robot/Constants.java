@@ -124,9 +124,13 @@ public final class Constants
   {
 
     // The P gain for the PID controller that drives this arm.
-    public static final double  kAlgaeArmKp                     = 2.0691;
+    public static final double  kAlgaeArmKp                     = 0.95562;
     public static final double  kAlgaeArmKi                     = 0;
-    public static final double  kAlgaeArmKd                     = 0.0;
+    public static final double  kAlgaeArmKd                     = 0.018333;
+    public static final double  kAlgaeArmkS                     = 0.30411; // volts (V)
+    public static final double  kAlgaeArmKv                     = 0.00094146; // volts per velocity (V/RPM)
+    public static final double  kAlgaeArmKa                     = 0.00020399; // volts per acceleration (V/(RPM/s))
+    public static final double  kAlgaeArmkG                     = 0.055; // volts (V)
     public static final double  kAlgaeArmReduction              = 112;
     public static final Angle   kAlgaeArmAllowedClosedLoopError
                                                                 = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
@@ -134,10 +138,10 @@ public final class Constants
     public static final double  kAlgaeArmMass                   = Units.lbsToKilograms(15); // Kilograms
     public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(0);
-    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-75);
-    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(250);
+    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-55);
+    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(210);
     public static final double  kAlgaeArmRampRate               = 0.5;
-    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(358.5);
+    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(360);
     public static final boolean kAlgaeArmInverted               = false;
     public static final double  kAlgaeArmMaxVelocityRPM
                                                                 = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
@@ -149,10 +153,7 @@ public final class Constants
                                                                               Second).per(Second)
                                                                           .in(RPM.per(Second));
     public static final int     kAlgaeArmStallCurrentLimitAmps  = 40;
-    public static final double  kAlgaeArmkS                     = 0; // volts (V)
-    public static final double  kAlgaeArmkG                     = 1.53; // volts (V)
-    public static final double  kAlgaeArmKv                     = 1.58; // volts per velocity (V/RPM)
-    public static final double  kAlgaeArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
+   
     public static final double  kAlgaeAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
     public static final int algaeCanandColor                    = 22;
     public static       int     algaeArmMotorID                 = 16; // Checked
