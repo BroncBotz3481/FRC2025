@@ -81,7 +81,6 @@ public class RobotMath
     public static Angle convertDistanceToRotations(Distance distance)
     {
       // m/(2*pi*r)*g = e
-      SmartDashboard.putNumber("CONVERSION", Units.metersToInches(ElevatorConstants.kElevatorSproketTeeth * ElevatorConstants.kElevatorPitch)/(Math.PI));
       return Rotations.of((distance.in(Meters) /
                           (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)) *
                           ElevatorConstants.kElevatorGearing);

@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -312,6 +313,9 @@ public class AlgaeArmSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    SmartDashboard.putNumber("Algae Arm Sensor (Rotations)",m_encoder.getPosition());
+    SmartDashboard.putNumber("Algae Arm Angle (Degrees)",  getAngle().in(Degrees));
+    SmartDashboard.putNumber("Algae Arm Angle Absolute (Degrees)",  Rotations.of(m_absEncoder.getPosition()).in(Degrees));
     //    System.out.println(getAngle());
     //    System.out.println(Units.radiansToDegrees(m_AlgaeArmSim.getAngleRads()));
   }
@@ -332,6 +336,13 @@ public class AlgaeArmSubsystem extends SubsystemBase
   {
     return aroundAngle(degree, AlgaeArmConstants.kAlgaeAngleAllowableError);
   }
+
+
+public Command setPower(double d) {
+  return run(()->m_motor.set(d)).until(atMax);
+}
+
+
 
 
 

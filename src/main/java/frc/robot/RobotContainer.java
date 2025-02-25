@@ -174,13 +174,22 @@ public class RobotContainer
     // configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     SmartDashboard.putData(CommandScheduler.getInstance());
-    m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
-    m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
-    m_driverController.button(3).whileTrue(elevator.setElevatorHeight(0.35).repeatedly());
-    m_driverController.button(4).whileTrue(elevator.setElevatorHeight(0.1).repeatedly());
-    m_driverController.button(5).whileTrue(elevator.setElevatorHeight(0.5).repeatedly());
 
-    elevator.setDefaultCommand(elevator.hold());
+    // Elevator Testing
+    boolean elevatorTesting = true;
+    if(elevatorTesting)
+    {
+      m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
+      m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
+      m_driverController.button(3).whileTrue(elevator.setElevatorHeight(0.35).repeatedly());
+      m_driverController.button(4).whileTrue(elevator.setElevatorHeight(0.1).repeatedly());
+      m_driverController.button(5).whileTrue(elevator.setElevatorHeight(0.5).repeatedly());
+      elevator.setDefaultCommand(elevator.hold());
+    }
+
+    // m_driverController.button(1).whileTrue(algaeArm.setPower(0.01));
+
+
     // drivebase.setDefaultCommand(
     //     !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
