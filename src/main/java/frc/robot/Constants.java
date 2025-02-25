@@ -145,11 +145,11 @@ public final class Constants
     public static final boolean kAlgaeArmInverted               = false;
     public static final double  kAlgaeArmMaxVelocityRPM
                                                                 = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
-        90)).per(
+        10)).per(
         Second).in(RPM);
     public static final double  kAlgaeArmMaxAccelerationRPMperSecond
                                                                 = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
-                                                                              180)).per(
+                                                                              30)).per(
                                                                               Second).per(Second)
                                                                           .in(RPM.per(Second));
     public static final int     kAlgaeArmStallCurrentLimitAmps  = 40;

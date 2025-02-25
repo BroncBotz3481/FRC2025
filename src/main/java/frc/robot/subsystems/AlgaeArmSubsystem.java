@@ -345,6 +345,12 @@ public Command setPower(double d) {
   return run(()->m_motor.set(d)).until(atMax);
 }
 
+public double angleHold=0;
+
+public Command hold() {
+  return startRun(()->{angleHold=getAngle().in(Rotations);m_pidController.reset(angleHold);}, ()->{reachSetpoint(angleHold);});
+}
+
 
 
 

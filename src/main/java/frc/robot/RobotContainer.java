@@ -190,6 +190,10 @@ public class RobotContainer
     m_driverController.button(1).whileTrue(algaeArm.setPower(0.1));
     m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
     m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
+    m_driverController.button(4).whileTrue(algaeArm.setAlgaeArmAngle(-45).repeatedly());
+    m_driverController.button(5).whileTrue(algaeArm.setAlgaeArmAngle(90).repeatedly());
+
+
     algaeArm.setDefaultCommand(algaeArm.setPower(0));
 
 
