@@ -70,7 +70,7 @@ public class RobotContainer
 
   private final ElevatorSubsystem    elevator    = new ElevatorSubsystem();
   private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
-  private final ClimberSubsystem     climb       = new ClimberSubsystem();
+  // private final ClimberSubsystem     climb       = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
   private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
@@ -159,23 +159,27 @@ public class RobotContainer
   {
     // Configure the trigger bindings
     DriverStation.silenceJoystickConnectionWarning(true);
-    elevator.setDefaultCommand(elevator.setGoal(0));
-    coralArm.setDefaultCommand(coralArm.setGoal(-45));
-    climb.setDefaultCommand(climb.stop());
-    algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
-    algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
-    coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
-    targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
+    // elevator.setDefaultCommand(elevator.setGoal(0));
+    // coralArm.setDefaultCommand(coralArm.setGoal(-45));
+    // climb.setDefaultCommand(climb.stop());
+    // algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
+    // algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
+    // coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
+    // targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
     
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
-    configureBindings();
+    // configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     SmartDashboard.putData(CommandScheduler.getInstance());
-    drivebase.setDefaultCommand(
-        !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
+    m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
+    m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
+    m_driverController.button(3).whileTrue(elevator.setElevatorHeight(0.35).repeatedly());
+    elevator.setDefaultCommand(elevator.setPower(0));
+    // drivebase.setDefaultCommand(
+    //     !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
   }
 
@@ -242,7 +246,7 @@ public class RobotContainer
               .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
               .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
 
-  m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
+  // m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
   // Button 19 is used just for testing loading sys
 
 /*

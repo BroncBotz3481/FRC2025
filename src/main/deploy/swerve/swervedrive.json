@@ -1,7 +1,7 @@
 {
   "imu": {
     "type": "canandgyro",
-    "id": 1,
+    "id": 25,
     "canbus": null
   },
   "invertedIMU": false,

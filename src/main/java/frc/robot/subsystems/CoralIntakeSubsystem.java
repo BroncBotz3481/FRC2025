@@ -17,9 +17,15 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
+import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -30,6 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CoralArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
@@ -45,6 +52,14 @@ public class CoralIntakeSubsystem extends SubsystemBase
   private final SparkClosedLoopController wristController = m_wristMotor.getClosedLoopController();
   private final RelativeEncoder           m_wristEncoder  = m_wristMotor.getEncoder();
   private final AbsoluteEncoder           m_absEncoder    = m_wristMotor.getAbsoluteEncoder();
+
+  private final LaserCan         m_intakeLaserCAN     = new LaserCan(IntakeConstants.rightLaserCAN);
+  private final LaserCanSim      m_intakeLaserCANSim  = new LaserCanSim(IntakeConstants.rightLaserCAN);
+  private final RegionOfInterest m_laserCanROI          = new RegionOfInterest(0, 0, 16, 16);
+  private final TimingBudget     m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
+  private final Alert            m_laserCanFailure      = new Alert("LaserCAN failed to configure.",
+                                                                    AlertType.kError);
+  
 
   // Simulation stuff
   private final DCMotor                 m_wristMotorGearbox  = DCMotor.getNEO(1);

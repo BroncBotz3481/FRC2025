@@ -27,6 +27,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -83,11 +85,11 @@ public class ElevatorSubsystem extends SubsystemBase
 
   public final  Trigger           atMin            = new Trigger(() -> MathUtil.isNear(getHeightMeters(),
                                                                                        ElevatorConstants.kMinElevatorHeightMeters,
-                                                                                       Inches.of(3).in(Meters)
+                                                                                       Inches.of(1).in(Meters)
                                                                                       ));
   public final  Trigger           atMax            = new Trigger(() -> MathUtil.isNear(getHeightMeters(),
-                                                                                       ElevatorConstants.kMinElevatorHeightMeters,
-                                                                                       Inches.of(3).in(Meters)
+                                                                                       ElevatorConstants.kMaxElevatorHeightMeters,
+                                                                                       Inches.of(1).in(Meters)
                                                                                       ));
   // SysId Routine and seutp
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
@@ -101,7 +103,7 @@ public class ElevatorSubsystem extends SubsystemBase
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
           new SysIdRoutine.Config(Volts.per(Second).of(1),
-                                  Volts.of(7),
+                                  Volts.of(3),
                                   Seconds.of(10)),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motor(s).
@@ -123,8 +125,8 @@ public class ElevatorSubsystem extends SubsystemBase
   private final SparkMaxSim       m_motorSim       = new SparkMaxSim(m_motor, m_elevatorGearbox);
 
   // Sensors
-  private final LaserCan         m_elevatorLaserCan     = new LaserCan(0);
-  private final LaserCanSim      m_elevatorLaserCanSim  = new LaserCanSim(0);
+  private final LaserCan         m_elevatorLaserCan     = new LaserCan(ElevatorConstants.rightLaserCAN);
+  private final LaserCanSim      m_elevatorLaserCanSim  = new LaserCanSim(ElevatorConstants.rightLaserCAN);
   private final RegionOfInterest m_laserCanROI          = new RegionOfInterest(0, 0, 16, 16);
   private final TimingBudget     m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
   private final Alert            m_laserCanFailure      = new Alert("LaserCAN failed to configure.",
@@ -142,6 +144,7 @@ public class ElevatorSubsystem extends SubsystemBase
   {
     SparkMaxConfig config = new SparkMaxConfig();
     config
+        .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
         .closedLoopRampRate(ElevatorConstants.kElevatorRampRate);
 
@@ -149,9 +152,10 @@ public class ElevatorSubsystem extends SubsystemBase
 
     SparkMaxConfig followerConfig = new SparkMaxConfig();
     followerConfig
+            .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
             .closedLoopRampRate(ElevatorConstants.kElevatorRampRate)
-            .follow(m_motor, false);
+            .follow(m_motor, true);
 
     m_motorRight.configure(followerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -161,6 +165,7 @@ public class ElevatorSubsystem extends SubsystemBase
     try
     {
       m_elevatorLaserCanSim.setRangingMode(RangingMode.LONG);
+      m_elevatorLaserCan.setRangingMode(RangingMode.LONG);
     } catch (Exception e)
     {
       m_laserCanFailure.set(true);
@@ -245,9 +250,13 @@ public class ElevatorSubsystem extends SubsystemBase
                                     .in(Rotations));
     } else
     {
-   //   m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
-   //                                     m_elevatorLaserCan.getMeasurement().distance_mm + ElevatorConstants.kLaserCANOffset.in(Millimeters)))
-   //                                 .in(Rotations));
+      Measurement seedMeasurement = m_elevatorLaserCan.getMeasurement();
+      while(seedMeasurement == null)
+        seedMeasurement = m_elevatorLaserCan.getMeasurement();
+
+     m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
+                                       m_elevatorLaserCan.getMeasurement().distance_mm - ElevatorConstants.kLaserCANOffset.in(Millimeters)))
+                                   .in(Rotations));
     }
   }
 
@@ -262,8 +271,8 @@ public class ElevatorSubsystem extends SubsystemBase
         m_controller.calculate(getHeightMeters(), goal) +
         m_feedforward.calculateWithVelocities(getVelocityMetersPerSecond(),
                                               m_controller.getSetpoint().velocity),
-        -7,
-        7); // 7 is the max voltage to send out.
+        -12,
+        12); // 7 is the max voltage to send out.
     m_motor.setVoltage(voltsOut);
   }
 
@@ -288,6 +297,9 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public double getHeightMeters()
   {
+    // m = (e / g) * (2*pi*r)
+    // m/(2*pi*r) = e / g
+    // m/(2*pi*r)*g = e
     return (m_encoder.getPosition() / ElevatorConstants.kElevatorGearing) *
            (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
   }
@@ -359,7 +371,13 @@ public class ElevatorSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-
+    // seedElevatorMotorPosition();
+    Measurement laserCanMeasurement = m_elevatorLaserCan.getMeasurement();
+    if(laserCanMeasurement != null)
+    {
+      SmartDashboard.putNumber("Elevator LaserCAN (Meters)", Millimeters.of(laserCanMeasurement.distance_mm).in(Meters));
+    }
+    SmartDashboard.putNumber("Elevator Height (Meters)", getHeightMeters());
   }
 
   /**
@@ -384,6 +402,11 @@ public class ElevatorSubsystem extends SubsystemBase
   {
     return aroundHeight(height, ElevatorConstants.kElevatorAllowableError);
   }
+
+
+public Command setPower(double d) {
+  return run(()->m_motor.set(d));
+}
 
 
 

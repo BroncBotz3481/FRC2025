@@ -154,7 +154,8 @@ public final class Constants
     public static final double  kAlgaeArmKv                     = 1.58; // volts per velocity (V/RPM)
     public static final double  kAlgaeArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
     public static final double  kAlgaeAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
-    public static       int     algaeArmMotorID                 = 16;
+    public static final int algaeCanandColor                    = 22;
+    public static       int     algaeArmMotorID                 = 16; // Checked
 
   }
 
@@ -193,41 +194,42 @@ public final class Constants
     public static final double  kCoralArmKa                     = 0.08; // volts per acceleration (V/(RPM/s))
     public static final double  kCoralAngleAllowableError       = 1;//degree, for testing whether it's aroundAngle
 
-    // ID's
-    public static final int coralArmMotorID = 15;
+    public static final int coralArmMotorID = 15;  // Checked
   }
 
 
   public static class ElevatorConstants
   {
 
-    public static final double   kElevatorKp              = 26.722;
+    public static final double   kElevatorKp              = 53.47;
     public static final double   kElevatorKi              = 0;
-    public static final double   kElevatorKd              = 1.6047;
-    public static final double   kElevatorkS              = 0.01964; // volts (V)
-    public static final double   kElevatorkV              = 3.894; // volt per velocity (V/(m/s))
-    public static final double   kElevatorkA              = 0.173; // volt per acceleration (V/(m/s²))
-    public static final double   kElevatorkG              = 0.91274; // volts (V)
-    public static final double   kElevatorGearing         = 10.0;
+    public static final double   kElevatorKd              = 14.97;
+    public static final double   kElevatorkS              = 0.26737; // volts (V)
+    public static final double   kElevatorkV              = 9.9682;//10.773; // volt per velocity (V/(m/s))
+    public static final double   kElevatorkA              = 0.1931;//0.70109; // volt per acceleration (V/(m/s²))
+    public static final double   kElevatorkG              = 0.39266; // volts (V)
+    public static final double   kElevatorGearing         = 12.0;
     public static final double   kElevatorSproketTeeth    = 22;
     public static final double   kElevatorPitch           = Units.inchesToMeters(0.25);
-    public static final double   kElevatorDrumRadius      = kElevatorSproketTeeth * kElevatorPitch / (2 * Math.PI);// radius = Circumference / (2 pi)
+    public static final double   kElevatorDrumRadius      = (kElevatorSproketTeeth * kElevatorPitch) / (2 * Math.PI);// radius = Circumference / (2 pi)
     public static final double   kCarriageMass            = Units.lbsToKilograms(16); // kg
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-    public static final double   kMinElevatorHeightMeters = 0;//min height / 10
-    public static final double   kMaxElevatorHeightMeters = Units.inchesToMeters(42);
+    public static final double   kMinElevatorHeightMeters = Units.inchesToMeters(0);//min height / 10
+    public static final double   kMaxElevatorHeightMeters = 0.70;
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-    public static final Distance kLaserCANOffset          = Inches.of(3);
+    public static final Distance kLaserCANOffset          = Meters.of(0.27);
 
     //public static final double kElevatorMaxVelocity = 3.5;
     //public static final double kElevatorMaxAcceleration = 2.5;
     public static final Distance kStartingHeightSim      = Meters.of(0);
     public static final Distance kMinElevatorHeight      = Meters.of(kMinElevatorHeightMeters);
     public static final Distance kMaxElevatorHeight      = Meters.of(kMaxElevatorHeightMeters);
-    public static final double   kElevatorAllowableError = Units.inchesToMeters(2);
+    public static final double   kElevatorAllowableError = Units.inchesToMeters(0.5);
     public static final double   kLowerToScoreHeight     = Units.inchesToMeters(6);
     public static       int      elevatorMotorID         = 13;
-    public static       int      elevatorMotorRightID       = 14;
+    public static final int leftLaserCAN                 = 23;
+    public static final int rightLaserCAN                = 24; 
+    public static       int      elevatorMotorRightID    = 14;
     public static       double   kElevatorRampRate       = 0.1;
     public static       int      kElevatorCurrentLimit   = 40;
     public static double kMaxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
@@ -244,6 +246,8 @@ public final class Constants
     public static final int    coralWristMotorID   = 17;
     public static final int    coralRollerMotorID  = 18;
     public static       int    algaeRollerMotorID  = 19;
+    public static final int rightLaserCAN          = 20;
+    public static final int leftLaserCAN           = 21;
     public static final double defaultrRollerSpeed = 0;
     public static final double kIntakeReduction    = 0;
 

@@ -65,7 +65,6 @@ public class LoadingSystem
     return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
                      .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters).repeatedly()
                              .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly()))
-                     .until(() -> m_algaeArm.algaeInLoadPosition())
                      .andThen(m_elevator.setElevatorHeight(algaeElevatorLowHeightMeters).repeatedly()
                               .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly())
                              .alongWith(m_algaeIntake.setAlgaeIntakeRoller(0.5)))  // Remember to change the default intake speed

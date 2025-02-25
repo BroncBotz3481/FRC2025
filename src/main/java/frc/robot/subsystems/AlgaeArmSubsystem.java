@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.reduxrobotics.sensors.canandcolor.Canandcolor;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
@@ -63,8 +64,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   private final DCMotor                   m_armGearbox = DCMotor.getNEO(1);
   private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
                                                                       MotorType.kBrushless);
-  private       DigitalInput        armLoaded              = new DigitalInput(2);
-  private       DigitalInput        armInLoadedPosition    = new DigitalInput(1);
+  private       Canandcolor        armLoaded              = new Canandcolor(AlgaeArmConstants.algaeCanandColor);
 
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
@@ -126,8 +126,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
           0.0 // Add noise with a std-dev of 1 tick
       );
   private final SparkMaxSim         m_motorSim             = new SparkMaxSim(m_motor, m_armGearbox);
-  private       DIOSim              armLoadedSim           = new DIOSim(armLoaded);
-  private       DIOSim              armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
+  private       DIOSim              armLoadedSim           = new DIOSim(0);
 
 
   public AlgaeArmSubsystem()
@@ -317,15 +316,10 @@ public class AlgaeArmSubsystem extends SubsystemBase
     //    System.out.println(Units.radiansToDegrees(m_AlgaeArmSim.getAngleRads()));
   }
 
-  public boolean algaeInLoadPosition()
-  {
-    System.out.println(armInLoadedPosition.get());
-    return armInLoadedPosition.get();//m_algaeInArm.get()&&aroundAngle(135);//only check the angle-still need check elev?
-  }
 
   public boolean algaeLoaded()
   {
-    return armLoaded.get();//m_algaeInBin.get()|| m_algaeInArm.get();
+    return armLoaded.getProximity() < 0.85;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean aroundAngle(double degree, double allowableError)

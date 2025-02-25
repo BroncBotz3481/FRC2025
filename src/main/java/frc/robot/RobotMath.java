@@ -4,8 +4,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.Constants.CoralArmConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -78,8 +80,10 @@ public class RobotMath
      */
     public static Angle convertDistanceToRotations(Distance distance)
     {
-      return Rotations.of(distance.in(Meters) /
-                          (ElevatorConstants.kElevatorDrumRadius * 2 * Math.PI) *
+      // m/(2*pi*r)*g = e
+      SmartDashboard.putNumber("CONVERSION", Units.metersToInches(ElevatorConstants.kElevatorSproketTeeth * ElevatorConstants.kElevatorPitch)/(Math.PI));
+      return Rotations.of((distance.in(Meters) /
+                          (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)) *
                           ElevatorConstants.kElevatorGearing);
     }
 
