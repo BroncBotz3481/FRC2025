@@ -201,9 +201,9 @@ public final class Constants
   public static class ElevatorConstants
   {
 
-    public static final double   kElevatorKp              = 70.887;
+    public static final double   kElevatorKp              = 31.191;
     public static final double   kElevatorKi              = 0;
-    public static final double   kElevatorKd              = 20.554;
+    public static final double   kElevatorKd              = 8.7324;
     public static final double   kElevatorkS              = 0.26737; // volts (V)
     public static final double   kElevatorkV              = 9.9682;//10.773; // volt per velocity (V/(m/s))
     public static final double   kElevatorkA              = 0.1931; // volt per acceleration (V/(m/s²))
