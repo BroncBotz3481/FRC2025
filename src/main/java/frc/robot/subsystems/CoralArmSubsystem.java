@@ -147,7 +147,7 @@ public class CoralArmSubsystem extends SubsystemBase
                                                 CoralArmConstants.kCoralArmKd,
                                                 new Constraints(CoralArmConstants.kCoralArmMaxVelocityRPM,
                                                                 CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond));
-    // m_pidController.setTolerance(0.01);
+    m_pidController.setTolerance(0.1);
 
 
   }

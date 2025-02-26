@@ -203,9 +203,9 @@ public class RobotContainer
     {
       m_driverController.button(1).whileTrue(coralArm.setPower(0.1));
       m_driverController.button(2).whileTrue(coralArm.runSysIdRoutine());
-      m_driverController.button(3).whileTrue(coralArm.setGoal(90).repeatedly());
-      m_driverController.button(4).whileTrue(coralArm.setGoal(50).repeatedly());
-      m_driverController.button(5).whileTrue(coralArm.setGoal(-30).repeatedly());
+      m_driverController.button(3).whileTrue(coralArm.setCoralArmAngle(90).repeatedly());
+      m_driverController.button(4).whileTrue(coralArm.setCoralArmAngle(50).repeatedly());
+      m_driverController.button(5).whileTrue(coralArm.setCoralArmAngle(-30).repeatedly());
 
       coralArm.setDefaultCommand(coralArm.hold());
     }
