@@ -50,6 +50,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.CoralArmConstants;
+import frc.robot.Robot;
 import frc.robot.RobotMath.CoralArm;
 
 
@@ -280,7 +281,7 @@ public class CoralArmSubsystem extends SubsystemBase
 
   public boolean coralLoaded()
   {
-    Measurement measurement = armLoaded.getMeasurement();
+    Measurement measurement = Robot.isSimulation() ? armLoadedSim.getMeasurement() : armLoaded.getMeasurement();
     if (measurement != null)
     {
       if (measurement.status == LASERCAN_STATUS_VALID_MEASUREMENT)
