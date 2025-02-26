@@ -172,7 +172,7 @@ public class RobotContainer
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
     // configureBindings();
-    //drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
+    //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Elevator Testing
@@ -187,15 +187,28 @@ public class RobotContainer
       elevator.setDefaultCommand(elevator.hold());
     }
 
-    m_driverController.button(1).whileTrue(algaeArm.setPower(0.1));
-    m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
-    m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
-    m_driverController.button(4).whileTrue(algaeArm.setAlgaeArmAngle(-45).repeatedly());
-    m_driverController.button(5).whileTrue(algaeArm.setAlgaeArmAngle(90).repeatedly());
+    boolean algaeArmTesting = false;
+    if(algaeArmTesting)
+    {
+      m_driverController.button(1).whileTrue(algaeArm.setPower(0.1));
+      m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
+      m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
+      m_driverController.button(4).whileTrue(algaeArm.setAlgaeArmAngle(-45).repeatedly());
+      m_driverController.button(5).whileTrue(algaeArm.setAlgaeArmAngle(90).repeatedly());
+      algaeArm.setDefaultCommand(algaeArm.hold());
+    }
 
+    boolean coralArmTesting = true;
+    if(coralArmTesting)
+    {
+      m_driverController.button(1).whileTrue(coralArm.setPower(0.1));
+      m_driverController.button(2).whileTrue(coralArm.runSysIdRoutine());
+      m_driverController.button(3).whileTrue(coralArm.setGoal(90).repeatedly());
+      m_driverController.button(4).whileTrue(coralArm.setGoal(50).repeatedly());
+      m_driverController.button(5).whileTrue(coralArm.setGoal(-30).repeatedly());
 
-    algaeArm.setDefaultCommand(algaeArm.setPower(0));
-
+      coralArm.setDefaultCommand(coralArm.hold());
+    }
 
     // drivebase.setDefaultCommand(
     //     !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);

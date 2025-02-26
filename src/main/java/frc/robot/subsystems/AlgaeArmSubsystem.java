@@ -136,17 +136,9 @@ public class AlgaeArmSubsystem extends SubsystemBase
     SparkMaxConfig config = new SparkMaxConfig();
     config
         .smartCurrentLimit(AlgaeArmConstants.kAlgaeArmStallCurrentLimitAmps)
-        .closedLoopRampRate(AlgaeArmConstants.kAlgaeArmRampRate)
-        .idleMode(IdleMode.kCoast)
-        .inverted(AlgaeArmConstants.kAlgaeArmInverted)
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(AlgaeArmConstants.kAlgaeArmKp, AlgaeArmConstants.kAlgaeArmKi, AlgaeArmConstants.kAlgaeArmKd)
-        .outputRange(-1, 1)
-        .maxMotion
-        .maxVelocity(AlgaeArmConstants.kAlgaeArmMaxVelocityRPM)
-        .maxAcceleration(AlgaeArmConstants.kAlgaeArmMaxAccelerationRPMperSecond)
-        .allowedClosedLoopError(AlgaeArmConstants.kAlgaeArmAllowedClosedLoopError.in(Rotations));
+        .openLoopRampRate(AlgaeArmConstants.kAlgaeArmRampRate)
+        .idleMode(IdleMode.kBrake)
+        .inverted(AlgaeArmConstants.kAlgaeArmInverted);
     config.absoluteEncoder.inverted(true);
 
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -158,7 +150,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
                                                 AlgaeArmConstants.kAlgaeArmKd,
                                                 new Constraints(AlgaeArmConstants.kAlgaeArmMaxVelocityRPM,
                                                                 AlgaeArmConstants.kAlgaeArmMaxAccelerationRPMperSecond));
-    m_pidController.setTolerance(0.01);
+    // m_pidController.setTolerance(0.01);
 
 
   }
@@ -258,20 +250,12 @@ public class AlgaeArmSubsystem extends SubsystemBase
   public void reachSetpoint(double setPointDegree)
   {
     double  goalPosition = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations);
-    boolean rioPID       = true;
-    if (rioPID)
-    {
-      double pidOutput     = m_pidController.calculate(m_encoder.getPosition(), goalPosition);
-      State  setpointState = m_pidController.getSetpoint();
-      m_motor.setVoltage(pidOutput +
-                         m_feedforward.calculate(setpointState.position,
-                                                 setpointState.velocity)
-                        );
-    } else
-    {
-      m_controller.setReference(goalPosition,
-                                ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
-    }
+    double pidOutput     = m_pidController.calculate(m_encoder.getPosition(), goalPosition);
+    State  setpointState = m_pidController.getSetpoint();
+    m_motor.setVoltage(pidOutput +
+                        m_feedforward.calculate(setpointState.position,
+                                                setpointState.velocity)
+                      );
   }
 
   /**
@@ -304,7 +288,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public Command setAlgaeArmAngle(double degree)
   {
-    return setGoal(degree).beforeStarting(()->{m_pidController.reset(getAngle().in(Rotations));}).until(() -> aroundAngle(degree));
+    return setGoal(degree).beforeStarting(()->{m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(getAngle()).in(Rotations));}).until(() -> aroundAngle(degree));
   }
 
 
@@ -348,7 +332,8 @@ public Command setPower(double d) {
 public double angleHold=0;
 
 public Command hold() {
-  return startRun(()->{angleHold=getAngle().in(Rotations);m_pidController.reset(angleHold);}, ()->{reachSetpoint(angleHold);});
+  return startRun(()->{angleHold=AlgaeArm.convertAlgaeAngleToSensorUnits(getAngle()).in(Rotations);m_pidController.reset(angleHold);}, ()->{reachSetpoint(
+    AlgaeArm.convertSensorUnitsToAlgaeAngle(Degrees.of(angleHold)).in(Rotations));});
 }
 
 

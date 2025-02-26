@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -60,8 +61,8 @@ public class CoralArmSubsystem extends SubsystemBase
                                                                       MotorType.kBrushless);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
-  public final Trigger atMin = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralArmMinAngle.plus(Degrees.of(5))));
-  public final Trigger atMax = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralArmMaxAngle.minus(Degrees.of(5))));
+  public final Trigger atMin = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralArmMinAngle.plus(Degrees.of(0.01))));
+  public final Trigger atMax = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralArmMaxAngle.minus(Degrees.of(0.01))));
 
   // SysId Routine and seutp
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
@@ -74,9 +75,9 @@ public class CoralArmSubsystem extends SubsystemBase
   private final SysIdRoutine          m_sysIdRoutine   =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(Volts.per(Second).of(CoralArmConstants.kCoralArmRampRate),
+          new SysIdRoutine.Config(Volts.per(Second).of(1),
                                   Volts.of(1),
-                                  Seconds.of(5)),
+                                  Seconds.of(30)),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motor(s).
               m_motor::setVoltage,
@@ -134,17 +135,9 @@ public class CoralArmSubsystem extends SubsystemBase
     SparkMaxConfig config = new SparkMaxConfig();
     config
         .smartCurrentLimit(CoralArmConstants.kCoralArmStallCurrentLimitAmps)
-        .closedLoopRampRate(CoralArmConstants.kCoralArmRampRate)
+        .openLoopRampRate(CoralArmConstants.kCoralArmRampRate)
         .idleMode(IdleMode.kBrake)
-        .inverted(CoralArmConstants.kCoralArmInverted)
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(CoralArmConstants.kCoralArmKp, CoralArmConstants.kCoralArmKi, CoralArmConstants.kCoralArmKd)
-        .outputRange(-1, 1)
-        .maxMotion
-        .maxVelocity(CoralArmConstants.kCoralArmMaxVelocityRPM)
-        .maxAcceleration(CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond)
-        .allowedClosedLoopError(CoralArmConstants.kCoralArmAllowedClosedLoopError.in(Rotations));
+        .inverted(CoralArmConstants.kCoralArmInverted);
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     synchronizeAbsoluteEncoder();
 
@@ -154,7 +147,7 @@ public class CoralArmSubsystem extends SubsystemBase
                                                 CoralArmConstants.kCoralArmKd,
                                                 new Constraints(CoralArmConstants.kCoralArmMaxVelocityRPM,
                                                                 CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond));
-    m_pidController.setTolerance(0.01);
+    // m_pidController.setTolerance(0.01);
 
 
   }
@@ -231,9 +224,8 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public void synchronizeAbsoluteEncoder()
   {
-    m_encoder.setPosition(Rotations.of(m_absEncoder.getPosition())
-                                   .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)
-                                   .in(Rotations));
+    m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
+    .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Rotations));
   }
 
   /**
@@ -278,8 +270,7 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public Angle getAngle()
   {
-    m_angle.mut_replace(CoralArm.convertSensorUnitsToCoralAngle(m_angle.mut_replace(m_encoder.getPosition(),
-                                                                                    Rotations)));
+    m_angle.mut_replace(CoralArm.convertSensorUnitsToCoralAngle(Rotations.of(m_encoder.getPosition())));
     return m_angle;
   }
 
@@ -297,7 +288,7 @@ public class CoralArmSubsystem extends SubsystemBase
 
   public Command setGoal(double degree)
   {
-    return run(() -> reachSetpoint(degree));
+    return startRun(()->m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(Degrees.of(degree)).in(Rotations)),() -> reachSetpoint(degree));
   }
 
 
@@ -314,6 +305,10 @@ public class CoralArmSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    SmartDashboard.putNumber("Coral Arm Sensor (Rotations)", m_encoder.getPosition());
+    SmartDashboard.putNumber("Coral Arm Angle (Degrees)",  getAngle().in(Degrees));
+    SmartDashboard.putNumber("Coral Arm Angle Absolute (Degrees)",  Rotations.of(m_absEncoder.getPosition()).in(Degrees));
+    
     //    System.out.println(getAngle());
     //    System.out.println(Units.radiansToDegrees(m_coralArmSim.getAngleRads()));
   }
@@ -346,5 +341,16 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     return aroundAngle(degree, CoralArmConstants.kCoralAngleAllowableError);
   }
+
+
+public Command setPower(double d) {
+  return run(()->m_motor.set(d));
+}
+
+private double angleHold = 0;
+
+public Command hold() {
+  return startRun(()->{angleHold = getAngle().in(Degrees); m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));}, ()->reachSetpoint(angleHold));
+}
 
 }
