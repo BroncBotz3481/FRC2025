@@ -9,10 +9,13 @@ import static edu.wpi.first.units.Units.Meter;
 import java.util.Set;
 
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -113,6 +116,9 @@ public class RobotContainer
                                                                .deadband(OperatorConstants.DEADBAND)
                                                                .scaleTranslation(0.8)
                                                                .allianceRelativeControl(true);
+
+
+
   // Derive the heading axis with math!
   SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy()
                                                                      .withControllerHeadingAxis(() -> Math.sin(
@@ -123,7 +129,8 @@ public class RobotContainer
                                                                                                         2) * Math.PI) *
                                                                                                       (Math.PI * 2))
                                                                      .headingWhile(true);
-
+SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+                                                             .allianceRelativeControl(false);
   Command driveFieldOrientedDirectAngleSim = drivebase.driveFieldOriented(driveDirectAngleSim);
 
   Command driveSetpointGenSim = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleSim);
@@ -159,19 +166,19 @@ public class RobotContainer
   {
     // Configure the trigger bindings
     DriverStation.silenceJoystickConnectionWarning(true);
-    // elevator.setDefaultCommand(elevator.setGoal(0));
-    // coralArm.setDefaultCommand(coralArm.setGoal(-45));
-    // climb.setDefaultCommand(climb.stop());
-    // algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
-    // algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
-    // coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
-    // targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
+     elevator.setDefaultCommand(elevator.setGoal(0));
+    coralArm.setDefaultCommand(coralArm.setGoal(-45));
+    //climb.setDefaultCommand(climb.stop());
+    algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
+    algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
+    coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
+    targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
     
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
-//        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
-    // configureBindings();
+        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
+     configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
@@ -287,6 +294,28 @@ public class RobotContainer
               .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
               .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
 
+
+              if (Robot.isSimulation())
+              {
+                Pose2d target = new Pose2d(new Translation2d(1, 4),
+                                           Rotation2d.fromDegrees(90));
+                //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+                driveDirectAngleSim.driveToPose(() -> target,
+                                                     new ProfiledPIDController(5,
+                                                                               0,
+                                                                               0,
+                                                                               new Constraints(5, 2)),
+                                                     new ProfiledPIDController(5,
+                                                                               0,
+                                                                               0,
+                                                                               new Constraints(Units.degreesToRadians(360),
+                                                                                               Units.degreesToRadians(180))
+                                                     ));
+                m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+                m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+                m_driverController.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleSim.driveToPoseEnabled(true),
+                                                               () -> driveDirectAngleSim.driveToPoseEnabled(false)));
+              }           
   // m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
   // Button 19 is used just for testing loading sys
 
@@ -302,89 +331,10 @@ public class RobotContainer
                                                                 .minus(Rotation2d.fromDegrees(180)))))
   );
  */
-      //             m_driverController.button(7).whileTrue(
-      // targetingSystem.setTargetCommand(
-      //           TargetingSystem.ReefBranch.J,
-      //           TargetingSystem.ReefBranchLevel.L3)
-      //           .andThen(Commands.print("Aim Correct"))
-      //           .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-      //           .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm, coralArm, drivebase)))
-      //           .andThen(Commands.print("I AM ALIVE, YAAA HAAAAA")));
+   
 
-
-
-
-//    m_driverController.button(2).whileTrue(coralIntake.setWristAngle(30)); //left side
-    //m_driverController.button(3).whileTrue(coralIntake.setWristAngle(150)); //right side
-
-        /*
-        m_driverController.button(10).whileTrue(drivebase.sysIdDriveMotorCommand());
-        m_driverController.button(9).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                (Meter.of(3),
-                        Meter.of(4)),
-                Rotation2d.fromDegrees(-180))));
-
-        m_driverController.button(8).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                (Meter.of(5),
-                        Meter.of(3)),
-                Rotation2d.fromDegrees(0))));
-
-        m_driverController.button(7).whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d
-                (Meter.of(3.5),
-                        Meter.of(2.5)),
-                Rotation2d.fromDegrees(125))));
-
-        m_driverController.button(5).whileTrue(driveToSetPoint(6.1, 4, 125));
-        m_driverController.button(4).whileTrue(driveToSetPoint(5.2, 5.2, -120));
-        m_driverController.button(3).whileTrue(driveToSetPoint(3.3, 5.3, -50));
-        //Processor
-        m_driverController.button(2).whileTrue(driveToProcessor());
-        //Human Playerstation
-        m_driverController.button(1).whileTrue(driveToHumanPlayer1());
-
-        // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-        // cancelling on release.
-
-
-        m_driverController.button(11).whileTrue(elevator.setGoal(3));
-        m_driverController.button(11).whileTrue(coralArm.setGoal(90));
-        m_driverController.button(12).whileTrue(elevator.setGoal(6));
-        m_driverController.button(12).whileTrue(algaeArm.setGoal(45));
-        m_driverController.button(12).whileTrue(coralArm.setGoal(75));
-        m_driverController.button(15).whileTrue(loadingSystem.algaeLoad());
-
-
-        m_driverController.button(13).whileTrue(elevator.setGoal(9));
-        m_driverController.button(14).whileTrue(coralArm.runSysIdRoutine());
-        elevator.atHeight(5, 0.1).whileTrue(Commands.print("I AM ALIVE, YAAA HAAAAA"));
-
-        m_driverController.button(19).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds));
-        m_driverController.button(18).whileTrue(algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeIntakeSpeeds));
-
-        m_driverController.button(20).whileTrue(algaeArm.setGoal(45));
-        m_driverController.button(21).whileTrue(algaeArm.setGoal(90));
-        m_driverController.button(22).whileTrue(climb.climbDown());
-        m_driverController.button(23).whileTrue(climb.climbUp());
-
-
-        System.out.println(getMe()); // 0
-        m_driverController.button(25).whileTrue(
-                Commands.runOnce(() -> changeMe())
-                        .andThen(Commands.print(""+getMe())) // 0
-                        .andThen(() -> System.out.println(getMe()))); // 1
-        */
+      
   }
-
-  private void changeMe()
-  {
-    me = 1;
-  }
-
-  private double getMe()
-  {
-    return me;
-  }
-
 
 
   /**
