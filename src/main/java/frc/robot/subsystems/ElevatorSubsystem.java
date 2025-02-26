@@ -127,7 +127,7 @@ public class ElevatorSubsystem extends SubsystemBase
   // Sensors
   private final LaserCan         m_elevatorLaserCan     = new LaserCan(ElevatorConstants.rightLaserCAN);
   private final LaserCanSim      m_elevatorLaserCanSim  = new LaserCanSim(ElevatorConstants.rightLaserCAN);
-  private final RegionOfInterest m_laserCanROI          = new RegionOfInterest(0, 0, 16, 16);
+  private final RegionOfInterest m_laserCanROI          = new RegionOfInterest(-2, -2, 4, 4);
   private final TimingBudget     m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
   private final Alert            m_laserCanFailure      = new Alert("LaserCAN failed to configure.",
                                                                     AlertType.kError);

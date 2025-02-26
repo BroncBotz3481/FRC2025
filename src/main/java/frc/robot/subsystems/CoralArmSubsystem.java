@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
@@ -10,17 +11,17 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
@@ -35,10 +36,10 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -56,13 +57,15 @@ public class CoralArmSubsystem extends SubsystemBase
 {
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor m_armGearbox = DCMotor.getNEO(1);
+  private final DCMotor                   m_armGearbox = DCMotor.getNEO(1);
   private final SparkMax                  m_motor      = new SparkMax(CoralArmConstants.coralArmMotorID,
                                                                       MotorType.kBrushless);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
-  public final Trigger atMin = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralArmMinAngle.plus(Degrees.of(0.01))));
-  public final Trigger atMax = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralArmMaxAngle.minus(Degrees.of(0.01))));
+  public final  Trigger                   atMin
+                                                       = new Trigger(() -> getAngle().lte(CoralArmConstants.kCoralArmMinAngle));
+  public final  Trigger                   atMax
+                                                       = new Trigger(() -> getAngle().gte(CoralArmConstants.kCoralArmMaxAngle));
 
   // SysId Routine and seutp
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
@@ -91,11 +94,9 @@ public class CoralArmSubsystem extends SubsystemBase
                                                     RobotController.getBatteryVoltage(), Volts))
                    .angularPosition(m_angle.mut_replace(m_encoder.getPosition(), Rotations))
                    .angularVelocity(m_velocity.mut_replace(m_encoder.getVelocity(), RPM));
-//                .angularPosition(m_angle.mut_replace(getAngle()))
-//                .angularVelocity(m_velocity.mut_replace(getVelocity()));
               },
               this));
-  private final AbsoluteEncoder           m_absEncoder = m_motor.getAbsoluteEncoder();
+  private final AbsoluteEncoder       m_absEncoder     = m_motor.getAbsoluteEncoder();
   // Standard classes for controlling our arm
   private final ProfiledPIDController m_pidController;
   private final ArmFeedforward        m_feedforward    = new ArmFeedforward(CoralArmConstants.kCoralArmkS,
@@ -106,7 +107,7 @@ public class CoralArmSubsystem extends SubsystemBase
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim               =
+  private final SingleJointedArmSim m_armSim          =
       new SingleJointedArmSim(
           m_armGearbox,
           CoralArmConstants.kCoralArmReduction,
@@ -119,13 +120,12 @@ public class CoralArmSubsystem extends SubsystemBase
           0.02 / 4096.0,
           0.0 // Add noise with a std-dev of 1 tick
       );
-  private final SparkMaxSim         m_motorSim             = new SparkMaxSim(m_motor, m_armGearbox);
+  private final SparkMaxSim         m_motorSim        = new SparkMaxSim(m_motor, m_armGearbox);
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-  private       DigitalInput        armLoaded              = new DigitalInput(4);
-  private       DIOSim              armLoadedSim           = new DIOSim(armLoaded);
-  private       DigitalInput        armInLoadedPosition    = new DigitalInput(3);
-  private       DIOSim              armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
-
+  private final LaserCan            armLoaded         = new LaserCan(CoralArmConstants.laserCANv2);
+  private final LaserCanSim         armLoadedSim      = new LaserCanSim(CoralArmConstants.laserCANv2);
+  private final Alert               m_laserCanFailure = new Alert("LaserCAN failed to configure.",
+                                                                  AlertType.kError);
 
   /**
    * Subsystem constructor.
@@ -149,6 +149,14 @@ public class CoralArmSubsystem extends SubsystemBase
                                                                 CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond));
     m_pidController.setTolerance(0.1);
 
+    try
+    {
+      armLoaded.setRangingMode(RangingMode.SHORT);
+      armLoadedSim.setRangingMode(RangingMode.SHORT);
+    } catch (Exception e)
+    {
+      m_laserCanFailure.set(true);
+    }
 
   }
 
@@ -184,48 +192,13 @@ public class CoralArmSubsystem extends SubsystemBase
   }
 
   /**
-   * Near the maximum Angle of the arm within X degrees.
-   *
-   * @param toleranceDegrees Degrees close to maximum of the Arm.
-   * @return is near the maximum of the arm.
-   */
-  public boolean nearMax(double toleranceDegrees)
-  {
-    if (getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees)))
-    {
-      System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println(
-          "At max:" + getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees)));
-    }
-    return getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees));
-
-  }
-
-  /**
-   * Near the minimum angle of the Arm in within X degrees.
-   *
-   * @param toleranceDegrees Tolerance of the Arm.
-   * @return is near the minimum of the arm.
-   */
-  public boolean nearMin(double toleranceDegrees)
-  {
-    if (getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees)))
-    {
-      System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println(
-          "At min:" + getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees)));
-    }
-    return getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees));
-
-  }
-
-  /**
    * Synchronizes the NEO encoder with the attached Absolute Encoder.
    */
   public void synchronizeAbsoluteEncoder()
   {
     m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
-    .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Rotations));
+                                                                           .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
+                                  .in(Rotations));
   }
 
   /**
@@ -246,21 +219,13 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public void reachSetpoint(double setPointDegree)
   {
-    double  goalPosition = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations);
-    boolean rioPID       = true;
-    if (rioPID)
-    {
-      double pidOutput     = m_pidController.calculate(m_encoder.getPosition(), goalPosition);
-      State  setpointState = m_pidController.getSetpoint();
-      m_motor.setVoltage(pidOutput +
-                         m_feedforward.calculate(setpointState.position,
-                                                 setpointState.velocity)
-                        );
-    } else
-    {
-      m_controller.setReference(goalPosition,
-                                ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
-    }
+    double goalPosition  = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations);
+    double pidOutput     = m_pidController.calculate(m_encoder.getPosition(), goalPosition);
+    State  setpointState = m_pidController.getSetpoint();
+    m_motor.setVoltage(pidOutput +
+                       m_feedforward.calculate(setpointState.position,
+                                               setpointState.velocity)
+                      );
   }
 
   /**
@@ -288,7 +253,8 @@ public class CoralArmSubsystem extends SubsystemBase
 
   public Command setGoal(double degree)
   {
-    return startRun(()->m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(Degrees.of(degree)).in(Rotations)),() -> reachSetpoint(degree));
+    return startRun(() -> m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(Degrees.of(degree))
+                                                        .in(Rotations)), () -> reachSetpoint(degree));
   }
 
 
@@ -306,23 +272,24 @@ public class CoralArmSubsystem extends SubsystemBase
   public void periodic()
   {
     SmartDashboard.putNumber("Coral Arm Sensor (Rotations)", m_encoder.getPosition());
-    SmartDashboard.putNumber("Coral Arm Angle (Degrees)",  getAngle().in(Degrees));
-    SmartDashboard.putNumber("Coral Arm Angle Absolute (Degrees)",  Rotations.of(m_absEncoder.getPosition()).in(Degrees));
-    
-    //    System.out.println(getAngle());
-    //    System.out.println(Units.radiansToDegrees(m_coralArmSim.getAngleRads()));
+    SmartDashboard.putNumber("Coral Arm Angle (Degrees)", getAngle().in(Degrees));
+    SmartDashboard.putNumber("Coral Arm Angle Absolute (Degrees)",
+                             Rotations.of(m_absEncoder.getPosition()).in(Degrees));
   }
 
-  public boolean coralInLoadPosition()
-  {
-
-    return armInLoadedPosition.get();//m_coralInArm.get()&&aroundAngle(240);
-  }//Sim
 
   public boolean coralLoaded()
   {
-    return armLoaded.get();//m_coralInBin.get()||m_coralInArm.get();
-  }//Sim
+    Measurement measurement = armLoaded.getMeasurement();
+    if (measurement != null)
+    {
+      if (measurement.status == LASERCAN_STATUS_VALID_MEASUREMENT)
+      {
+        return measurement.distance_mm <= CoralArmConstants.intakeMinimumDistanceMM;
+      }
+    }
+    return false;
+  }
 
 
   /**
@@ -343,14 +310,19 @@ public class CoralArmSubsystem extends SubsystemBase
   }
 
 
-public Command setPower(double d) {
-  return run(()->m_motor.set(d));
-}
+  public Command setPower(double d)
+  {
+    return run(() -> m_motor.set(d));
+  }
 
-private double angleHold = 0;
+  private double angleHold = 0;
 
-public Command hold() {
-  return startRun(()->{angleHold = getAngle().in(Degrees); m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));}, ()->reachSetpoint(angleHold));
-}
+  public Command hold()
+  {
+    return startRun(() -> {
+      angleHold = getAngle().in(Degrees);
+      m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));
+    }, () -> reachSetpoint(angleHold));
+  }
 
 }

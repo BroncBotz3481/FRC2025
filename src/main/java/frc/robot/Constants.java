@@ -9,8 +9,8 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 
 import edu.wpi.first.math.util.Units;
@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.RobotMath.AlgaeArm;
 import frc.robot.RobotMath.CoralArm;
-import frc.robot.RobotMath.Elevator;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This
@@ -196,6 +195,8 @@ public final class Constants
     public static final int     kCoralArmStallCurrentLimitAmps  = 40;
     
     public static final int coralArmMotorID = 15;  // Checked
+    public static final double intakeMinimumDistanceMM = Inches.of(1).in(Millimeters);
+    public static       int    laserCANv2 = 20;
   }
 
 
