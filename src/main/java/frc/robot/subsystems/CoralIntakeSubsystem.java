@@ -91,9 +91,15 @@ public class CoralIntakeSubsystem extends SubsystemBase
     SparkMaxConfig cfg = new SparkMaxConfig();
     cfg
         .smartCurrentLimit(IntakeConstants.k_wristCurrentLimit) // Move to Constants
-        .openLoopRampRate(IntakeConstants.k_wristClosedLoopRampRate) // Move to Constants
-        .idleMode(IdleMode.kBrake)
-        .inverted(false);
+        .closedLoopRampRate(IntakeConstants.k_wristClosedLoopRampRate) // Move to Constants
+        .idleMode(IdleMode.kCoast)
+        .inverted(true)
+        .encoder
+        .positionConversionFactor(1/WristConstants.kWristGearRatio);
+      cfg
+        .closedLoop
+        .pid(0.1, 0, 0);
+    m_wristEncoder.setPosition(0);
     m_wristMotor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     SmartDashboard.putData("Wrist", wristMechanism);
   }
@@ -148,6 +154,18 @@ public class CoralIntakeSubsystem extends SubsystemBase
     return run(() -> {
       wristController.setReference(Degrees.of(angle).in(Rotations), ControlType.kPosition);
     });
+  }
+
+
+  public Command setWristPower(double d) {
+    return run(()->m_wristMotor.set(d));
+  }
+
+  @Override
+  public void periodic()
+  {
+    SmartDashboard.putNumber("Wrist Angle", Rotations.of(m_wristEncoder.getPosition()).in(Degrees));
+
   }
   
 }

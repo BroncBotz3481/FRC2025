@@ -210,6 +210,15 @@ public class RobotContainer
       coralArm.setDefaultCommand(coralArm.hold());
     }
 
+    boolean wristTesting = true;
+    if(wristTesting)
+    {
+      m_driverController.button(1).whileTrue(coralIntake.setWristPower(0.1));
+      m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
+      m_driverController.button(3).whileTrue(coralIntake.setWristAngle(0));
+      coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0).repeatedly());
+    }
+
     // drivebase.setDefaultCommand(
     //     !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
