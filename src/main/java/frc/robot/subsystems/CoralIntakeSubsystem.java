@@ -91,17 +91,9 @@ public class CoralIntakeSubsystem extends SubsystemBase
     SparkMaxConfig cfg = new SparkMaxConfig();
     cfg
         .smartCurrentLimit(IntakeConstants.k_wristCurrentLimit) // Move to Constants
-        .closedLoopRampRate(IntakeConstants.k_wristClosedLoopRampRate) // Move to Constants
+        .openLoopRampRate(IntakeConstants.k_wristClosedLoopRampRate) // Move to Constants
         .idleMode(IdleMode.kBrake)
-        .inverted(false)
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(0.01, 0, 0) // Change meee
-        .outputRange(-1, 1);
-//        .maxMotion
-//        .maxVelocity(CoralArmConstants.kCoralArmMaxVelocityRPM) // Change me
-//        .maxAcceleration(CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond) // Change me
-//        .allowedClosedLoopError(CoralArmConstants.kCoralArmAllowedClosedLoopError.in(Rotations)); // Change me
+        .inverted(false);
     m_wristMotor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     SmartDashboard.putData("Wrist", wristMechanism);
   }

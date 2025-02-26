@@ -110,7 +110,7 @@ public final class Constants
   {
 
     public static final double kWristMomentOfInertia = 0.00032; // kg * m^2
-    public static final double kWristGearRatio       = 1.0;
+    public static final double kWristGearRatio       = 12.0*(30.0/54.0);
 
     public static class RollerConstants
     {
@@ -163,13 +163,13 @@ public final class Constants
   {
 
     // The P gain for the PID controller that drives this arm.
-    public static final double  kCoralArmKp                     = 1.2822;
+    public static final double  kCoralArmKp                     = 0.74152;
     public static final double  kCoralArmKi                     = 0;
-    public static final double  kCoralArmKd                     = 0.13159;
-    public static final double  kCoralArmkS                     = 0.29523; // volts (V)
-    public static final double  kCoralArmKv                     = 0.099614; // volts per velocity (V/RPM)
-    public static final double  kCoralArmKa                     = 0.045762; // volts per acceleration (V/(RPM/s))
-    public static final double  kCoralArmkG                     = 0.09966; // volts (V)
+    public static final double  kCoralArmKd                     = 0.07863;
+    public static final double  kCoralArmkS                     = 0.19214; // volts (V)
+    public static final double  kCoralArmKv                     = 0.11319; // volts per velocity (V/RPM)
+    public static final double  kCoralArmKa                     = 0.028083; // volts per acceleration (V/(RPM/s))
+    public static final double  kCoralArmkG                     = 0.023981; // volts (V)
     public static final double  kCoralAngleAllowableError       = 0.1;//degree, for testing whether it's aroundAngle
 
     public static final double  kCoralArmReduction              = 112.0;
@@ -182,11 +182,11 @@ public final class Constants
     public static final Angle   kCoralArmMinAngle               = Degrees.of(-86);
     public static final Angle   kCoralArmMaxAngle               = Degrees.of(92);
     public static final double  kCoralArmRampRate               = 0.5;
-    public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(189);
+    public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(190);
     public static final boolean kCoralArmInverted               = true;
     public static final double  kCoralArmMaxVelocityRPM
                                                                 = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(
-        20)).per(
+        10)).per(
         Second).in(RPM);
     public static final double  kCoralArmMaxAccelerationRPMperSecond
                                                                 = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(

@@ -75,8 +75,8 @@ public class CoralArmSubsystem extends SubsystemBase
   private final SysIdRoutine          m_sysIdRoutine   =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(Volts.per(Second).of(1),
-                                  Volts.of(1),
+          new SysIdRoutine.Config(Volts.per(Second).of(2),
+                                  Volts.of(2),
                                   Seconds.of(30)),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motor(s).
@@ -136,7 +136,7 @@ public class CoralArmSubsystem extends SubsystemBase
     config
         .smartCurrentLimit(CoralArmConstants.kCoralArmStallCurrentLimitAmps)
         .openLoopRampRate(CoralArmConstants.kCoralArmRampRate)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .inverted(CoralArmConstants.kCoralArmInverted);
     m_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     synchronizeAbsoluteEncoder();

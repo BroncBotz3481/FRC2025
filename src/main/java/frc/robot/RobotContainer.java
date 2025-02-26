@@ -198,7 +198,7 @@ public class RobotContainer
       algaeArm.setDefaultCommand(algaeArm.hold());
     }
 
-    boolean coralArmTesting = true;
+    boolean coralArmTesting = false;
     if(coralArmTesting)
     {
       m_driverController.button(1).whileTrue(coralArm.setPower(0.1));
