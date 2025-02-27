@@ -185,6 +185,7 @@ public class TargetingSystem
 
   public enum ReefBranchLevel
   {
+    L1,
     L2,
     L3,
     L4

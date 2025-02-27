@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -176,6 +177,32 @@ SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative
     
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
+
+
+driveDirectAngle
+        .driveToPose(targetingSystem::getTargetPose,
+                     new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(5, 2)),
+                     new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(360, 180)));
+    Command driveFieldOrientedDriectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+
+    drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
+    SmartDashboard.putData(CommandScheduler.getInstance());
+
+    boolean driveToPoseTesting = true;
+    if (driveToPoseTesting)
+    {
+      m_driverController.button(1).whileTrue(Commands.startRun(() ->
+                                                                   targetingSystem.autoTarget(drivebase::getPose),
+                                                               () -> driveDirectAngle.driveToPoseEnabled(() -> !driveDirectAngle.atTargetPose(
+                                                                   0.01))));
+    }
+
+
+
+
+
+
+
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
         drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
      configureBindings();
@@ -217,7 +244,7 @@ SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative
       coralArm.setDefaultCommand(coralArm.hold());
     }
 
-    boolean wristTesting = true;
+    boolean wristTesting = false;
     if(wristTesting)
     {
       m_driverController.button(1).whileTrue(coralIntake.setWristPower(0.1));
@@ -244,10 +271,31 @@ SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     
-    m_OperatorController1.button(1).onTrue(Commands.print("Level 1 selected"));
-    m_OperatorController1.button(2).onTrue(Commands.print("Level 2 selected"));
-    m_OperatorController1.button(3).onTrue(Commands.print("Level 3 selected"));
-    m_OperatorController1.button(4).onTrue(Commands.print("Level 4 selected"));
+    m_OperatorController1.button(1).onTrue(targetingSystem.setTargetCommand(
+      TargetingSystem.ReefBranch.J,
+      TargetingSystem.ReefBranchLevel.L1)
+    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase,coralIntake))));
+
+    
+    m_OperatorController1.button(2).onTrue(targetingSystem.setTargetCommand(
+      TargetingSystem.ReefBranch.J,
+      TargetingSystem.ReefBranchLevel.L2)
+    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase, coralIntake))));
+
+    m_OperatorController1.button(3).onTrue(targetingSystem.setTargetCommand(
+      TargetingSystem.ReefBranch.J,
+      TargetingSystem.ReefBranchLevel.L3)
+    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase, coralIntake))));
+
+    m_OperatorController1.button(4).onTrue(targetingSystem.setTargetCommand(
+      TargetingSystem.ReefBranch.J,
+      TargetingSystem.ReefBranchLevel.L4)
+    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
+    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase, coralIntake))));
+
 
     m_OperatorController1.button(5).onTrue(Commands.print("Left Side selected"));
     m_OperatorController1.button(6).onTrue(Commands.print("Right Side selected")); 
@@ -259,15 +307,20 @@ SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative
     m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
   
-    m_OperatorController1.button(11).onTrue( 
-      targetingSystem.setTargetCommand(
-        TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L2).andThen(loadingSystem.algaeLoad(42, 14)));
-        
-    m_OperatorController1.button(12).onTrue( 
-      targetingSystem.setTargetCommand(
-        TargetingSystem.ReefBranch.J, //I just need the height of the levels, not the specific branch, how to do that
-        TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad(42, 44)));
+    
+    m_driverController.button(11).whileTrue(
+      targetingSystem.autoTargetCommand(drivebase::getPose).andThen
+      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(()->!driveDirectAngle.atTargetPose(0.01)))
+      .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
+      .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
+    .andThen(loadingSystem.algaeLoad(42,14))))));
+
+    m_driverController.button(12).whileTrue(
+      targetingSystem.autoTargetCommand(drivebase::getPose).andThen
+      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(()->!driveDirectAngle.atTargetPose(0.01)))
+      .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
+      .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
+    .andThen(loadingSystem.algaeLoad(42,44))))));
 
     m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
     m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
