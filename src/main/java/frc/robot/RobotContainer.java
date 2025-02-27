@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Meter;
 
 import java.util.Set;
+import java.util.concurrent.Flow.Processor;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -49,6 +50,7 @@ import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
 import frc.robot.systems.field.FieldConstants.CoralStation;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -204,7 +206,7 @@ driveDirectAngle
 
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
-        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
+        targetingSystem.field=drivebase.getSwerveDrive().field;
      configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
@@ -310,20 +312,20 @@ driveDirectAngle
     
     m_driverController.button(11).whileTrue(
       targetingSystem.autoTargetCommand(drivebase::getPose).andThen
-      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(()->!driveDirectAngle.atTargetPose(0.01)))
+      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
       .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
       .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
     .andThen(loadingSystem.algaeLoad(42,14))))));
 
     m_driverController.button(12).whileTrue(
       targetingSystem.autoTargetCommand(drivebase::getPose).andThen
-      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(()->!driveDirectAngle.atTargetPose(0.01)))
+      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
       .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
       .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
     .andThen(loadingSystem.algaeLoad(42,44))))));
 
     m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
-    m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
+    m_OperatorController1.button(14).onTrue(driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
 
     m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
@@ -365,9 +367,9 @@ driveDirectAngle
                                                                                                Units.degreesToRadians(180))
                                                      ));
                 m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-                m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-                m_driverController.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleSim.driveToPoseEnabled(true),
-                                                               () -> driveDirectAngleSim.driveToPoseEnabled(false)));
+                //m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+                m_driverController.button(2).onTrue(Commands.runEnd(() -> driveDirectAngleSim.driveToPoseEnabled(true),
+                                                              () -> driveDirectAngleSim.driveToPoseEnabled(false)));
               }           
   // m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
   // Button 19 is used just for testing loading sys
@@ -422,19 +424,21 @@ driveDirectAngle
   public Command driveToHumanPlayer2()
   {
     if (AllianceFlipUtil.shouldFlip()){
-      return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.rightCenterFace));
+      return drivebase.driveToPose(CoralStation.rightCenterFace);
   } else  {
-      return drivebase.driveToPose((CoralStation.rightCenterFace));
+      return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.rightCenterFace));
   }
   }
 
   public Command driveToProcessor()
   {
-    return drivebase.driveToPose(
-        new Pose2d(new Translation2d
-                       (Meter.of(11.5),
-                        Meter.of(7.5)),
-                   Rotation2d.fromDegrees(90)));
+
+   // return drivebase.driveToPose(AllianceFlipUtil.apply(FieldConstants.Processor.centerFace));
+     if (AllianceFlipUtil.shouldFlip()){
+        return drivebase.driveToPose(FieldConstants.Processor.centerFace);
+   } else  {
+        return drivebase.driveToPose(AllianceFlipUtil.flip(FieldConstants.Processor.centerFace));
+   }
   }
 
   public ParallelCommandGroup setElevArm(double goal, double degree)

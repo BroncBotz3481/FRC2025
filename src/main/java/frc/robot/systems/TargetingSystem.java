@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.systems.field.AllianceFlipUtil;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 
 public class TargetingSystem
 {
-
+  public Field2d field;
   private AprilTagFieldLayout fieldLayout              = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   private ReefBranch          targetBranch;
   private ReefBranchLevel     targetBranchLevel;
@@ -156,6 +157,10 @@ public class TargetingSystem
     }
     Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
     targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
+    if(field != null)
+    {
+      field.getObject("Target").setPose(selectedTargetPose);
+    }
     return selectedTargetPose;
   }
 

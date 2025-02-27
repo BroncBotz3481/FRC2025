@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -69,7 +70,7 @@ public class ScoringSystem
   {
     //set elevator height, set algae angle, spit out ball, drive pose
     double algaeArmAngleDegrees = -45;
-    double elevatorHeightMeters = 1.0;
+    double elevatorHeightMeters = Units.inchesToMeters(6);
     return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
             .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
             .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
