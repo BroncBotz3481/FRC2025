@@ -137,7 +137,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
     config
         .smartCurrentLimit(AlgaeArmConstants.kAlgaeArmStallCurrentLimitAmps)
         .openLoopRampRate(AlgaeArmConstants.kAlgaeArmRampRate)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .inverted(AlgaeArmConstants.kAlgaeArmInverted);
     config.absoluteEncoder.inverted(true);
 

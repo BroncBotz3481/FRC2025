@@ -410,7 +410,7 @@ public Command setPower(double d) {
 
 private double holdPoint = 0;
 public Command hold() {
-  return startRun(()->{holdPoint=getHeightMeters();m_controller.reset(holdPoint);},()->reachGoal(holdPoint));
+  return startRun(()->{holdPoint=MathUtil.clamp(getHeightMeters(),0.01,6);m_controller.reset(holdPoint);},()->reachGoal(holdPoint));
 }
 
 

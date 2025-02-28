@@ -172,11 +172,11 @@ public class RobotContainer
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
     // configureBindings();
-    //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
+    // drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Elevator Testing
-    boolean elevatorTesting = false;
+    boolean elevatorTesting = true;
     if(elevatorTesting)
     {
       m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
@@ -187,7 +187,7 @@ public class RobotContainer
       elevator.setDefaultCommand(elevator.hold());
     }
 
-    boolean algaeArmTesting = false;
+    boolean algaeArmTesting = true;
     if(algaeArmTesting)
     {
       m_driverController.button(1).whileTrue(algaeArm.setPower(0.1));
@@ -195,10 +195,12 @@ public class RobotContainer
       m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
       m_driverController.button(4).whileTrue(algaeArm.setAlgaeArmAngle(-45).repeatedly());
       m_driverController.button(5).whileTrue(algaeArm.setAlgaeArmAngle(90).repeatedly());
+      m_driverController.button(6).whileTrue(algaeIntake.setAlgaeIntakeRoller(0.8));
+      algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
       algaeArm.setDefaultCommand(algaeArm.hold());
     }
 
-    boolean coralArmTesting = false;
+    boolean coralArmTesting = true;
     if(coralArmTesting)
     {
       m_driverController.button(1).whileTrue(coralArm.setPower(0.1));
@@ -206,15 +208,16 @@ public class RobotContainer
       m_driverController.button(3).whileTrue(coralArm.setCoralArmAngle(90).repeatedly());
       m_driverController.button(4).whileTrue(coralArm.setCoralArmAngle(50).repeatedly());
       m_driverController.button(5).whileTrue(coralArm.setCoralArmAngle(-30).repeatedly());
-
-      coralArm.setDefaultCommand(coralArm.hold());
+      m_driverController.button(6).whileTrue(coralIntake.setCoralIntakePower(0.3));
+      coralIntake.setDefaultCommand(coralIntake.setCoralIntakePower(0));
+      coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0));
     }
 
-    boolean wristTesting = true;
+    boolean wristTesting = false;
     if(wristTesting)
     {
       m_driverController.button(1).whileTrue(coralIntake.setWristPower(0.1));
-      m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
+      m_driverController.button(2).whileTrue(coralIntake.setWristAngle(37));
       m_driverController.button(3).whileTrue(coralIntake.setWristAngle(0));
       coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0).repeatedly());
     }

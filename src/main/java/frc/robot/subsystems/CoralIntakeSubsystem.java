@@ -4,6 +4,8 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 
+import java.nio.channels.SeekableByteChannel;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
@@ -49,6 +51,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
   private final SparkMax m_wristMotor  = new SparkMax(IntakeConstants.coralWristMotorID, MotorType.kBrushless);
   private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.coralRollerMotorID, MotorType.kBrushless);
 
+  private final AbsoluteEncoder m_wristENcoder2 = m_wristMotor.getAbsoluteEncoder();
   private final SparkClosedLoopController wristController = m_wristMotor.getClosedLoopController();
   private final RelativeEncoder           m_wristEncoder  = m_wristMotor.getEncoder();
   private final AbsoluteEncoder           m_absEncoder    = m_wristMotor.getAbsoluteEncoder();
@@ -96,12 +99,21 @@ public class CoralIntakeSubsystem extends SubsystemBase
         .inverted(true)
         .encoder
         .positionConversionFactor(1/WristConstants.kWristGearRatio);
+        
+      cfg
+      .absoluteEncoder
+      .inverted(true)
+      .positionConversionFactor(1/WristConstants.kWristGearRatio);
       cfg
         .closedLoop
         .pid(0.1, 0, 0);
+    SparkMaxConfig cfgRoller = new SparkMaxConfig();
+    cfgRoller.inverted(true);
+    m_rollerMotor.configure(cfgRoller, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     m_wristEncoder.setPosition(0);
     m_wristMotor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     SmartDashboard.putData("Wrist", wristMechanism);
+    synchronizeEncoders();
   }
 
 
@@ -156,6 +168,10 @@ public class CoralIntakeSubsystem extends SubsystemBase
     });
   }
 
+  public void synchronizeEncoders()
+  {
+    m_wristEncoder.setPosition(m_wristENcoder2.getPosition()-WristConstants.kWristOffset.in(Rotations));
+  }
 
   public Command setWristPower(double d) {
     return run(()->m_wristMotor.set(d));
@@ -164,8 +180,13 @@ public class CoralIntakeSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    SmartDashboard.putNumber("Wrist Angle", Rotations.of(m_wristEncoder.getPosition()).in(Degrees));
+    SmartDashboard.putNumber("Wrist Angle", Rotations.of(m_wristEncoder.getPosition()).in(Rotations));
+    SmartDashboard.putNumber("Wrist Angle Absolute Encoder (Degrees)", Rotations.of(m_wristENcoder2.getPosition()).in(Rotations));
+  }
 
+
+  public Command setCoralIntakePower(double i) {
+    return run(()->m_rollerMotor.set(i));
   }
   
 }

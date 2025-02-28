@@ -3,7 +3,10 @@ package frc.robot.subsystems;
 
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -32,6 +35,9 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
 
   public AlgaeIntakeSubsystem()
   {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.inverted(true);
+    m_rollerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) done
     //       in the constructor or in the robot coordination class, such as RobotContainer.
     //       Also, you can call addChild(name, sendableChild) to associate sendables with the subsystem
@@ -65,7 +71,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
   public Command setAlgaeIntakeRoller(double speed)
   {
     return run(() -> {
-      m_rollerMotor.set(speed * IntakeConstants.defaultrRollerSpeed);
+      m_rollerMotor.set(speed );
     });
   }
 }

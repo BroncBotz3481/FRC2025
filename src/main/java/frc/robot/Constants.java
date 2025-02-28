@@ -110,7 +110,8 @@ public final class Constants
   {
 
     public static final double kWristMomentOfInertia = 0.00032; // kg * m^2
-    public static final double kWristGearRatio       = 18.0*(30.0/54.0)*4.577;
+    public static final double kWristGearRatio       = (30.0/54.0)*64;
+    public static final Angle kWristOffset = Degrees.of(0);
 
     public static class RollerConstants
     {
@@ -141,7 +142,7 @@ public final class Constants
     public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-60);
     public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(210);
     public static final double  kAlgaeArmRampRate               = 0.5;
-    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(369);
+    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(365);
     public static final boolean kAlgaeArmInverted               = false;
     public static final double  kAlgaeArmMaxVelocityRPM         = AlgaeArm.convertAlgaeAngleToSensorUnits(
       Degrees.of(20)).per(
