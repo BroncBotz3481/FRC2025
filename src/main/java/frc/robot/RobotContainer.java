@@ -168,14 +168,14 @@ SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative
   public RobotContainer()
   {
     // Configure the trigger bindings
-    DriverStation.silenceJoystickConnectionWarning(true);
-     elevator.setDefaultCommand(elevator.setGoal(0));
-    coralArm.setDefaultCommand(coralArm.setGoal(-45));
-    //climb.setDefaultCommand(climb.stop());
-    algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
-    algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
-    coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
-    targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
+    // DriverStation.silenceJoystickConnectionWarning(true);
+    //  elevator.setDefaultCommand(elevator.setGoal(0));
+    // coralArm.setDefaultCommand(coralArm.setGoal(-45));
+    // //climb.setDefaultCommand(climb.stop());
+    // algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
+    // algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
+    // coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
+    // targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
     
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
@@ -195,8 +195,8 @@ driveDirectAngle
     {
       m_driverController.button(1).whileTrue(Commands.startRun(() ->
                                                                    targetingSystem.autoTarget(drivebase::getPose),
-                                                               () -> driveDirectAngle.driveToPoseEnabled(() -> !driveDirectAngle.atTargetPose(
-                                                                   0.01))));
+                                                               () -> driveDirectAngle.driveToPoseEnabled(true)).until(() ->drivebase.getPose().getTranslation().getDistance(targetingSystem.getTargetPose().getTranslation()) < 2)
+                                                               .andThen(Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false))));
     }
 
 
@@ -207,7 +207,7 @@ driveDirectAngle
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
         targetingSystem.field=drivebase.getSwerveDrive().field;
-     configureBindings();
+    //  configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
