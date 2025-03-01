@@ -7,11 +7,9 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -167,10 +165,6 @@ public class RobotContainer
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
     // configureBindings();
 
-    driveDirectAngle
-        .driveToPose(targetingSystem::getTargetPose,
-                     new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(5, 2)),
-                     new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(360, 180)));
     Command driveFieldOrientedDriectAngle = drivebase.driveFieldOriented(driveDirectAngle);
 
     drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
@@ -179,10 +173,10 @@ public class RobotContainer
     boolean driveToPoseTesting = true;
     if (driveToPoseTesting)
     {
-      m_driverController.button(1).whileTrue(Commands.startRun(() ->
-                                                                   targetingSystem.autoTarget(drivebase::getPose),
-                                                               () -> driveDirectAngle.driveToPoseEnabled(() -> !driveDirectAngle.atTargetPose(
-                                                                   0.01))));
+      m_driverController.button(1).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                            .andThen(targetingSystem.driveToTarget(drivebase,
+                                                                                                   driveDirectAngle)));
+      m_driverController.button(2).whileTrue(targetingSystem.driveToPose(drivebase, driveDirectAngle, new Pose2d(1,4, Rotation2d.kZero)));
     }
 
     // Elevator Testing
