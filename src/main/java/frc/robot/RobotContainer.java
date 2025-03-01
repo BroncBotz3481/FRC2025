@@ -167,15 +167,15 @@ SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative
 
   public RobotContainer()
   {
-    // Configure the trigger bindings
-    // DriverStation.silenceJoystickConnectionWarning(true);
-    //  elevator.setDefaultCommand(elevator.setGoal(0));
-    // coralArm.setDefaultCommand(coralArm.setGoal(-45));
-    // //climb.setDefaultCommand(climb.stop());
-    // algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
-    // algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
-    // coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
-    // targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
+    //Configure the trigger bindings
+    DriverStation.silenceJoystickConnectionWarning(true);
+     elevator.setDefaultCommand(elevator.setGoal(0));
+    coralArm.setDefaultCommand(coralArm.setGoal(-45));
+    //climb.setDefaultCommand(climb.stop());
+    algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
+    algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
+    coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
+   targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
     
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
@@ -207,7 +207,7 @@ driveDirectAngle
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
         targetingSystem.field=drivebase.getSwerveDrive().field;
-    //  configureBindings();
+     configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
@@ -309,20 +309,21 @@ driveDirectAngle
     m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
   
-    
-    m_driverController.button(11).whileTrue(
-      targetingSystem.autoTargetCommand(drivebase::getPose).andThen
-      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
-      .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
-      .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
-    .andThen(loadingSystem.algaeLoad(42,14))))));
+    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42,14));
+    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42,44));
+    // m_driverController.button(11).whileTrue(
+    //   targetingSystem.autoTargetCommand(drivebase::getPose).andThen
+    //   (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
+    //   .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
+    //   .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
+    // .andThen(loadingSystem.algaeLoad(42,14))))));
 
-    m_driverController.button(12).whileTrue(
-      targetingSystem.autoTargetCommand(drivebase::getPose).andThen
-      (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
-      .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
-      .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
-    .andThen(loadingSystem.algaeLoad(42,44))))));
+    // m_driverController.button(12).whileTrue(
+    //   targetingSystem.autoTargetCommand(drivebase::getPose).andThen
+    //   (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
+    //   .andThen(Commands.waitUntil(()->driveDirectAngle.atTargetPose(0.01))
+    //   .andThen((Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false)))
+    // .andThen(loadingSystem.algaeLoad(42,44))))));
 
     m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
     m_OperatorController1.button(14).onTrue(driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
