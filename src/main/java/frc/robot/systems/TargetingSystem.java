@@ -11,8 +11,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants.Reef;
@@ -53,8 +55,8 @@ public class TargetingSystem
                                                                                            0,
                                                                                            0,
                                                                                            new TrapezoidProfile.Constraints(
-                                                                                               360,
-                                                                                               180));
+                                                                                               90,
+                                                                                               15));
 
   private void initializeBranchPoses()
   {
@@ -68,12 +70,15 @@ public class TargetingSystem
       reefPoseToBranchMap.put(targetPose, ReefBranch.values()[branchPositionIndex]);
       reefPoseToBranchMap.put(AllianceFlipUtil.flip(targetPose), ReefBranch.values()[branchPositionIndex]);
     }
+    allianceRelativeReefBranches = reefBranches.stream()
+                                               .map(AllianceFlipUtil::apply)
+                                               .collect(Collectors.toList());
   }
 
 
   public TargetingSystem()
   {
-
+    new Trigger(()-> DriverStation.getAlliance().isPresent()).toggleOnTrue(Commands.runOnce(this::initializeBranchPoses));
   }
 
 
@@ -199,9 +204,7 @@ public class TargetingSystem
     {
       initializeBranchPoses();
     }
-    allianceRelativeReefBranches = reefBranches.stream()
-                                               .map(AllianceFlipUtil::apply)
-                                               .collect(Collectors.toList());
+
     Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
     targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
     return selectedTargetPose;
