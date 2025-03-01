@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.reduxrobotics.canand.CanandDevice;
 import com.reduxrobotics.sensors.canandcolor.Canandcolor;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
@@ -310,7 +311,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeLoaded()
   {
-    return armLoaded.getProximity() < 0.85;//m_algaeInBin.get()|| m_algaeInArm.get();
+    return armLoaded.getProximity() < 0.85 || armLoadedSim.getValue();//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean aroundAngle(double degree, double allowableError)
