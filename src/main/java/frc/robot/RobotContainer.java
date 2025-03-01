@@ -310,7 +310,7 @@ driveDirectAngle
 
   
     m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42,14));
-    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42,44));
+    m_driverController.button(12).whileTrue(loadingSystem.algaeLoad(42,44));
     // m_driverController.button(11).whileTrue(
     //   targetingSystem.autoTargetCommand(drivebase::getPose).andThen
     //   (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
