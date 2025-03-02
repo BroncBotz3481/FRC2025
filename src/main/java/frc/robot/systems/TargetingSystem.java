@@ -5,13 +5,17 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants.Reef;
 import frc.robot.systems.field.FieldConstants.ReefHeight;
@@ -21,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import swervelib.SwerveInputStream;
 
 //targetting system should be able to select either left or right side of the branch
 //then select what level we want
@@ -29,7 +34,7 @@ import java.util.stream.Collectors;
 
 public class TargetingSystem
 {
-  public Field2d field;
+
   private AprilTagFieldLayout fieldLayout              = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   private ReefBranch          targetBranch;
   private ReefBranchLevel     targetBranchLevel;
@@ -40,19 +45,40 @@ public class TargetingSystem
   private List<Pose2d>            reefBranches                 = null;
   private List<Pose2d>            allianceRelativeReefBranches = null;
   private Map<Pose2d, ReefBranch> reefPoseToBranchMap          = null;
+  private ProfiledPIDController   translationPID               = new ProfiledPIDController(5,
+                                                                                           0,
+                                                                                           0,
+                                                                                           new TrapezoidProfile.Constraints(
+                                                                                               5,
+                                                                                               2));
+  private ProfiledPIDController   rotationPID                  = new ProfiledPIDController(5,
+                                                                                           0,
+                                                                                           0,
+                                                                                           new TrapezoidProfile.Constraints(
+                                                                                               90,
+                                                                                               15));
 
-  public TargetingSystem()
+  private void initializeBranchPoses()
   {
     reefBranches = new ArrayList<>();
     reefPoseToBranchMap = new HashMap<>();
     for (int branchPositionIndex = 0; branchPositionIndex < Reef.branchPositions.size(); branchPositionIndex++)
     {
       Map<ReefHeight, Pose3d> branchPosition = Reef.branchPositions.get(branchPositionIndex);
-      Pose2d                  targetPose     = AllianceFlipUtil.apply(branchPosition.get(ReefHeight.L4).toPose2d());
+      Pose2d                  targetPose     = branchPosition.get(ReefHeight.L4).toPose2d();
       reefBranches.add(targetPose);
       reefPoseToBranchMap.put(targetPose, ReefBranch.values()[branchPositionIndex]);
       reefPoseToBranchMap.put(AllianceFlipUtil.flip(targetPose), ReefBranch.values()[branchPositionIndex]);
     }
+    allianceRelativeReefBranches = reefBranches.stream()
+                                               .map(AllianceFlipUtil::apply)
+                                               .collect(Collectors.toList());
+  }
+
+
+  public TargetingSystem()
+  {
+    new Trigger(()-> DriverStation.getAlliance().isPresent()).toggleOnTrue(Commands.runOnce(this::initializeBranchPoses));
   }
 
 
@@ -135,6 +161,31 @@ public class TargetingSystem
     }
   }
 
+  public Command driveToTarget(SwerveSubsystem swerveDrive, SwerveInputStream driveStream)
+  {
+    double metersTolerance = Inches.of(1).in(Meters);
+    driveStream
+        .driveToPose(this::getTargetPose, translationPID, rotationPID);
+    return Commands.print("GOING TO POSE")
+                   .andThen(Commands.runOnce(() -> {swerveDrive.getSwerveDrive().field.getObject("target")
+                                                                                     .setPose(getTargetPose());
+                   }))
+                   .andThen(Commands.runOnce(() -> driveStream.driveToPoseEnabled(true))
+                                    .andThen(Commands.waitUntil(() -> driveStream.atTargetPose(metersTolerance))))
+                   .andThen(Commands.print("DONE GOING TO POSE"))
+                   .finallyDo(() -> driveStream.driveToPoseEnabled(false));
+  }
+
+  public Command driveToPose(SwerveSubsystem swerveDrive, SwerveInputStream driveStream, Pose2d pose)
+  {
+    return Commands.runOnce(() -> driveStream.driveToPose(() -> pose, translationPID, rotationPID))
+                   .andThen(driveToTarget(swerveDrive, driveStream))
+                   .finallyDo(() -> driveStream.driveToPose(this::getTargetPose,
+                                                            translationPID,
+                                                            rotationPID));
+  }
+
+
   public Pose2d getTargetPose()
   {
     Pose2d scoringPose = Pose2d.kZero;
@@ -149,26 +200,20 @@ public class TargetingSystem
 
   public Pose2d autoTarget(Supplier<Pose2d> currentPose)
   {
-    if (allianceRelativeReefBranches == null)
+    if(reefBranches == null)
     {
-      allianceRelativeReefBranches = reefBranches.stream()
-                                                 .map(AllianceFlipUtil::apply)
-                                                 .collect(Collectors.toList());
+      initializeBranchPoses();
     }
+
     Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
     targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
-    if(field != null)
-    {
-      field.getObject("Target").setPose(selectedTargetPose);
-    }
     return selectedTargetPose;
   }
 
   public Command autoTargetCommand(Supplier<Pose2d> currentPose)
   {
-    return Commands.runOnce(() -> {
-      autoTarget(currentPose);
-    });
+    return Commands.runOnce(() ->
+                                autoTarget(currentPose)).andThen(Commands.print("Auto-targetting complete"));
   }
 
   public enum ReefBranch

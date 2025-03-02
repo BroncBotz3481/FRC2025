@@ -4,9 +4,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.*;
-import frc.robot.Constants.CoralArmConstants;
+import frc.robot.subsystems.AlgaeArmSubsystem;
+import frc.robot.subsystems.AlgaeIntakeSubsystem;
+import frc.robot.subsystems.CoralArmSubsystem;
+import frc.robot.subsystems.CoralIntakeSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 ;
 
@@ -25,7 +27,7 @@ public class LoadingSystem
                        AlgaeArmSubsystem algaeArm,
                        ElevatorSubsystem elevator,
                        CoralIntakeSubsystem coralIntake,
-                       TargetingSystem   targetSys,
+                       TargetingSystem targetSys,
                        AlgaeIntakeSubsystem algaeIntake)
   {
     m_coralArm = coralArm;
@@ -42,35 +44,38 @@ public class LoadingSystem
   public Command coralLoad()
   {
     double coralArmLoadingAngleDegrees   = -8;
-    double coralStationHeightMeters = Units.feetToMeters(3) + Units.inchesToMeters(1.5);
+    double coralStationHeightMeters      = Units.feetToMeters(3) + Units.inchesToMeters(1.5);
     double coralElevatorHighHeightMeters = 0;
 
     return m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
-                    .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
-                            .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
-                            .alongWith(m_wrist.setWristAngle(90)))
+                     .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
+                                        .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees)
+                                                             .repeatedly())
+                                        .alongWith(m_wrist.setWristAngle(90)))
                      .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
   }
 
   public Command algaeLoad(double elevatorHeight, double angle)//fix angle
   {
     // Put algae arm out, roll in
-    double algaeArmLoadingAngleDegrees   = angle;
+    double algaeArmLoadingAngleDegrees  = angle;
     double elevatorExtendedHeightMeters = elevatorHeight;
-            //Units.inchesToMeters(elevatorHeight) > ElevatorConstants.kElevatorUnextendedHeight?
-            //Units.inchesToMeters(elevatorHeight) : 0 ;
-    double algaeElevatorHighHeightMeters =  elevatorExtendedHeightMeters + Units.inchesToMeters(3.0);// The ball is higher than Branches
-    double algaeElevatorLowHeightMeters  = elevatorExtendedHeightMeters - Units.inchesToMeters(3.0);// change it back to 1.0
+    //Units.inchesToMeters(elevatorHeight) > ElevatorConstants.kElevatorUnextendedHeight?
+    //Units.inchesToMeters(elevatorHeight) : 0 ;
+    double algaeElevatorHighHeightMeters = elevatorExtendedHeightMeters +
+                                           Units.inchesToMeters(3.0);// The ball is higher than Branches
+    double algaeElevatorLowHeightMeters  = elevatorExtendedHeightMeters -
+                                           Units.inchesToMeters(3.0);// change it back to 1.0
 
-    return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
-                     .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters).repeatedly()
-                             .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly()))
-                     .andThen(m_elevator.setElevatorHeight(algaeElevatorLowHeightMeters).repeatedly()
-                              .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly())
-                             .alongWith(m_algaeIntake.setAlgaeIntakeRoller(0.5)))  // Remember to change the default intake speed
-                     .until(() -> m_algaeArm.algaeLoaded())
-                             .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
-                                     .deadlineFor(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly()));
+    return Commands.print("Running algae load").andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters))
+                   .andThen(m_elevator.setElevatorHeight(algaeElevatorLowHeightMeters).repeatedly()
+                                      .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly(),
+                                                 m_algaeIntake.setAlgaeIntakeRoller(0.5)))  // Remember to change the default intake speed
+                   .until(() -> m_algaeArm.algaeLoaded())
+                   .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
+                                      .deadlineFor(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees)
+                                                             .repeatedly()))
+        .andThen(Commands.print("Done algae load"));
 
   }
 
@@ -80,9 +85,10 @@ public class LoadingSystem
     double coralArmLockingAngleDegrees      = m_targetSystem.getTargetBranchCoralArmAngle();
     double coralElevatorLockingHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
     return m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters)
-            .andThen(m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters).repeatedly()
-                    .alongWith(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees).repeatedly())
-                     .alongWith(m_wrist.setWristAngle(90).repeatedly()));
+                     .andThen(m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters).repeatedly()
+                                        .alongWith(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees)
+                                                             .repeatedly())
+                                        .alongWith(m_wrist.setWristAngle(90).repeatedly()));
   }
 
   public Command algaeLockProcessor()

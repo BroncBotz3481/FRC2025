@@ -34,6 +34,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
@@ -126,6 +128,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
       );
   private final SparkMaxSim         m_motorSim             = new SparkMaxSim(m_motor, m_armGearbox);
   private       DIOSim              armLoadedSim           = new DIOSim(0);
+  private DigitalInput armLoadedFake = new DigitalInput(0);
 
 
   public AlgaeArmSubsystem()
@@ -307,7 +310,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
  public boolean algaeLoaded()
   {
-    return armLoaded.getProximity() < 0.85 || armLoadedSim.getValue();//m_algaeInBin.get()|| m_algaeInArm.get();
+    return RobotBase.isSimulation() ?  armLoadedSim.getValue() : armLoaded.getProximity() < 0.85;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean aroundAngle(double degree, double allowableError)

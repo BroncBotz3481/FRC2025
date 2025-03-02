@@ -6,36 +6,21 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meter;
 
-import java.util.Set;
-import java.util.concurrent.Flow.Processor;
-
 import com.pathplanner.lib.auto.NamedCommands;
-
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.Odometry;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AlgaeArmConstants;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -46,10 +31,9 @@ import frc.robot.systems.ScoringSystem;
 import frc.robot.systems.TargetingSystem;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants;
-import swervelib.SwerveController;
-import swervelib.SwerveDrive;
-import swervelib.SwerveInputStream;
 import frc.robot.systems.field.FieldConstants.CoralStation;
+import java.util.Set;
+import swervelib.SwerveInputStream;
 
 
 /**
@@ -63,7 +47,7 @@ public class RobotContainer
   public static final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem       drivebase          = new SwerveSubsystem();
+  private final       SwerveSubsystem       drivebase          = new SwerveSubsystem();
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
 
@@ -83,7 +67,12 @@ public class RobotContainer
   private final CoralIntakeSubsystem coralIntake = new CoralIntakeSubsystem();
 
   private final TargetingSystem targetingSystem = new TargetingSystem();
-  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm, algaeArm, elevator, coralIntake, targetingSystem, algaeIntake);
+  private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm,
+                                                                    algaeArm,
+                                                                    elevator,
+                                                                    coralIntake,
+                                                                    targetingSystem,
+                                                                    algaeIntake);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
                                                                     drivebase,
@@ -105,12 +94,12 @@ public class RobotContainer
                                                            .withControllerHeadingAxis(m_driverController::getRightX,
                                                                                       m_driverController::getRightY)
                                                            .headingWhile(true);
-  
-  Command driveFieldOrientedDriectAngle = drivebase.driveFieldOriented(driveDirectAngle);
-  Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
+
+  Command driveFieldOrientedDriectAngle     = drivebase.driveFieldOriented(driveDirectAngle);
+  Command driveSetpointGen                  = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
   Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
 
-//Non reality code
+  //Non reality code
   SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(drivebase.getSwerveDrive(),
                                                                    () -> -m_driverController.getLeftY(),
                                                                    () -> -m_driverController.getLeftX())
@@ -121,20 +110,21 @@ public class RobotContainer
                                                                .allianceRelativeControl(true);
 
 
-
   // Derive the heading axis with math!
-  SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy()
-                                                                     .withControllerHeadingAxis(() -> Math.sin(
-                                                                                                    m_driverController.getRawAxis(
-                                                                                                        2) * Math.PI) * (Math.PI * 2),
-                                                                                                () -> Math.cos(
-                                                                                                    m_driverController.getRawAxis(
-                                                                                                        2) * Math.PI) *
-                                                                                                      (Math.PI * 2))
-                                                                     .headingWhile(true);
-SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-                                                             .allianceRelativeControl(false);
-  Command driveFieldOrientedDirectAngleSim = drivebase.driveFieldOriented(driveDirectAngleSim);
+  SwerveInputStream driveDirectAngleSim              = driveAngularVelocitySim.copy()
+                                                                              .withControllerHeadingAxis(() -> Math.sin(
+                                                                                                             m_driverController.getRawAxis(
+                                                                                                                 2) * Math.PI) * (Math.PI * 2),
+                                                                                                         () -> Math.cos(
+                                                                                                             m_driverController.getRawAxis(
+                                                                                                                 2) *
+                                                                                                             Math.PI) *
+                                                                                                               (Math.PI *
+                                                                                                                2))
+                                                                              .headingWhile(true);
+  SwerveInputStream driveRobotOriented               = driveAngularVelocity.copy().robotRelative(true)
+                                                                           .allianceRelativeControl(false);
+  Command           driveFieldOrientedDirectAngleSim = drivebase.driveFieldOriented(driveDirectAngleSim);
 
   Command driveSetpointGenSim = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleSim);
 
@@ -169,51 +159,54 @@ SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative
   {
     //Configure the trigger bindings
     DriverStation.silenceJoystickConnectionWarning(true);
-     elevator.setDefaultCommand(elevator.setGoal(0));
+    elevator.setDefaultCommand(elevator.setGoal(0));
     coralArm.setDefaultCommand(coralArm.setGoal(-45));
     //climb.setDefaultCommand(climb.stop());
     algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
     algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
     coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
-   targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
-    
+    targetingSystem.setTarget(TargetingSystem.ReefBranch.A, TargetingSystem.ReefBranchLevel.L3);
+
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
-
-
-driveDirectAngle
-        .driveToPose(targetingSystem::getTargetPose,
-                     new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(5, 2)),
-                     new ProfiledPIDController(5, 0, 0, new TrapezoidProfile.Constraints(360, 180)));
     Command driveFieldOrientedDriectAngle = drivebase.driveFieldOriented(driveDirectAngle);
 
     drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
-    boolean driveToPoseTesting = true;
+    boolean driveToPoseTesting = false;
     if (driveToPoseTesting)
     {
       m_driverController.button(1).whileTrue(Commands.startRun(() ->
                                                                    targetingSystem.autoTarget(drivebase::getPose),
-                                                               () -> driveDirectAngle.driveToPoseEnabled(true)).until(() ->drivebase.getPose().getTranslation().getDistance(targetingSystem.getTargetPose().getTranslation()) < 2)
-                                                               .andThen(Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(false))));
+                                                               () -> driveDirectAngle.driveToPoseEnabled(true))
+                                                     .until(() -> drivebase.getPose().getTranslation()
+                                                                           .getDistance(targetingSystem.getTargetPose()
+                                                                                                       .getTranslation()) <
+                                                                  2)
+                                                     .andThen(Commands.runOnce(() -> driveDirectAngle.driveToPoseEnabled(
+                                                         false))));
     }
 
-
-
-
-
-
-
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
-        targetingSystem.field=drivebase.getSwerveDrive().field;
-     configureBindings();
+//    targetingSystem.field = drivebase.getSwerveDrive().field;
+//    configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    // Put Mechanism 2d to SmartDashboard
+    SmartDashboard.putData("Side View", Constants.sideRobotView);
+
+    boolean algaeLoadTesting = true;
+    if(algaeLoadTesting)
+    {
+      m_driverController.button(1).whileTrue(loadingSystem.algaeLoad(0.4,45));
+    }
+
     // Elevator Testing
     boolean elevatorTesting = false;
-    if(elevatorTesting)
+    if (elevatorTesting)
     {
       m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
       m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
@@ -224,7 +217,7 @@ driveDirectAngle
     }
 
     boolean algaeArmTesting = false;
-    if(algaeArmTesting)
+    if (algaeArmTesting)
     {
       m_driverController.button(1).whileTrue(algaeArm.setPower(0.1));
       m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
@@ -235,7 +228,7 @@ driveDirectAngle
     }
 
     boolean coralArmTesting = false;
-    if(coralArmTesting)
+    if (coralArmTesting)
     {
       m_driverController.button(1).whileTrue(coralArm.setPower(0.1));
       m_driverController.button(2).whileTrue(coralArm.runSysIdRoutine());
@@ -247,7 +240,7 @@ driveDirectAngle
     }
 
     boolean wristTesting = false;
-    if(wristTesting)
+    if (wristTesting)
     {
       m_driverController.button(1).whileTrue(coralIntake.setWristPower(0.1));
       m_driverController.button(2).whileTrue(coralIntake.setWristAngle(90));
@@ -269,38 +262,57 @@ driveDirectAngle
    */
   private void configureBindings()
   {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // Put Mechanism 2d to SmartDashboard
-    SmartDashboard.putData("Side View", Constants.sideRobotView);
-    
-    m_OperatorController1.button(1).onTrue(targetingSystem.setTargetCommand(
-      TargetingSystem.ReefBranch.J,
-      TargetingSystem.ReefBranchLevel.L1)
-    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase,coralIntake))));
 
-    
+    m_OperatorController1.button(1).onTrue(targetingSystem.setTargetCommand(
+                                                              TargetingSystem.ReefBranch.J,
+                                                              TargetingSystem.ReefBranchLevel.L1)
+                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
+                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
+                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                                                                  Set.of(elevator,
+                                                                                         algaeArm,
+                                                                                         coralArm,
+                                                                                         drivebase,
+                                                                                         coralIntake))));
+
     m_OperatorController1.button(2).onTrue(targetingSystem.setTargetCommand(
-      TargetingSystem.ReefBranch.J,
-      TargetingSystem.ReefBranchLevel.L2)
-    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase, coralIntake))));
+                                                              TargetingSystem.ReefBranch.J,
+                                                              TargetingSystem.ReefBranchLevel.L2)
+                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
+                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
+                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                                                                  Set.of(elevator,
+                                                                                         algaeArm,
+                                                                                         coralArm,
+                                                                                         drivebase,
+                                                                                         coralIntake))));
 
     m_OperatorController1.button(3).onTrue(targetingSystem.setTargetCommand(
-      TargetingSystem.ReefBranch.J,
-      TargetingSystem.ReefBranchLevel.L3)
-    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase, coralIntake))));
+                                                              TargetingSystem.ReefBranch.J,
+                                                              TargetingSystem.ReefBranchLevel.L3)
+                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
+                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
+                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                                                                  Set.of(elevator,
+                                                                                         algaeArm,
+                                                                                         coralArm,
+                                                                                         drivebase,
+                                                                                         coralIntake))));
 
     m_OperatorController1.button(4).onTrue(targetingSystem.setTargetCommand(
-      TargetingSystem.ReefBranch.J,
-      TargetingSystem.ReefBranchLevel.L4)
-    .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-    .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase, coralIntake))));
-
+                                                              TargetingSystem.ReefBranch.J,
+                                                              TargetingSystem.ReefBranchLevel.L4)
+                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
+                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
+                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                                                                  Set.of(elevator,
+                                                                                         algaeArm,
+                                                                                         coralArm,
+                                                                                         drivebase,
+                                                                                         coralIntake))));
 
     m_OperatorController1.button(5).onTrue(Commands.print("Left Side selected"));
-    m_OperatorController1.button(6).onTrue(Commands.print("Right Side selected")); 
+    m_OperatorController1.button(6).onTrue(Commands.print("Right Side selected"));
 
     m_OperatorController1.button(7).onTrue(Commands.print("Launch Command"));
     m_OperatorController1.button(8).onTrue(Commands.print("Cancel Selected Command"));
@@ -308,9 +320,8 @@ driveDirectAngle
     m_OperatorController1.button(9).onTrue(Commands.print("Outtake Coral"));
     m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
-  
-    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42,14));
-    m_driverController.button(12).whileTrue(loadingSystem.algaeLoad(42,44));
+    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42, 14));
+    m_driverController.button(12).whileTrue(loadingSystem.algaeLoad(42, 44));
     // m_driverController.button(11).whileTrue(
     //   targetingSystem.autoTargetCommand(drivebase::getPose).andThen
     //   (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
@@ -330,50 +341,27 @@ driveDirectAngle
 
     m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-
     m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1().repeatedly());
     m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2().repeatedly());
-   
-  //   m_OperatorController1.button(17).whileTrue( //Dance
-  //   elevator.setElevatorHeight(Units.inchesToMeters(31)).repeatedly()
-  //   .alongWith(waveArms(80, 20))
-  //   .until(() ->coralArm.aroundAngle(80)).withTimeout(2)
-  //   .andThen(waveArms(20, 80))
-  //   .until(() ->algaeArm.aroundAngle(80)).withTimeout(2)
-  //   .until(() -> elevator.aroundHeight((Units.inchesToMeters(32))))
 
-  //  );
+    //   m_OperatorController1.button(17).whileTrue( //Dance
+    //   elevator.setElevatorHeight(Units.inchesToMeters(31)).repeatedly()
+    //   .alongWith(waveArms(80, 20))
+    //   .until(() ->coralArm.aroundAngle(80)).withTimeout(2)
+    //   .andThen(waveArms(20, 80))
+    //   .until(() ->algaeArm.aroundAngle(80)).withTimeout(2)
+    //   .until(() -> elevator.aroundHeight((Units.inchesToMeters(32))))
 
-   
-   m_driverController.button(17).whileTrue(
-    targetingSystem.autoTargetCommand(drivebase::getPose)
-              .andThen(Commands.defer(()-> drivebase.driveToPose(targetingSystem.getTargetPose()), Set.of(drivebase)))
-              .andThen(Commands.defer(scoringSystem::scoreCoral,  Set.of(elevator, algaeArm,coralArm,drivebase))));
+    //  );
 
-
-              if (Robot.isSimulation())
-              {
-                Pose2d target = new Pose2d(new Translation2d(1, 4),
-                                           Rotation2d.fromDegrees(90));
-                //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-                driveDirectAngleSim.driveToPose(() -> target,
-                                                     new ProfiledPIDController(5,
-                                                                               0,
-                                                                               0,
-                                                                               new Constraints(5, 2)),
-                                                     new ProfiledPIDController(5,
-                                                                               0,
-                                                                               0,
-                                                                               new Constraints(Units.degreesToRadians(360),
-                                                                                               Units.degreesToRadians(180))
-                                                     ));
-                m_driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-                //m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-                m_driverController.button(2).onTrue(Commands.runEnd(() -> driveDirectAngleSim.driveToPoseEnabled(true),
-                                                              () -> driveDirectAngleSim.driveToPoseEnabled(false)));
-              }           
-  // m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
-  // Button 19 is used just for testing loading sys
+    m_driverController.button(17).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose)
+                       .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                                               Set.of(drivebase)))
+                       .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                               Set.of(elevator, algaeArm, coralArm, drivebase))));
+    // m_driverController.button(18).whileTrue(algaeArm.setAlgaeArmAngle(250).repeatedly().andThen(climb.climbUp()));
+    // Button 19 is used just for testing loading sys
 
 /*
  *     .andThen(waveArms(80, 20))
@@ -387,9 +375,7 @@ driveDirectAngle
                                                                 .minus(Rotation2d.fromDegrees(180)))))
   );
  */
-   
 
-      
   }
 
 
@@ -416,30 +402,37 @@ driveDirectAngle
 
   public Command driveToHumanPlayer1()
   {
-    if (AllianceFlipUtil.shouldFlip()){
-        return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.leftCenterFace));
-    } else  {
-        return drivebase.driveToPose((CoralStation.leftCenterFace));
+    if (AllianceFlipUtil.shouldFlip())
+    {
+      return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.leftCenterFace));
+    } else
+    {
+      return drivebase.driveToPose((CoralStation.leftCenterFace));
     }
   }
+
   public Command driveToHumanPlayer2()
   {
-    if (AllianceFlipUtil.shouldFlip()){
+    if (AllianceFlipUtil.shouldFlip())
+    {
       return drivebase.driveToPose(CoralStation.rightCenterFace);
-  } else  {
+    } else
+    {
       return drivebase.driveToPose(AllianceFlipUtil.flip(CoralStation.rightCenterFace));
-  }
+    }
   }
 
   public Command driveToProcessor()
   {
 
-   // return drivebase.driveToPose(AllianceFlipUtil.apply(FieldConstants.Processor.centerFace));
-     if (AllianceFlipUtil.shouldFlip()){
-        return drivebase.driveToPose(FieldConstants.Processor.centerFace);
-   } else  {
-        return drivebase.driveToPose(AllianceFlipUtil.flip(FieldConstants.Processor.centerFace));
-   }
+    // return drivebase.driveToPose(AllianceFlipUtil.apply(FieldConstants.Processor.centerFace));
+    if (AllianceFlipUtil.shouldFlip())
+    {
+      return drivebase.driveToPose(FieldConstants.Processor.centerFace);
+    } else
+    {
+      return drivebase.driveToPose(AllianceFlipUtil.flip(FieldConstants.Processor.centerFace));
+    }
   }
 
   public ParallelCommandGroup setElevArm(double goal, double degree)
@@ -447,11 +440,10 @@ driveDirectAngle
     return new ParallelCommandGroup(elevator.setGoal(goal), coralArm.setGoal(degree));
   }
 
-  public ParallelCommandGroup waveArms(double coralAngle, double algaeAngle){
+  public ParallelCommandGroup waveArms(double coralAngle, double algaeAngle)
+  {
     return new ParallelCommandGroup(coralArm.setGoal(coralAngle), algaeArm.setGoal(algaeAngle));
   }
 
-
-  
 
 }
