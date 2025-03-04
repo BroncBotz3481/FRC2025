@@ -12,6 +12,8 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Second;
 
+import org.dyn4j.dynamics.joint.PulleyJoint;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -260,6 +262,8 @@ public final class Constants
     public static final double k_wristClosedLoopRampRate = 0.25;
 
     public static final double CoralOuttakeSpeeds = -0.8;
+    public static final double intakeZeroPosition = 0;
+    public static final double intake90Position = 0.27;
 
     public static Angle  kMinAngle       = Degrees.of(-20);
     public static Angle  kMaxAngle       = Degrees.of(220);

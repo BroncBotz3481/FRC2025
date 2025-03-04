@@ -55,7 +55,7 @@ public class ScoringSystem
 
     return new ParallelDeadlineGroup(
       m_elevator.setElevatorHeight(elevatorHeightMeters).withName("ScoreCoralElevatorHeight")
-      .andThen(m_coralIntake.spitCoralOut(IntakeConstants.defaultrRollerSpeed, 90))
+      .andThen(m_coralIntake.spitCoralOut(IntakeConstants.defaultrRollerSpeed, IntakeConstants.intake90Position))
     .andThen(Commands.print("Tell me why aint nothing but a mistake"))
     .andThen(m_elevator.setElevatorHeight(
         elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight).withName("ScoreCoralElevatorHeightLower"))
