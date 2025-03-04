@@ -13,6 +13,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -304,8 +305,8 @@ public class RobotContainer
     m_OperatorController1.button(9).whileTrue(coralIntake.spitCoralOut(IntakeConstants.CoralOuttakeSpeeds, 0));
     m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
-    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42, 14));
-    m_driverController.button(12).whileTrue(loadingSystem.algaeLoad(42, 44));
+    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(Units.inchesToMeters(42), 14));
+    m_driverController.button(12).whileTrue(loadingSystem.algaeLoad(Units.inchesToMeters(42), 44));
     // m_driverController.button(11).whileTrue(
     //   targetingSystem.autoTargetCommand(drivebase::getPose).andThen
     //   (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
