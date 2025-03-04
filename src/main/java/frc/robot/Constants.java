@@ -110,7 +110,7 @@ public final class Constants
   {
 
     public static final double kWristMomentOfInertia = 0.00032; // kg * m^2
-    public static final double kWristGearRatio       = (30.0/54.0)*64;
+    public static final double kWristGearRatio       = (30.0/54.0)*28.0;
     public static final Angle kWristOffset = Degrees.of(0);
 
     public static class RollerConstants

@@ -173,11 +173,11 @@ public class RobotContainer
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
     // configureBindings();
-    drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
+//    drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Elevator Testing
-    boolean elevatorTesting = true;
+    boolean elevatorTesting = false;
     if(elevatorTesting)
     {
       m_driverController.y().whileTrue(elevator.setPower(0.2).until(elevator.atMax));
@@ -198,7 +198,7 @@ public class RobotContainer
       elevator.setDefaultCommand(elevator.hold());
     }
 
-    boolean algaeArmTesting = true;
+    boolean algaeArmTesting = false;
     if(algaeArmTesting)
     {
       m_driverController.b().whileTrue(algaeArm.setPower(0.2));
@@ -218,7 +218,7 @@ public class RobotContainer
       algaeArm.setDefaultCommand(algaeArm.hold());
     }
 
-    boolean coralArmTesting = true;
+    boolean coralArmTesting = false;
     if(coralArmTesting)
     {
       m_driverController.povUp().whileTrue(coralArm.setPower(0.1));
@@ -235,17 +235,21 @@ public class RobotContainer
       m_OperatorController1.leftBumper().whileTrue(coralIntake.setCoralIntakePower(0.5));
       m_OperatorController1.rightBumper().whileTrue(coralIntake.setCoralIntakePower(-0.2));
 
+
       coralIntake.setDefaultCommand(coralIntake.setCoralIntakePower(0));
       coralArm.setDefaultCommand(coralArm.hold());
     }
 
-    boolean wristTesting = false;
+    boolean wristTesting = true;
     if(wristTesting)
     {
-      m_driverController.button(1).whileTrue(coralIntake.setWristPower(0.1));
-      m_driverController.button(2).whileTrue(coralIntake.setWristAngle(37));
-      m_driverController.button(3).whileTrue(coralIntake.setWristAngle(0));
+      m_driverController.a().whileTrue(coralIntake.setWristPower(0.1));
+      m_driverController.y().whileTrue(coralIntake.setWristPower(-0.1));
+
+      m_driverController.b().whileTrue(coralIntake.setWristAngle(0));
+      m_driverController.x().whileTrue(coralIntake.setWristAngle(0.27));
       coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0).repeatedly());
+      coralIntake.setDefaultCommand(coralIntake.setWristPower(0));
     }
 
     // drivebase.setDefaultCommand(

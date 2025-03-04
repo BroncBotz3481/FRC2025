@@ -4,8 +4,9 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 
-import java.nio.channels.SeekableByteChannel;
-
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
+import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
@@ -19,13 +20,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
-import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -37,8 +34,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.CoralArmConstants;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
@@ -51,24 +46,24 @@ public class CoralIntakeSubsystem extends SubsystemBase
   private final SparkMax m_wristMotor  = new SparkMax(IntakeConstants.coralWristMotorID, MotorType.kBrushless);
   private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.coralRollerMotorID, MotorType.kBrushless);
 
-  private final AbsoluteEncoder m_wristENcoder2 = m_wristMotor.getAbsoluteEncoder();
+  private final AbsoluteEncoder           m_wristENcoder2 = m_wristMotor.getAbsoluteEncoder();
   private final SparkClosedLoopController wristController = m_wristMotor.getClosedLoopController();
   private final RelativeEncoder           m_wristEncoder  = m_wristMotor.getEncoder();
   private final AbsoluteEncoder           m_absEncoder    = m_wristMotor.getAbsoluteEncoder();
 
-  private final LaserCan         m_intakeLaserCAN     = new LaserCan(IntakeConstants.rightLaserCAN);
-  private final LaserCanSim      m_intakeLaserCANSim  = new LaserCanSim(IntakeConstants.rightLaserCAN);
+  private final LaserCan         m_intakeLaserCAN       = new LaserCan(IntakeConstants.rightLaserCAN);
+  private final LaserCanSim      m_intakeLaserCANSim    = new LaserCanSim(IntakeConstants.rightLaserCAN);
   private final RegionOfInterest m_laserCanROI          = new RegionOfInterest(0, 0, 16, 16);
   private final TimingBudget     m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
   private final Alert            m_laserCanFailure      = new Alert("LaserCAN failed to configure.",
                                                                     AlertType.kError);
-  
+
 
   // Simulation stuff
-  private final DCMotor                 m_wristMotorGearbox  = DCMotor.getNEO(1);
-  private final DCMotor                 m_rollerMotorGearbox = DCMotor.getNEO(1);
+  private final DCMotor m_wristMotorGearbox  = DCMotor.getNEO(1);
+  private final DCMotor m_rollerMotorGearbox = DCMotor.getNEO(1);
 
-  private final FlywheelSim             m_wristSim           = new FlywheelSim(
+  private final FlywheelSim m_wristSim = new FlywheelSim(
       LinearSystemId.createFlywheelSystem(
           m_wristMotorGearbox,
           WristConstants.kWristMomentOfInertia,
@@ -76,7 +71,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
       m_wristMotorGearbox,
       1.0 / 4096.0);
 
-  private final FlywheelSim             m_rollerSim          = new FlywheelSim(LinearSystemId.createFlywheelSystem(
+  private final FlywheelSim m_rollerSim = new FlywheelSim(LinearSystemId.createFlywheelSystem(
       m_rollerMotorGearbox,
       RollerConstants.kWristMomentOfInertia,
       RollerConstants.kWristGearRatio), m_rollerMotorGearbox, 1.0 / 4096.0);
@@ -85,9 +80,9 @@ public class CoralIntakeSubsystem extends SubsystemBase
   private final SparkMaxSim             m_wristMotorSim      = new SparkMaxSim(m_wristMotor, m_wristMotorGearbox);
   private final SparkMaxSim             m_rollerMotorSim     = new SparkMaxSim(m_rollerMotor, m_rollerMotorGearbox);
 
-  private final Mechanism2d wristMechanism = new Mechanism2d(10,10);
-  private final MechanismRoot2d wristMech = wristMechanism.getRoot("Wrist", 5, 0);
-  private final MechanismLigament2d wristArm = wristMech.append(new MechanismLigament2d("Wrist Arm",4,90));
+  private final Mechanism2d         wristMechanism = new Mechanism2d(10, 10);
+  private final MechanismRoot2d     wristMech      = wristMechanism.getRoot("Wrist", 5, 0);
+  private final MechanismLigament2d wristArm       = wristMech.append(new MechanismLigament2d("Wrist Arm", 4, 90));
 
   public CoralIntakeSubsystem()
   {
@@ -96,17 +91,20 @@ public class CoralIntakeSubsystem extends SubsystemBase
         .smartCurrentLimit(IntakeConstants.k_wristCurrentLimit) // Move to Constants
         .closedLoopRampRate(IntakeConstants.k_wristClosedLoopRampRate) // Move to Constants
         .idleMode(IdleMode.kCoast)
-        .inverted(true)
+        .inverted(false)
         .encoder
-        .positionConversionFactor(1/WristConstants.kWristGearRatio);
-        
-      cfg
-      .absoluteEncoder
-      .inverted(true)
-      .positionConversionFactor(1/WristConstants.kWristGearRatio);
-      cfg
+        .positionConversionFactor(1);
+
+    cfg
+        .absoluteEncoder
+        .inverted(true)
+        .positionConversionFactor(1);
+    cfg
         .closedLoop
-        .pid(0.1, 0, 0);
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .positionWrappingEnabled(true)
+        .positionWrappingInputRange(0,1)
+        .pid(1, 0, 0);
     SparkMaxConfig cfgRoller = new SparkMaxConfig();
     cfgRoller.inverted(true);
     m_rollerMotor.configure(cfgRoller, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -161,33 +159,38 @@ public class CoralIntakeSubsystem extends SubsystemBase
     });
   }
 
+  BangBangController bangBangController = new BangBangController(0.001);
+
   public Command setWristAngle(double angle)
   {
     return run(() -> {
-      wristController.setReference(Degrees.of(angle).in(Rotations), ControlType.kPosition);
+      wristController.setReference(angle, ControlType.kPosition);
     });
   }
 
+
   public void synchronizeEncoders()
   {
-    m_wristEncoder.setPosition(m_wristENcoder2.getPosition()-WristConstants.kWristOffset.in(Rotations));
+    m_wristEncoder.setPosition(m_wristENcoder2.getPosition() - WristConstants.kWristOffset.in(Rotations));
   }
 
-  public Command setWristPower(double d) {
-    return run(()->m_wristMotor.set(d));
+  public Command setWristPower(double d)
+  {
+    return run(() -> m_wristMotor.set(d));
   }
 
   @Override
   public void periodic()
   {
-    SmartDashboard.putNumber("Wrist Angle", Rotations.of(m_wristEncoder.getPosition()).in(Rotations));
-    SmartDashboard.putNumber("Wrist Angle Absolute Encoder (Degrees)", Rotations.of(m_wristENcoder2.getPosition()).in(Rotations));
+    SmartDashboard.putNumber("Wrist Angle", m_wristEncoder.getPosition());
+    SmartDashboard.putNumber("Wrist Angle Absolute Encoder", m_wristENcoder2.getPosition());
   }
 
 
-  public Command setCoralIntakePower(double i) {
-    return run(()->m_rollerMotor.set(i));
+  public Command setCoralIntakePower(double i)
+  {
+    return run(() -> m_rollerMotor.set(i));
   }
-  
+
 }
 
