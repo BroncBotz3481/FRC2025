@@ -305,8 +305,8 @@ public class RobotContainer
     m_OperatorController1.button(9).whileTrue(coralIntake.spitCoralOut(IntakeConstants.CoralOuttakeSpeeds, IntakeConstants.intakeZeroPosition));
     m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
-    m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(Units.inchesToMeters(42), 14));
-    m_driverController.button(12).whileTrue(loadingSystem.algaeLoad(Units.inchesToMeters(42), 44));
+    m_OperatorController1.button(11).whileTrue(loadingSystem.algaeLoad(0.039, 2.637)); //L23
+    m_OperatorController1.button(12).whileTrue(loadingSystem.algaeLoad(0.0566, 33.2)); //L34
     // m_driverController.button(11).whileTrue(
     //   targetingSystem.autoTargetCommand(drivebase::getPose).andThen
     //   (Commands.runOnce(()->driveDirectAngle.driveToPoseEnabled(true))
