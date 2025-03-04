@@ -26,6 +26,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -65,7 +66,7 @@ public class RobotContainer
 
   private final ElevatorSubsystem    elevator    = new ElevatorSubsystem();
   private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
-  // private final ClimberSubsystem     climb       = new ClimberSubsystem();
+  private final ClimberSubsystem     climb       = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
   private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
@@ -86,13 +87,15 @@ public class RobotContainer
                                                                     loadingSystem,
                                                                     targetingSystem,
                                                                     coralIntake);
+
+  private double multi = 0.8;
   // The real world (whats that?)
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                                                                 () -> m_driverController.getLeftY() * -1,
                                                                 () -> m_driverController.getLeftX() * -1)
                                                             .withControllerRotationAxis(m_driverController::getRightX)
                                                             .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(0.8)
+                                                            .scaleTranslation(multi)
                                                             .allianceRelativeControl(true);
 
   SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
@@ -166,7 +169,7 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
     elevator.setDefaultCommand(elevator.setGoal(0));
     coralArm.setDefaultCommand(coralArm.setGoal(-45));
-    //climb.setDefaultCommand(climb.stop());
+    climb.setDefaultCommand(climb.stop());
     algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
     algaeArm.setDefaultCommand(algaeArm.setGoal(-45));
     coralIntake.setDefaultCommand(coralIntake.spitCoralOut(0, 0));
@@ -268,6 +271,19 @@ public class RobotContainer
   private void configureBindings()
   {
 
+    //slow left bumper
+    //pov up, pov down
+    //y right 90, x left 90
+  
+
+    m_driverController.povUp().whileTrue(climb.climbUp());
+    m_driverController.povDown().whileTrue(climb.climbDown());
+
+    m_driverController.leftBumper().whileTrue(Commands.run(()->driveDirectAngle.scaleTranslation(0.4))); // Slow mode
+    m_driverController.leftBumper().whileFalse(Commands.run(()->driveDirectAngle.scaleTranslation(0.8)));//Fast mode
+    
+   // m_driverController.leftBumper().onTrue
+
     m_OperatorController1.button(1).whileTrue(
         targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
                        .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
@@ -324,7 +340,7 @@ public class RobotContainer
     m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
     m_OperatorController1.button(14).onTrue(driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
 
-    m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
+    //m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
     m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1().repeatedly());
     m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2().repeatedly());
@@ -429,6 +445,6 @@ public class RobotContainer
   {
     return new ParallelCommandGroup(coralArm.setGoal(coralAngle), algaeArm.setGoal(algaeAngle));
   }
-
+  
 
 }
