@@ -65,7 +65,7 @@ public class TargetingSystem
     for (int branchPositionIndex = 0; branchPositionIndex < Reef.branchPositions.size(); branchPositionIndex++)
     {
       Map<ReefHeight, Pose3d> branchPosition = Reef.branchPositions.get(branchPositionIndex);
-      Pose2d                  targetPose     = branchPosition.get(ReefHeight.L4).toPose2d();
+      Pose2d                  targetPose     = branchPosition.get(ReefHeight.L2).toPose2d();
       reefBranches.add(targetPose);
       reefPoseToBranchMap.put(targetPose, ReefBranch.values()[branchPositionIndex]);
       reefPoseToBranchMap.put(AllianceFlipUtil.flip(targetPose), ReefBranch.values()[branchPositionIndex]);

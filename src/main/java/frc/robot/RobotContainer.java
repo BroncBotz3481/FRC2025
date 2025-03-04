@@ -6,7 +6,10 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import java.util.Set;
+
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -29,10 +33,10 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.systems.LoadingSystem;
 import frc.robot.systems.ScoringSystem;
 import frc.robot.systems.TargetingSystem;
+import frc.robot.systems.TargetingSystem.ReefBranchLevel;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants;
 import frc.robot.systems.field.FieldConstants.CoralStation;
-import java.util.Set;
 import swervelib.SwerveInputStream;
 
 
@@ -190,7 +194,7 @@ public class RobotContainer
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //    targetingSystem.field = drivebase.getSwerveDrive().field;
-//    configureBindings();
+    configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
@@ -198,7 +202,7 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
 
-    boolean algaeLoadTesting = true;
+    boolean algaeLoadTesting = false;
     if(algaeLoadTesting)
     {
       m_driverController.button(1).whileTrue(loadingSystem.algaeLoad(0.4,45));
@@ -263,53 +267,33 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    m_OperatorController1.button(1).onTrue(targetingSystem.setTargetCommand(
-                                                              TargetingSystem.ReefBranch.J,
-                                                              TargetingSystem.ReefBranchLevel.L1)
-                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
-                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
-                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
-                                                                                  Set.of(elevator,
-                                                                                         algaeArm,
-                                                                                         coralArm,
-                                                                                         drivebase,
-                                                                                         coralIntake))));
+    m_OperatorController1.button(1).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
+                       .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                                               Set.of(drivebase)))
+                       .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                               Set.of(elevator, algaeArm, coralArm, drivebase))));
 
-    m_OperatorController1.button(2).onTrue(targetingSystem.setTargetCommand(
-                                                              TargetingSystem.ReefBranch.J,
-                                                              TargetingSystem.ReefBranchLevel.L2)
-                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
-                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
-                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
-                                                                                  Set.of(elevator,
-                                                                                         algaeArm,
-                                                                                         coralArm,
-                                                                                         drivebase,
-                                                                                         coralIntake))));
+    m_OperatorController1.button(2).whileTrue(
+    targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
+                    .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                                            Set.of(drivebase)))
+                    .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                            Set.of(elevator, algaeArm, coralArm, drivebase))));
 
-    m_OperatorController1.button(3).onTrue(targetingSystem.setTargetCommand(
-                                                              TargetingSystem.ReefBranch.J,
-                                                              TargetingSystem.ReefBranchLevel.L3)
-                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
-                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
-                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
-                                                                                  Set.of(elevator,
-                                                                                         algaeArm,
-                                                                                         coralArm,
-                                                                                         drivebase,
-                                                                                         coralIntake))));
+    m_OperatorController1.button(3).whileTrue(
+    targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+                    .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                                            Set.of(drivebase)))
+                    .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                            Set.of(elevator, algaeArm, coralArm, drivebase))));
 
-    m_OperatorController1.button(4).onTrue(targetingSystem.setTargetCommand(
-                                                              TargetingSystem.ReefBranch.J,
-                                                              TargetingSystem.ReefBranchLevel.L4)
-                                                          .andThen(Commands.defer(() -> drivebase.driveToPose(
-                                                              targetingSystem.getTargetPose()), Set.of(drivebase)))
-                                                          .andThen(Commands.defer(scoringSystem::scoreCoral,
-                                                                                  Set.of(elevator,
-                                                                                         algaeArm,
-                                                                                         coralArm,
-                                                                                         drivebase,
-                                                                                         coralIntake))));
+    m_OperatorController1.button(4).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
+                       .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                                               Set.of(drivebase)))
+                       .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                               Set.of(elevator, algaeArm, coralArm, drivebase))));
 
     m_OperatorController1.button(5).onTrue(Commands.print("Left Side selected"));
     m_OperatorController1.button(6).onTrue(Commands.print("Right Side selected"));
@@ -317,7 +301,7 @@ public class RobotContainer
     m_OperatorController1.button(7).onTrue(Commands.print("Launch Command"));
     m_OperatorController1.button(8).onTrue(Commands.print("Cancel Selected Command"));
 
-    m_OperatorController1.button(9).onTrue(Commands.print("Outtake Coral"));
+    m_OperatorController1.button(9).whileTrue(coralIntake.spitCoralOut(IntakeConstants.CoralOuttakeSpeeds, 0));
     m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
     m_driverController.button(11).whileTrue(loadingSystem.algaeLoad(42, 14));
@@ -354,8 +338,8 @@ public class RobotContainer
 
     //  );
 
-    m_driverController.button(17).whileTrue(
-        targetingSystem.autoTargetCommand(drivebase::getPose)
+    m_OperatorController1.button(17).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
                        .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
                                                Set.of(drivebase)))
                        .andThen(Commands.defer(scoringSystem::scoreCoral,
