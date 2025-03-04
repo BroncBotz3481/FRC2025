@@ -36,6 +36,7 @@ import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveInputStream;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -340,4 +341,10 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(swerveDrive::lockPose);
   }
+
+public Command drive(Supplier<ChassisSpeeds> driveAngularVelocity) {
+  return run(()->{
+    swerveDrive.drive(driveAngularVelocity.get());
+  });
+}
 }

@@ -36,7 +36,8 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
   public AlgaeIntakeSubsystem()
   {
     SparkMaxConfig config = new SparkMaxConfig();
-    config.inverted(true);
+    config.smartCurrentLimit(40)
+    .inverted(true);
     m_rollerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) done
     //       in the constructor or in the robot coordination class, such as RobotContainer.

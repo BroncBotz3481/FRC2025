@@ -93,6 +93,7 @@ public class RobotContainer
                                                             .withControllerRotationAxis(m_driverController::getRightX)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
+                                                            .scaleRotation(0.4)
                                                             .allianceRelativeControl(true);
 
   SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
@@ -102,7 +103,7 @@ public class RobotContainer
   
   Command driveFieldOrientedDriectAngle = drivebase.driveFieldOriented(driveDirectAngle);
   Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
-  Command driveFieldOrientedAngularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+  Command driveFieldOrientedAngularVelocity = drivebase.drive(driveAngularVelocity);
 
 //Non reality code
   SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(drivebase.getSwerveDrive(),
@@ -172,30 +173,47 @@ public class RobotContainer
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //        drivebase.getSwerveDrive().field.getObject("REEF").setPose(targetingSystem.getTargetPose());
     // configureBindings();
-    // drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
+    drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Elevator Testing
     boolean elevatorTesting = true;
     if(elevatorTesting)
     {
-      m_driverController.button(1).whileTrue(elevator.setPower(0.1).until(elevator.atMax));
-      m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
-      m_driverController.button(3).whileTrue(elevator.setElevatorHeight(0.35).repeatedly());
-      m_driverController.button(4).whileTrue(elevator.setElevatorHeight(0.1).repeatedly());
-      m_driverController.button(5).whileTrue(elevator.setElevatorHeight(0.5).repeatedly());
+      m_driverController.y().whileTrue(elevator.setPower(0.2).until(elevator.atMax));
+      m_driverController.x().whileTrue(elevator.setPower(-0.2).until(elevator.atMax));
+      m_OperatorController1.x().whileTrue(elevator.setGoal(0.47)); // l4
+      m_OperatorController1.y().whileTrue(elevator.setGoal(0.014)); // l3
+      m_OperatorController1.povRight().whileTrue(elevator.setGoal(0.039)); // l2 algae
+      m_OperatorController1.povLeft().whileTrue(elevator.setGoal(0.0566)); // l3 algae
+      m_OperatorController1.start().whileTrue(elevator.setGoal(0.014)); // l2
+      m_OperatorController1.povLeft().whileTrue(elevator.setGoal(0.735)); // barge
+
+
+
+      // m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
+      // m_driverController.button(3).whileTrue(elevator.setElevatorHeight(0.35).repeatedly());
+      // m_driverController.button(4).whileTrue(elevator.setElevatorHeight(0.1).repeatedly());
+      // m_driverController.button(5).whileTrue(elevator.setElevatorHeight(0.5).repeatedly());
       elevator.setDefaultCommand(elevator.hold());
     }
 
     boolean algaeArmTesting = true;
     if(algaeArmTesting)
     {
-      m_driverController.button(1).whileTrue(algaeArm.setPower(0.1));
-      m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
-      m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
-      m_driverController.button(4).whileTrue(algaeArm.setAlgaeArmAngle(-45).repeatedly());
-      m_driverController.button(5).whileTrue(algaeArm.setAlgaeArmAngle(90).repeatedly());
-      m_driverController.button(6).whileTrue(algaeIntake.setAlgaeIntakeRoller(0.8));
+      m_driverController.b().whileTrue(algaeArm.setPower(0.2));
+      m_driverController.a().whileTrue(algaeArm.setPower(-0.2));
+      m_driverController.povLeft().whileTrue(algaeArm.setGoal(33.2).andThen(Commands.waitSeconds(2)).andThen(algaeArm.setGoal(35))); // l3 algae
+      m_driverController.povRight().whileTrue(algaeArm.setGoal(2.637).andThen(Commands.waitSeconds(2)).andThen(algaeArm.setGoal(8))); // l2 algae
+      m_OperatorController1.povLeft().whileTrue(algaeArm.setGoal(90)); // barge
+
+      // m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
+      // m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
+      // m_driverController.button(4).whileTrue(algaeArm.setAlgaeArmAngle(-45).repeatedly());
+      // m_driverController.button(5).whileTrue(algaeArm.setAlgaeArmAngle(90).repeatedly());
+      m_driverController.leftBumper().whileTrue(algaeIntake.setAlgaeIntakeRoller(0.8));
+      m_driverController.rightBumper().whileTrue(algaeIntake.setAlgaeIntakeRoller(-0.8));
+
       algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
       algaeArm.setDefaultCommand(algaeArm.hold());
     }
@@ -203,14 +221,22 @@ public class RobotContainer
     boolean coralArmTesting = true;
     if(coralArmTesting)
     {
-      m_driverController.button(1).whileTrue(coralArm.setPower(0.1));
-      m_driverController.button(2).whileTrue(coralArm.runSysIdRoutine());
-      m_driverController.button(3).whileTrue(coralArm.setCoralArmAngle(90).repeatedly());
-      m_driverController.button(4).whileTrue(coralArm.setCoralArmAngle(50).repeatedly());
-      m_driverController.button(5).whileTrue(coralArm.setCoralArmAngle(-30).repeatedly());
-      m_driverController.button(6).whileTrue(coralIntake.setCoralIntakePower(0.3));
+      m_driverController.povUp().whileTrue(coralArm.setPower(0.1));
+      m_driverController.povDown().whileTrue(coralArm.setPower(-0.1));
+      m_OperatorController1.x().whileTrue(coralArm.setGoal(57.9)); // l4
+      m_OperatorController1.y().whileTrue(coralArm.setGoal(36.14)); // l3
+      m_OperatorController1.start().whileTrue(coralArm.setGoal(10)); // l2
+      m_OperatorController1.povDown().whileTrue(coralArm.score());
+
+      // m_driverController.button(2).whileTrue(coralArm.runSysIdRoutine());
+      // m_driverController.button(3).whileTrue(coralArm.setCoralArmAngle(90).repeatedly());
+      // m_driverController.button(4).whileTrue(coralArm.setCoralArmAngle(50).repeatedly());
+      // m_driverController.button(5).whileTrue(coralArm.setCoralArmAngle(-30).repeatedly());
+      m_OperatorController1.leftBumper().whileTrue(coralIntake.setCoralIntakePower(0.5));
+      m_OperatorController1.rightBumper().whileTrue(coralIntake.setCoralIntakePower(-0.2));
+
       coralIntake.setDefaultCommand(coralIntake.setCoralIntakePower(0));
-      coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0));
+      coralArm.setDefaultCommand(coralArm.hold());
     }
 
     boolean wristTesting = false;

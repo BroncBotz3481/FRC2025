@@ -140,9 +140,9 @@ public final class Constants
     public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(-60);
     public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-60);
-    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(210);
+    public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(215);
     public static final double  kAlgaeArmRampRate               = 0.5;
-    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(365);
+    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(138);
     public static final boolean kAlgaeArmInverted               = false;
     public static final double  kAlgaeArmMaxVelocityRPM         = AlgaeArm.convertAlgaeAngleToSensorUnits(
       Degrees.of(20)).per(
@@ -203,13 +203,15 @@ public final class Constants
   public static class ElevatorConstants
   {
 
-    public static final double   kElevatorKp              = 61.168;
+    public static final double   kElevatorKp              = 52.29;
     public static final double   kElevatorKi              = 0;
-    public static final double   kElevatorKd              = 18.884;
+    public static final double   kElevatorKd              = 15.57;
     public static final double   kElevatorkS              = 0.26737; // volts (V)
     public static final double   kElevatorkV              = 9.9682;//10.773; // volt per velocity (V/(m/s))
     public static final double   kElevatorkA              = 0.1931; // volt per acceleration (V/(m/s²))
     public static final double   kElevatorkG              = 0.39266; // volts (V)
+    public static double kMaxVelocity = Meters.of(1).per(Second).in(MetersPerSecond);
+    public static double kMaxAcceleration = Meters.of(0.5).per(Second).per(Second).in(MetersPerSecondPerSecond);
     public static final double   kElevatorGearing         = 12.0;
     public static final double   kElevatorSproketTeeth    = 22;
     public static final double   kElevatorPitch           = Units.inchesToMeters(0.25);
@@ -234,8 +236,6 @@ public final class Constants
     public static       int      elevatorMotorRightID    = 14;
     public static       double   kElevatorRampRate       = 0.1;
     public static       int      kElevatorCurrentLimit   = 40;
-    public static double kMaxVelocity = Meters.of(1).per(Second).in(MetersPerSecond);
-    public static double kMaxAcceleration = Meters.of(0.5).per(Second).per(Second).in(MetersPerSecondPerSecond);
     public static final double   kElevatorUnextendedHeight    = Units.inchesToMeters(41.5);
   }
 

@@ -349,6 +349,11 @@ public Command setPower(double d) {
 
 private double angleHold = 0;
 
+public Command score()
+{
+    return startRun(()->{angleHold = getAngle().minus(Degrees.of(20)).in(Degrees); m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));}, ()->reachSetpoint(angleHold));
+}
+
 public Command hold() {
   return startRun(()->{angleHold = getAngle().in(Degrees); m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));}, ()->reachSetpoint(angleHold));
 }

@@ -332,8 +332,7 @@ public Command setPower(double d) {
 public double angleHold=0;
 
 public Command hold() {
-  return startRun(()->{angleHold=AlgaeArm.convertAlgaeAngleToSensorUnits(getAngle()).in(Rotations);m_pidController.reset(angleHold);}, ()->{reachSetpoint(
-    AlgaeArm.convertSensorUnitsToAlgaeAngle(Degrees.of(angleHold)).in(Rotations));});
+  return startRun(()->{angleHold=getAngle().in(Degrees);m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(angleHold)).in(Rotations));}, ()->{reachSetpoint(angleHold);});
 }
 
 

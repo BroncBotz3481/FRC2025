@@ -84,21 +84,24 @@ public class TargetingSystem
   public double getTargetBranchCoralArmAngle()
   {
     switch (targetBranchLevel)
-    {
-      case L2 ->
-      {
-        return ReefHeight.L2.pitch;
-      }
-      case L3 ->
-      {
-        return ReefHeight.L3.pitch;
-      }
-      case L4 ->
-      {
-        return ReefHeight.L4.pitch;
-      }
+        {
+          case L2 ->
+          {
+            return ReefHeight.L2.pitch;
+          }
+          case L3 ->
+          {
+            return ReefHeight.L3.pitch;
+          }
+          case L4 ->
+          {
+            return 57.9;
+          }
+          case L1 -> {
+            return ReefHeight.L1.pitch;
+          }
+          default -> throw new IllegalArgumentException("Unexpected value: " + targetBranchLevel);
     }
-    return 0;
   }
 
   public void setTarget(ReefBranch targetBranch, ReefBranchLevel targetBranchLevel)
@@ -185,6 +188,7 @@ public class TargetingSystem
 
   public enum ReefBranchLevel
   {
+    L1,
     L2,
     L3,
     L4
