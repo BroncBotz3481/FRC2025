@@ -279,5 +279,6 @@ public final class Constants
     public static final int    climberMotorRightID = 21;
     public static final double kClimbSpeed         = 0.8;
 
+    public static  int kClimberCurrentLimit = 40;
   }
 }
