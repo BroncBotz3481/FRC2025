@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.controllers.Launchpad;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -59,10 +62,7 @@ public class RobotContainer
 
   private final CommandXboxController m_OperatorController1 =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
-  private final CommandXboxController m_OperatorController2 =
-      new CommandXboxController(OperatorConstants.kOperatorController2Port);
-  private final CommandXboxController m_OperatorController3 =
-      new CommandXboxController(OperatorConstants.kOperatorController3Port);
+  private final Launchpad launchpad = new Launchpad(2,3,4,new Color8Bit(Color.kRed));
 
   private final ElevatorSubsystem    elevator    = new ElevatorSubsystem();
   private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
@@ -185,21 +185,27 @@ public class RobotContainer
     boolean driveToPoseTesting = false;
     if (driveToPoseTesting)
     {
-      m_driverController.button(1).whileTrue(Commands.startRun(() ->
-                                                                   targetingSystem.autoTarget(drivebase::getPose),
-                                                               () -> driveDirectAngle.driveToPoseEnabled(true))
-                                                     .until(() -> drivebase.getPose().getTranslation()
-                                                                           .getDistance(targetingSystem.getTargetPose()
-                                                                                                       .getTranslation()) <
-                                                                  2)
-                                                     .andThen(Commands.runOnce(() -> driveDirectAngle.driveToPoseEnabled(
-                                                         false))));
+//      m_driverController.button(1).whileTrue(Commands.startRun(() ->
+//                                                                   targetingSystem.autoTarget(drivebase::getPose),
+//                                                               () -> driveDirectAngle.driveToPoseEnabled(true))
+//                                                     .until(() -> drivebase.getPose().getTranslation()
+//                                                                           .getDistance(targetingSystem.getTargetPose()
+//                                                                                                       .getTranslation()) <
+//                                                                  2)
+//                                                     .andThen(Commands.runOnce(() -> driveDirectAngle.driveToPoseEnabled(
+//                                                         false))));
     }
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //    targetingSystem.field = drivebase.getSwerveDrive().field;
-    configureBindings();
+//    configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
+    boolean launchpadTesting = true;
+    if (launchpadTesting) {
+      elevator.setDefaultCommand(elevator.setPower(0));
+      launchpad.changeLED(1,4, new Color8Bit(Color.kGreen));
+      launchpad.getButton(1, 4).whileTrue(elevator.runSysIdRoutine());
+    }
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
