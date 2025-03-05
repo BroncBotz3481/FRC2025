@@ -55,7 +55,7 @@ public class RobotContainer
   public static final CommandXboxController m_OperatorController1 =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
-  private final Launchpad launchpad = new Launchpad(2,3,4,new Color8Bit(Color.kRed));
+  private final Launchpad launchpad = new Launchpad(1,2,3,new Color8Bit(Color.kRed));
 
   // The robot's subsystems and commands are defined here...
   private final       SwerveSubsystem       drivebase             = new SwerveSubsystem();
