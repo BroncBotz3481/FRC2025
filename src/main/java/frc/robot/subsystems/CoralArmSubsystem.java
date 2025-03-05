@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
@@ -10,6 +13,9 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
@@ -34,7 +40,10 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
@@ -114,7 +123,7 @@ public class CoralArmSubsystem extends SubsystemBase
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim               =
+  private final SingleJointedArmSim m_armSim          =
       new SingleJointedArmSim(
           m_armGearbox,
           CoralArmConstants.kCoralArmReduction,
@@ -127,12 +136,14 @@ public class CoralArmSubsystem extends SubsystemBase
           0.02 / 4096.0,
           0.0 // Add noise with a std-dev of 1 tick
       );
-  private final SparkMaxSim         m_motorSim             = new SparkMaxSim(m_motor, m_armGearbox);
+  private final SparkMaxSim         m_motorSim        = new SparkMaxSim(m_motor, m_armGearbox);
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-  private       DigitalInput        armLoaded              = new DigitalInput(4);
-  private       DIOSim              armLoadedSim           = new DIOSim(armLoaded);
-  private       DigitalInput        armInLoadedPosition    = new DigitalInput(3);
-  private       DIOSim              armInLoadedPositionSim = new DIOSim(armInLoadedPosition);
+  private       DigitalInput        armLoaded         = new DigitalInput(4);
+  private       DIOSim              armLoadedSim      = new DIOSim(armLoaded);
+  private final LaserCan            coralDistance     = new LaserCan(CoralArmConstants.laserCANv2);
+  private final LaserCanSim         coralDistanceSim  = new LaserCanSim(CoralArmConstants.laserCANv2);
+  private final Alert               m_laserCanFailure = new Alert("LaserCAN failed to configure.",
+                                                                  AlertType.kError);
 
 
   /**
@@ -157,7 +168,14 @@ public class CoralArmSubsystem extends SubsystemBase
                                                                 CoralArmConstants.kCoralArmMaxAccelerationRPMperSecond));
     m_pidController.setTolerance(0.1);
 
-
+    try
+    {
+      coralDistance.setRangingMode(RangingMode.SHORT);
+      coralDistanceSim.setRangingMode(RangingMode.SHORT);
+    } catch (Exception e)
+    {
+      m_laserCanFailure.set(true);
+    }
   }
 
 
@@ -324,16 +342,27 @@ public class CoralArmSubsystem extends SubsystemBase
     //    System.out.println(Units.radiansToDegrees(m_coralArmSim.getAngleRads()));
   }
 
-  public boolean coralInLoadPosition()
-  {
-
-    return armInLoadedPosition.get();//m_coralInArm.get()&&aroundAngle(240);
-  }//Sim
-
   public boolean coralLoaded()
   {
     return armLoaded.get();//m_coralInBin.get()||m_coralInArm.get();
   }//Sim
+
+
+  public boolean coralScored()
+  {
+    if (RobotBase.isSimulation())
+    {
+      return !armLoaded.get() || coralDistanceSim.getMeasurement().distance_mm > Inches.of(6).in(Millimeters);
+    } else
+    {
+      Measurement measure = coralDistance.getMeasurement();
+      if (measure != null && measure.status == LASERCAN_STATUS_VALID_MEASUREMENT)
+      {
+        return measure.distance_mm > Inches.of(6).in(Millimeters);
+      }
+    }
+    return false;
+  }
 
 
   /**
@@ -397,7 +426,6 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     return setCoralArmAngle(Coral.L4);
   }
-
 
 
   public Command getCoralCommand(TargetingSystem targetingSystem)

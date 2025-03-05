@@ -49,7 +49,7 @@ public class LoadingSystem
                     .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
                             .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
                             .alongWith(m_wrist.setWristAngle(90)))
-                     .until(() -> m_coralArm.coralInLoadPosition() && m_coralArm.coralLoaded());
+                     .until(() -> m_coralArm.coralLoaded());
   }
 
   public Command algaeLoad(double elevatorHeight, double angle)//fix angle

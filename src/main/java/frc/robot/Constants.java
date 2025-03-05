@@ -197,6 +197,7 @@ public final class Constants
     public static final int     kCoralArmStallCurrentLimitAmps  = 40;
     
     public static final int coralArmMotorID = 15;  // Checked
+    public static  final     int laserCANv2 = 20;
   }
 
 
