@@ -1,7 +1,7 @@
 package frc.robot.systems;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -51,16 +51,14 @@ public class ScoringSystem
     // Arm down, elevator down, drive backwards x in
     return m_targetSystem.driveToTarget(m_swerve, m_swerveInputStream)
                          .andThen(
-                             new ParallelCommandGroup(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                                                      m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
-                                                      m_coralIntake.wristScore()).withTimeout(2)
-                                                                                 .until(m_elevator.atCoralHeight(
-                                                                                                      m_targetSystem)
-                                                                                                  .and(m_coralArm.atCoralAngle(
-                                                                                                      m_targetSystem)))
-                                                                                 .andThen(m_coralArm.score())
-                                                                                 .alongWith(m_swerve.lockPos())
-                                                                                 .until(() -> m_coralArm.coralScored()));
+                             Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+                                               m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
+                                               m_coralIntake.wristScore()).withTimeout(2)
+                                     .until(m_elevator.atCoralHeight(m_targetSystem)
+                                                      .and(m_coralArm.atCoralAngle(m_targetSystem)))
+                                     .andThen(m_coralArm.score())
+                                     .alongWith(m_swerve.lockPos())
+                                     .until(() -> m_coralArm.coralScored()));
 
 //    return new ParallelDeadlineGroup(
 //        m_elevator.setElevatorHeight(elevatorHeightMeters).withName("ScoreCoralElevatorHeight")
