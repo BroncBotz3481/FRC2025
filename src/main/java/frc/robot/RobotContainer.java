@@ -207,6 +207,42 @@ public class RobotContainer
       elevator.setDefaultCommand(elevator.setPower(0));
       launchpad.changeLED(1,4, new Color8Bit(Color.kGreen));
       launchpad.getButton(1, 4).whileTrue(elevator.runSysIdRoutine());
+
+      launchpad.getButton(0,0).whileTrue(loadingSystem.algaeLockNet());
+      launchpad.getButton(0,1).whileTrue(loadingSystem.algaeLockProcessor());
+      launchpad.getButton(1,0).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
+                        .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                              Set.of(drivebase)))
+                        .andThen(Commands.defer(scoringSystem::scoreCoral,
+                              Set.of(elevator, algaeArm, coralArm, drivebase, coralIntake))));
+      launchpad.getButton(2,0).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+                    .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                                            Set.of(drivebase)))
+                    .andThen(Commands.defer(scoringSystem::scoreCoral,
+                                            Set.of(elevator, algaeArm, coralArm, drivebase, coralIntake))));
+      launchpad.getButton(3,0).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
+                    .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                              Set.of(drivebase)))
+                    .andThen(Commands.defer(scoringSystem::scoreCoral,
+                              Set.of(elevator, algaeArm, coralArm, drivebase, coralIntake))));
+      launchpad.getButton(4, 0).whileTrue(
+        targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
+                    .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
+                              Set.of(drivebase)))
+                    .andThen(Commands.defer(scoringSystem::scoreCoral,
+                              Set.of(elevator, algaeArm, coralArm, drivebase, coralIntake))));
+      launchpad.getButton(2,1).whileTrue(loadingSystem.algaeLoad(0.0566, 33.2)); //L34
+      launchpad.getButton(3,1).whileTrue(loadingSystem.algaeLoad(0.039, 2.637)); //L23
+
+      launchpad.getButton(1,7).whileTrue(loadingSystem.coralLoad());
+
+      launchpad.getButton(8,6).whileTrue(coralIntake.spitCoralOut(IntakeConstants.CoralOuttakeSpeeds, IntakeConstants.intakeZeroPosition));
+
+      //continue
+      
     }
     SmartDashboard.putData(CommandScheduler.getInstance());
 
