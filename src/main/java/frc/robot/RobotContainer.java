@@ -42,6 +42,8 @@ import frc.robot.systems.TargetingSystem.ReefBranchLevel;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants;
 import frc.robot.systems.field.FieldConstants.CoralStation;
+import swervelib.SwerveController;
+import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
 
 
@@ -178,7 +180,7 @@ public class RobotContainer
 //    floorIntake.setDefaultCommand(floorIntake.setCoralIntakeAngle(0));
 
     Command driveFieldOrientedDriectAngle = drivebase.driveFieldOriented(driveDirectAngle);
-
+    //drivebase.setDefaultCommand(driveFieldOrientedDirectAngleSim);
     drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
@@ -198,7 +200,7 @@ public class RobotContainer
 
 //        targetingSystem.setTarget(ReefBranch.G,  ReefBranchLevel.L2);
 //    targetingSystem.field = drivebase.getSwerveDrive().field;
-//    configureBindings();
+    configureBindings();
     //drivebase.setDefaultCommand(driveFieldOrientedDriectAngle);
     boolean launchpadTesting = true;
     if (launchpadTesting) {
@@ -276,6 +278,7 @@ public class RobotContainer
    */
   private void configureBindings()
   {
+//DRIVER CONTROLLER
 
     //slow left bumper
     //pov up, pov down
@@ -288,7 +291,12 @@ public class RobotContainer
     m_driverController.leftBumper().whileTrue(Commands.run(()->driveDirectAngle.scaleTranslation(0.4))); // Slow mode
     m_driverController.leftBumper().whileFalse(Commands.run(()->driveDirectAngle.scaleTranslation(0.8)));//Fast mode
     
-   // m_driverController.leftBumper().onTrue
+    m_driverController.button(3).whileTrue(Commands.run(()->SwerveController.headingCalculate(SwerveDrive.getOdometryHeading(),
+                                                          SwerveDrive.getOdometryHeading().minus(Units.degreesToRadians(90)))));
+//-----------------------------------------------------------------------------------------------------------------------------------
+//OPERATOR
+
+
 
     m_OperatorController1.button(1).whileTrue(
         targetingSystem.autoTargetCommand(drivebase::getPose).andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))

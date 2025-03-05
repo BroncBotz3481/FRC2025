@@ -308,7 +308,7 @@ public class SwerveSubsystem extends SubsystemBase
   }
   public Rotation2d getRotation()
   {
-    return swerveDrive.getYaw();
+    return swerveDrive.getYaw(); //Yaaaaa,yaaaa,yaaaa
   }
 
   public Command LineUpHP()
@@ -335,6 +335,10 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.drive(new Translation2d(Units.inchesToMeters(4), 0), 0, false, false);
     });
   }
+  
+       
+    
+
 
   public Command lockPos()
   {
