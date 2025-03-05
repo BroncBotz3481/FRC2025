@@ -352,7 +352,7 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     if (RobotBase.isSimulation())
     {
-      return !armLoaded.get() || coralDistanceSim.getMeasurement().distance_mm > Inches.of(6).in(Millimeters);
+      return coralDistanceSim.getMeasurement().distance_mm > Inches.of(6).in(Millimeters);
     } else
     {
       Measurement measure = coralDistance.getMeasurement();
@@ -374,6 +374,8 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public boolean aroundAngle(double degree, double allowableError)
   {
+//    System.out.println("Current Angle: " + getAngle().in(Degrees) + " Desired Angle: " + degree + " Allowable Error: " +
+//                       allowableError);
     return MathUtil.isNear(degree, getAngle().in(Degrees), allowableError);
   }
 

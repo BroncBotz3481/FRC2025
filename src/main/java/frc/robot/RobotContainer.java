@@ -129,9 +129,10 @@ public class RobotContainer
 
   public void setDefaultCommands()
   {
-    elevator.setDefaultCommand(elevator.setGoal(0.14));
+    elevator.setDefaultCommand(elevator.setPower(0));
     algaeArm.setDefaultCommand(algaeArm.setPower(0));
     coralArm.setDefaultCommand(coralArm.setPower(0));
+    coralIntake.setDefaultCommand(coralIntake.wristRest());
   }
 
   public RobotContainer()
@@ -144,6 +145,7 @@ public class RobotContainer
     drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
+    setDefaultCommands();
     boolean scoreCoralTesting = true;
     if (scoreCoralTesting)
     {

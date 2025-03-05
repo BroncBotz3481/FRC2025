@@ -52,12 +52,22 @@ public class ScoringSystem
     return m_targetSystem.driveToTarget(m_swerve)
                          .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
                                                     m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
-                                                    m_coralIntake.wristScore()).withTimeout(2)
+                                                    m_swerve.lockPos())
                                           .until(m_elevator.atCoralHeight(m_targetSystem)
                                                            .and(m_coralArm.atCoralAngle(m_targetSystem)))
-                                          .andThen(m_coralArm.score())
-                                          .alongWith(m_swerve.lockPos())
-                                          .until(() -> m_coralArm.coralScored())
+                                          .withTimeout(5))
+                         .andThen(m_coralIntake.wristScore().until(m_coralIntake.atScoringAngle()))
+                         .andThen(Commands.parallel(m_coralIntake.wristScore(),
+                                                    m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+                                                    m_swerve.lockPos())
+                                          .withDeadline(m_coralArm.score())
+                                          .withTimeout(1)
+                                          .until(() -> m_coralArm.coralScored()))
+                         .andThen(m_swerve.driveForwards()
+                                          .alongWith(m_elevator.getCoralCommand(m_targetSystem)
+                                                               .repeatedly(),
+                                                     m_coralIntake.wristScore())
+                                          .withTimeout(1)
                                  );
 
 //    return new ParallelDeadlineGroup(

@@ -367,11 +367,18 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
-  public Command scoreBackward()
+  public Command driveForwards()
   {
     return run(() -> {
-      swerveDrive.drive(new Translation2d(Units.inchesToMeters(4), 0), 0, false, false);
-    }).withTimeout(1);
+      swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
+    }).finallyDo(()->swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+  }
+
+  public Command driveBackwards()
+  {
+    return run(() -> {
+      swerveDrive.drive(new Translation2d(-1, 0), 0, false, false);
+    }).finallyDo(()->swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
   }
 
   public Command lockPos()

@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -399,6 +400,8 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public boolean aroundHeight(double height, double allowableError)
   {
+//    System.out.println("Current Height: " + getHeightMeters() + " Desired Height: " + height + " Allowable Error: " +
+//                       allowableError);
     return MathUtil.isNear(height, getHeightMeters(), allowableError);
   }
 

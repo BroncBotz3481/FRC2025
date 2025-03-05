@@ -9,6 +9,11 @@ import edu.wpi.first.math.geometry.Transform2d;
 public class Setpoints
 {
 
+  public static class Wrist {
+    public static final double rest = 0.27;
+    public static final double active = 0;
+  }
+
   public static class Elevator
   {
 

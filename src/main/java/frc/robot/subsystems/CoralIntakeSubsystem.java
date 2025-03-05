@@ -26,6 +26,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -39,6 +40,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
+import frc.robot.Setpoints;
+import frc.robot.Setpoints.Wrist;
 
 public class CoralIntakeSubsystem extends SubsystemBase
 {
@@ -78,9 +81,10 @@ public class CoralIntakeSubsystem extends SubsystemBase
       RollerConstants.kWristMomentOfInertia,
       RollerConstants.kWristGearRatio), m_rollerMotorGearbox, 1.0 / 4096.0);
 
-  private final SparkAbsoluteEncoderSim m_wristAbsEncoderSim = new SparkAbsoluteEncoderSim(m_wristMotor);
   private final SparkMaxSim             m_wristMotorSim      = new SparkMaxSim(m_wristMotor, m_wristMotorGearbox);
   private final SparkMaxSim             m_rollerMotorSim     = new SparkMaxSim(m_rollerMotor, m_rollerMotorGearbox);
+  private final SparkAbsoluteEncoderSim m_wristAbsEncoderSim = m_wristMotorSim.getAbsoluteEncoderSim();
+
 
   private final Mechanism2d         wristMechanism = new Mechanism2d(10, 10);
   private final MechanismRoot2d     wristMech      = wristMechanism.getRoot("Wrist", 5, 0);
@@ -114,6 +118,11 @@ public class CoralIntakeSubsystem extends SubsystemBase
     m_wristMotor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     SmartDashboard.putData("Wrist", wristMechanism);
     synchronizeEncoders();
+    if(RobotBase.isSimulation())
+    {
+      m_wristAbsEncoderSim.setZeroOffset(0.27);
+      m_wristAbsEncoderSim.setPosition(0);
+    }
   }
 
 
@@ -142,6 +151,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
                              RoboRioSim.getVInVoltage(),
                              // Simulated battery voltage, in Volts
                              0.02);
+     m_wristAbsEncoderSim.iterate(m_wristSim.getAngularVelocityRPM(), 0.02);
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
@@ -149,8 +159,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
             m_rollerSim.getCurrentDrawAmps() + m_wristSim.getCurrentDrawAmps()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    m_wristAbsEncoderSim.setPosition(m_wristEncoder.getPosition());
-    wristArm.setAngle(Rotations.of(m_wristEncoder.getPosition()).in(Degrees));
+    wristArm.setAngle(Rotations.of(m_wristAbsEncoderSim.getPosition()).in(Degrees));
   }
 
   public Command spitCoralOut(double speed, double angle)
@@ -196,27 +205,27 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public Trigger atScoringAngle()
   {
-    return new Trigger(() -> MathUtil.isNear(0.27, m_absEncoder.getPosition(), 0.01));
+    return new Trigger(() -> MathUtil.isNear(Wrist.active, m_absEncoder.getPosition(), 0.01));
   }
 
   public Command wristScore()
   {
-    return setWristAngle(0.27);
+    return setWristAngle(Wrist.active);
   }
 
   public Command wristIntake()
   {
-    return spitCoralOut(-0.1, 0);
+    return spitCoralOut(-0.1, Wrist.active);
   }
 
   public Command wristRest()
   {
-    return spitCoralOut(0, 0.27);
+    return spitCoralOut(0, Wrist.rest);
   }
 
   public Command wristOuttake()
   {
-    return spitCoralOut(1, 0);
+    return spitCoralOut(1, Wrist.active);
   }
 
 }
