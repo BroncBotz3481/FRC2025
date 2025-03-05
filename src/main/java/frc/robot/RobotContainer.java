@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,6 +24,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Setpoints.Arm;
 import frc.robot.Setpoints.Arm.Algae;
 import frc.robot.Setpoints.Elevator;
+import frc.robot.controllers.Launchpad;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -51,6 +54,9 @@ public class RobotContainer
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   public static final CommandXboxController m_OperatorController1 =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+
+  private final Launchpad launchpad = new Launchpad(2,3,4,new Color8Bit(Color.kRed));
+
   // The robot's subsystems and commands are defined here...
   private final       SwerveSubsystem       drivebase             = new SwerveSubsystem();
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -264,44 +270,45 @@ public class RobotContainer
 boolean launchpadTesting = false;
 if (launchpadTesting){
       //L1 Score Coral
-      m_OperatorController1.button(1).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+      launchpad.getButton(1,0).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
                                                       .andThen(scoringSystem.scoreCoral()));
   //L2 Score Coral
-      m_OperatorController1.button(2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+      launchpad.getButton(2,0).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
                                                       .andThen(scoringSystem.scoreCoral()));
   //L3 Score Coral
-      m_OperatorController1.button(3).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+      launchpad.getButton(3,0).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
                                                       .andThen(scoringSystem.scoreCoral()));
   //L4 Score Coral
-      m_OperatorController1.button(4).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                      .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+      launchpad.getButton(4,0).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                      .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
                                                       .andThen(scoringSystem.scoreCoral()));
 
   //Loading pose for HP
-      m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());
+      launchpad.getButton(7,1).onTrue(loadingSystem.coralLoad());
 
   //Algae Load L23
-      m_OperatorController1.button(11).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+      launchpad.getButton(1,2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
                                                       .andThen(loadingSystem.algaeLoad(Elevator.Algae.L23, Arm.Algae.L23)));
 
   //Algae Load L34
-      m_OperatorController1.button(12).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+      launchpad.getButton(1,3).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
                                                       .andThen(loadingSystem.algaeLoad(Elevator.Algae.L34, Arm.Algae.L34)));
 
   //Score Net 
+      launchpad.getButton(0,0).whileTrue(scoringSystem.scoreAlgaeNet());
 
   //Score Processor
-      m_OperatorController1.button(14).onTrue(drivebase.driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
+     launchpad.getButton(1,0).whileTrue(drivebase.driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
 
-      m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
+      // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-      m_OperatorController1.button(15).whileTrue(drivebase.driveToLeftHP());
-      m_OperatorController1.button(16).whileTrue(drivebase.driveToRightHP());
+      launchpad.getButton(8,1).whileTrue(drivebase.driveToLeftHP());
+      launchpad.getButton(8,2).whileTrue(drivebase.driveToRightHP());
 
   //LAUNCH PAD ^
 } else{ //--------------------------------------------------------------------------------------------------------------------
