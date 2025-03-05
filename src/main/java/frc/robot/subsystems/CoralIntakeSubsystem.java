@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
@@ -103,7 +105,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(true)
-        .positionWrappingInputRange(0,1)
+        .positionWrappingInputRange(0, 1)
         .pid(1, 0, 0);
     SparkMaxConfig cfgRoller = new SparkMaxConfig();
     cfgRoller.inverted(true);
@@ -192,19 +194,29 @@ public class CoralIntakeSubsystem extends SubsystemBase
     return run(() -> m_rollerMotor.set(i));
   }
 
+  public Trigger atScoringAngle()
+  {
+    return new Trigger(() -> MathUtil.isNear(0.27, m_absEncoder.getPosition(), 0.01));
+  }
+
+  public Command wristScore()
+  {
+    return setWristAngle(0.27);
+  }
+
   public Command wristIntake()
   {
-    return spitCoralOut(-0.1,0);
+    return spitCoralOut(-0.1, 0);
   }
 
   public Command wristRest()
   {
-    return spitCoralOut(0,0.27);
+    return spitCoralOut(0, 0.27);
   }
 
   public Command wristOuttake()
   {
-    return spitCoralOut(1,0);
+    return spitCoralOut(1, 0);
   }
 
 }

@@ -57,6 +57,8 @@ import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.RobotMath.Elevator;
 import frc.robot.Setpoints;
+import frc.robot.Setpoints.Arm.Algae;
+import frc.robot.Setpoints.Elevator.Coral;
 import frc.robot.systems.TargetingSystem;
 import frc.robot.systems.TargetingSystem.ReefBranchLevel;
 import java.util.Map;
@@ -430,7 +432,7 @@ public class ElevatorSubsystem extends SubsystemBase
   // Scoring heights
   public Command CoralL1()
   {
-    return setPower(0);//setElevatorHeight(Setpoints.Elevator.Coral.L1);
+    return setPower(-0.1).until(atMin);//setElevatorHeight(Setpoints.Elevator.Coral.L1);
   }
 
   public Command CoralL2()
@@ -450,7 +452,7 @@ public class ElevatorSubsystem extends SubsystemBase
 
   public Command CoralHP()
   {
-    return setPower(0);//setElevatorHeight(Setpoints.Elevator.Coral.HP);
+    return setPower(-0.1).until(atMin);//setElevatorHeight(Setpoints.Elevator.Coral.HP);
   }
 
   public Command AlgaeL23()
@@ -491,4 +493,45 @@ public class ElevatorSubsystem extends SubsystemBase
     return Commands.select(algaeCommandMap, targetingSystem::getTargetBranchLevel);
   }
 
+  public Trigger atCoralHeight(TargetingSystem targetingSystem)
+  {
+    return new Trigger(()->{
+      switch (targetingSystem.getTargetBranchLevel()){
+        case L2 ->
+        {
+          return aroundHeight(Coral.L2);
+        }
+        case L3 ->
+        {
+          return aroundHeight(Coral.L3);
+        }
+        case L1 ->
+        {
+          return aroundHeight(Coral.L1);
+        }
+        case L4 ->
+        {
+          return aroundHeight(Coral.L4);
+        }
+      }
+      return false;
+    });
+  }
+
+  public Trigger atAlgaeHeight(TargetingSystem targetingSystem)
+  {
+    return new Trigger(()->{
+      switch (targetingSystem.getTargetBranchLevel()){
+        case L2 ->
+        {
+          return aroundHeight(Algae.L23);
+        }
+        case L3 ->
+        {
+          return aroundHeight(Algae.L34);
+        }
+      }
+      return false;
+    });
+  }
 }

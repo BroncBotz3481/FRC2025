@@ -339,4 +339,16 @@ public class AlgaeArmSubsystem extends SubsystemBase
     return Commands.select(algaeCommandMap, targetingSystem::getTargetBranchLevel);
   }
 
+  public Trigger atAlgaeAngle(TargetingSystem targetingSystem)
+  {
+    return  new Trigger(()->{
+      switch (targetingSystem.getTargetBranchLevel())
+      {
+        case L2 -> aroundAngle(Algae.L23);
+        case L3 -> aroundAngle(Algae.L34);
+      }
+      return false;
+    });
+  }
+
 }

@@ -409,5 +409,30 @@ public class CoralArmSubsystem extends SubsystemBase
     return Commands.select(coralCommandMap, targetingSystem::getTargetBranchLevel);
   }
 
+  public Trigger atCoralAngle(TargetingSystem targetingSystem)
+  {
+    return new Trigger(() -> {
+      switch (targetingSystem.getTargetBranchLevel())
+      {
+        case L2 ->
+        {
+          return aroundAngle(Coral.L2);
+        }
+        case L3 ->
+        {
+          return aroundAngle(Coral.L3);
+        }
+        case L1 ->
+        {
+          return aroundAngle(Coral.L1);
+        }
+        case L4 ->
+        {
+          return aroundAngle(Coral.L4);
+        }
+      }
+      return false;
+    });
+  }
 
 }

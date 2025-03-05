@@ -56,17 +56,22 @@ public class RobotContainer
 
   public static final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  public static final CommandXboxController m_OperatorController1 =
+      new CommandXboxController(OperatorConstants.kOperatorControllerPort);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase          = new SwerveSubsystem();
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
 
-  private final CommandXboxController m_OperatorController1 =
-      new CommandXboxController(OperatorConstants.kOperatorControllerPort);
-  private final CommandXboxController m_OperatorController2 =
-      new CommandXboxController(OperatorConstants.kOperatorController2Port);
-  private final CommandXboxController m_OperatorController3 =
-      new CommandXboxController(OperatorConstants.kOperatorController3Port);
+  // The real world (whats that?)
+  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+                                                                () -> m_driverController.getLeftY() * -1,
+                                                                () -> m_driverController.getLeftX() * -1)
+                                                            .withControllerRotationAxis(m_driverController::getRightX)
+                                                            .deadband(OperatorConstants.DEADBAND)
+                                                            .scaleTranslation(0.8)
+                                                            .scaleRotation(0.4)
+                                                            .allianceRelativeControl(false);
 
   private final ElevatorSubsystem    elevator    = new ElevatorSubsystem();
   private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
@@ -85,16 +90,9 @@ public class RobotContainer
                                                                     algaeArm,
                                                                     loadingSystem,
                                                                     targetingSystem,
-                                                                    coralIntake);
-  // The real world (whats that?)
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> m_driverController.getLeftY() * -1,
-                                                                () -> m_driverController.getLeftX() * -1)
-                                                            .withControllerRotationAxis(m_driverController::getRightX)
-                                                            .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(0.8)
-                                                            .scaleRotation(0.4)
-                                                            .allianceRelativeControl(false);
+                                                                    coralIntake,
+                                                                    driveAngularVelocity);
+
 
   Command driveRobotOrientedAngularVelocity = drivebase.drive(driveAngularVelocity);
 
@@ -107,16 +105,6 @@ public class RobotContainer
                                                                .deadband(OperatorConstants.DEADBAND)
                                                                .scaleTranslation(0.8)
                                                                .allianceRelativeControl(true);
-  // Derive the heading axis with math!
-  SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy()
-                                                                     .withControllerHeadingAxis(() -> Math.sin(
-                                                                                                    m_driverController.getRawAxis(
-                                                                                                        2) * Math.PI) * (Math.PI * 2),
-                                                                                                () -> Math.cos(
-                                                                                                    m_driverController.getRawAxis(
-                                                                                                        2) * Math.PI) *
-                                                                                                      (Math.PI * 2))
-                                                                     .headingWhile(true);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
