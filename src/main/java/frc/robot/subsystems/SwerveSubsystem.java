@@ -36,7 +36,6 @@ import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
-import swervelib.SwerveInputStream;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -213,6 +212,22 @@ public class SwerveSubsystem extends SubsystemBase
         3.0, 5.0, 3.0);
   }
 
+  public Command driveToPose(Supplier<Pose2d> pose)
+  {
+    return defer(() -> {
+// Create the constraints to use while pathfinding
+      PathConstraints constraints = new PathConstraints(
+          swerveDrive.getMaximumChassisVelocity(), 4.0,
+          swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+
+// Since AutoBuilder is configured, we can use it to build pathfinding commands
+      return AutoBuilder.pathfindToPose(
+          pose.get(),
+          constraints,
+          edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
+                                       );
+    });
+  }
 
   public Command driveToPose(Pose2d pose)
   {
@@ -307,6 +322,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return swerveDrive.getPose();
   }
+
   public Rotation2d getRotation()
   {
     return swerveDrive.getYaw();
@@ -342,9 +358,11 @@ public class SwerveSubsystem extends SubsystemBase
     return run(swerveDrive::lockPose);
   }
 
-public Command drive(Supplier<ChassisSpeeds> driveAngularVelocity) {
-  return run(()->{
-    swerveDrive.drive(driveAngularVelocity.get());
-  });
-}
+
+  public Command drive(Supplier<ChassisSpeeds> driveAngularVelocity)
+  {
+    return run(() -> {
+      swerveDrive.drive(driveAngularVelocity.get());
+    });
+  }
 }

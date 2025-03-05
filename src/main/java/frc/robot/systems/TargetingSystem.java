@@ -3,8 +3,6 @@ package frc.robot.systems;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -35,11 +33,11 @@ import swervelib.SwerveInputStream;
 public class TargetingSystem
 {
 
-  private ReefBranch          targetBranch;
-  private ReefBranchLevel     targetBranchLevel;
-  private Transform2d         robotBranchScoringOffset = new Transform2d(Inches.of(24).in(Meters),
-                                                                         Inches.of(0).in(Meters),
-                                                                         Rotation2d.fromDegrees(0));
+  private ReefBranch      targetBranch;
+  private ReefBranchLevel targetBranchLevel;
+  private Transform2d     robotBranchScoringOffset = new Transform2d(Inches.of(24).in(Meters),
+                                                                     Inches.of(0).in(Meters),
+                                                                     Rotation2d.fromDegrees(0));
 
   private List<Pose2d>            reefBranches                 = null;
   private List<Pose2d>            allianceRelativeReefBranches = null;
@@ -54,7 +52,7 @@ public class TargetingSystem
                                                                                            0,
                                                                                            0,
                                                                                            new TrapezoidProfile.Constraints(
-                                                                                               90,
+                                                                                               360,
                                                                                                15));
 
   private void initializeBranchPoses()
@@ -77,7 +75,8 @@ public class TargetingSystem
 
   public TargetingSystem()
   {
-    new Trigger(()-> DriverStation.getAlliance().isPresent()).toggleOnTrue(Commands.runOnce(this::initializeBranchPoses));
+    new Trigger(() -> DriverStation.getAlliance()
+                                   .isPresent()).toggleOnTrue(Commands.runOnce(this::initializeBranchPoses));
   }
 
   public void setTarget(ReefBranch targetBranch, ReefBranchLevel targetBranchLevel)
@@ -109,6 +108,7 @@ public class TargetingSystem
   {
     return targetBranchLevel;
   }
+
   public ReefBranch getTargetBranch()
   {
     return targetBranch;
@@ -116,17 +116,13 @@ public class TargetingSystem
 
   public Command driveToTarget(SwerveSubsystem swerveDrive, SwerveInputStream driveStream)
   {
-    double metersTolerance = Inches.of(1).in(Meters);
-    driveStream
-        .driveToPose(this::getTargetPose, translationPID, rotationPID);
     return Commands.print("GOING TO POSE")
-                   .andThen(Commands.runOnce(() -> {swerveDrive.getSwerveDrive().field.getObject("target")
-                                                                                     .setPose(getTargetPose());
+                   .andThen(Commands.runOnce(() -> {
+                     swerveDrive.getSwerveDrive().field.getObject("target")
+                                                       .setPose(getTargetPose());
                    }))
-                   .andThen(Commands.runOnce(() -> driveStream.driveToPoseEnabled(true))
-                                    .andThen(Commands.waitUntil(() -> driveStream.atTargetPose(metersTolerance))))
-                   .andThen(Commands.print("DONE GOING TO POSE"))
-                   .finallyDo(() -> driveStream.driveToPoseEnabled(false));
+                   .andThen(swerveDrive.driveToPose(this::getTargetPose))
+                   .andThen(Commands.print("DONE GOING TO POSE"));
   }
 
   public Command driveToPose(SwerveSubsystem swerveDrive, SwerveInputStream driveStream, Pose2d pose)
@@ -153,7 +149,7 @@ public class TargetingSystem
 
   public Pose2d autoTarget(Supplier<Pose2d> currentPose)
   {
-    if(reefBranches == null)
+    if (reefBranches == null)
     {
       initializeBranchPoses();
     }

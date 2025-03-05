@@ -399,14 +399,13 @@ public class CoralArmSubsystem extends SubsystemBase
   }
 
 
-  private Map<ReefBranchLevel, Command> coralCommandMap = Map.of(ReefBranchLevel.L1, L1(),
-                                                                 ReefBranchLevel.L2, L2(),
-                                                                 ReefBranchLevel.L3, L3(),
-                                                                 ReefBranchLevel.L4, L4());
 
   public Command getCoralCommand(TargetingSystem targetingSystem)
   {
-    return Commands.select(coralCommandMap, targetingSystem::getTargetBranchLevel);
+    return Commands.select(Map.of(ReefBranchLevel.L1, L1(),
+                                  ReefBranchLevel.L2, L2(),
+                                  ReefBranchLevel.L3, L3(),
+                                  ReefBranchLevel.L4, L4()), targetingSystem::getTargetBranchLevel);
   }
 
   public Trigger atCoralAngle(TargetingSystem targetingSystem)

@@ -475,28 +475,29 @@ public class ElevatorSubsystem extends SubsystemBase
     return setElevatorHeight(Setpoints.Elevator.Algae.PROCESSOR);
   }
 
-  private final Map<ReefBranchLevel, Command>                 coralCommandMap = Map.of(ReefBranchLevel.L1, CoralL1(),
-                                                                                       ReefBranchLevel.L2, CoralL2(),
-                                                                                       ReefBranchLevel.L3, CoralL3(),
-                                                                                       ReefBranchLevel.L4, CoralL4());
-  private final Map<TargetingSystem.ReefBranchLevel, Command> algaeCommandMap = Map.of(ReefBranchLevel.L2, AlgaeL23(),
-                                                                                       ReefBranchLevel.L3, AlgaeL34());
 
   public Command getCoralCommand(TargetingSystem targetingSystem)
   {
-    return Commands.select(coralCommandMap, targetingSystem::getTargetBranchLevel);
+    return Commands.select(Map.of(ReefBranchLevel.L1, CoralL1(),
+                                  ReefBranchLevel.L2, CoralL2(),
+                                  ReefBranchLevel.L3, CoralL3(),
+                                  ReefBranchLevel.L4, CoralL4()),
+                           targetingSystem::getTargetBranchLevel);
   }
 
 
   public Command getAlgaeCommand(TargetingSystem targetingSystem)
   {
-    return Commands.select(algaeCommandMap, targetingSystem::getTargetBranchLevel);
+    return Commands.select(Map.of(ReefBranchLevel.L2, AlgaeL23(),
+                                  ReefBranchLevel.L3, AlgaeL34()),
+                           targetingSystem::getTargetBranchLevel);
   }
 
   public Trigger atCoralHeight(TargetingSystem targetingSystem)
   {
-    return new Trigger(()->{
-      switch (targetingSystem.getTargetBranchLevel()){
+    return new Trigger(() -> {
+      switch (targetingSystem.getTargetBranchLevel())
+      {
         case L2 ->
         {
           return aroundHeight(Coral.L2);
@@ -520,8 +521,9 @@ public class ElevatorSubsystem extends SubsystemBase
 
   public Trigger atAlgaeHeight(TargetingSystem targetingSystem)
   {
-    return new Trigger(()->{
-      switch (targetingSystem.getTargetBranchLevel()){
+    return new Trigger(() -> {
+      switch (targetingSystem.getTargetBranchLevel())
+      {
         case L2 ->
         {
           return aroundHeight(Algae.L23);

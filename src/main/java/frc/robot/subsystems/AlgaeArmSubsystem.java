@@ -331,12 +331,10 @@ public class AlgaeArmSubsystem extends SubsystemBase
     return setAlgaeArmAngle(Algae.PROCESSOR);
   }
 
-  private Map<TargetingSystem.ReefBranchLevel, Command> algaeCommandMap = Map.of(ReefBranchLevel.L2, L23(),
-                                                                                 ReefBranchLevel.L3, L34());
-
   public Command getAlgaeCommand(TargetingSystem targetingSystem)
   {
-    return Commands.select(algaeCommandMap, targetingSystem::getTargetBranchLevel);
+    return Commands.select(Map.of(ReefBranchLevel.L2, L23(),
+                                  ReefBranchLevel.L3, L34()), targetingSystem::getTargetBranchLevel);
   }
 
   public Trigger atAlgaeAngle(TargetingSystem targetingSystem)

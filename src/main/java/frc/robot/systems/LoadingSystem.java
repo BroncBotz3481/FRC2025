@@ -77,12 +77,15 @@ public class LoadingSystem
   public Command coralLock()
   {
     // Set arm to target angle, elev target height
-    double coralArmLockingAngleDegrees      = m_targetSystem.getTargetBranchCoralArmAngle();
-    double coralElevatorLockingHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
-    return m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters)
-            .andThen(m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters).repeatedly()
-                    .alongWith(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees).repeatedly())
-                     .alongWith(m_wrist.setWristAngle(90).repeatedly()));
+    return m_coralArm.getCoralCommand(m_targetSystem).repeatedly()
+        .alongWith(m_elevator.getCoralCommand(m_targetSystem).repeatedly(), m_wrist.wristScore());
+//    double coralArmLockingAngleDegrees      = m_targetSystem.getTargetBranchCoralArmAngle();
+//    double coralElevatorLockingHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
+//    return m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters)
+//            .andThen(m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters).repeatedly()
+//                    .alongWith(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees).repeatedly())
+//                     .alongWith(m_wrist.setWristAngle(90).repeatedly()));
+
   }
 
   public Command algaeLockProcessor()
