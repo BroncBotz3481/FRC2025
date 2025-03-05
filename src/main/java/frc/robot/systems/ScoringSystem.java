@@ -49,7 +49,7 @@ public class ScoringSystem
   public Command scoreCoral()
   {
     // Arm down, elevator down, drive backwards x in
-    return m_targetSystem.driveToTarget(m_swerve, m_swerveInputStream)
+    return m_targetSystem.driveToTarget(m_swerve)
                          .andThen(
                              Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
                                                m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),

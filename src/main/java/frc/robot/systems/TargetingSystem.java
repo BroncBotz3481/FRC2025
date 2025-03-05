@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import swervelib.SwerveInputStream;
 
 //targetting system should be able to select either left or right side of the branch
 //then select what level we want
@@ -114,7 +113,7 @@ public class TargetingSystem
     return targetBranch;
   }
 
-  public Command driveToTarget(SwerveSubsystem swerveDrive, SwerveInputStream driveStream)
+  public Command driveToTarget(SwerveSubsystem swerveDrive)
   {
     return Commands.print("GOING TO POSE")
                    .andThen(Commands.runOnce(() -> {
@@ -124,16 +123,6 @@ public class TargetingSystem
                    .andThen(swerveDrive.driveToPose(this::getTargetPose))
                    .andThen(Commands.print("DONE GOING TO POSE"));
   }
-
-  public Command driveToPose(SwerveSubsystem swerveDrive, SwerveInputStream driveStream, Pose2d pose)
-  {
-    return Commands.runOnce(() -> driveStream.driveToPose(() -> pose, translationPID, rotationPID))
-                   .andThen(driveToTarget(swerveDrive, driveStream))
-                   .finallyDo(() -> driveStream.driveToPose(this::getTargetPose,
-                                                            translationPID,
-                                                            rotationPID));
-  }
-
 
   public Pose2d getTargetPose()
   {
