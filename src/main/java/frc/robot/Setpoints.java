@@ -95,4 +95,6 @@ public class Setpoints
     }
   }
 
+  public static final String Algae = null;
+
 }

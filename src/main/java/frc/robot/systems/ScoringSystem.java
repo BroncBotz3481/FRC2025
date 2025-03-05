@@ -3,6 +3,7 @@ package frc.robot.systems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
+import frc.robot.Setpoints;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
@@ -87,8 +88,9 @@ public class ScoringSystem
   public Command scoreAlgaeProcessor()
   {
     //set elevator height, set algae angle, spit out ball, drive pose
-    double algaeArmAngleDegrees = -45;
-    double elevatorHeightMeters = 1.0;
+    double algaeArmAngleDegrees = Setpoints.Arm.Algae.PROCESSOR;
+    double elevatorHeightMeters = Setpoints.Elevator.Algae.PROCESSOR;
+
     return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
                      .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
                      .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
@@ -99,8 +101,8 @@ public class ScoringSystem
   public Command scoreAlgaeNet()
   {
     //set elevator height, set alage angle, spit out ball, drive pose
-    double algaeArmAngleDegrees = 48;
-    double elevatorHeightMeters = 42;
+    double algaeArmAngleDegrees = Setpoints.Arm.Algae.NET;
+    double elevatorHeightMeters = Setpoints.Elevator.Algae.NET;
     return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
                      .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
                      .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))

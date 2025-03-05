@@ -19,6 +19,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Setpoints.Arm;
+import frc.robot.Setpoints.Arm.Algae;
+import frc.robot.Setpoints.Elevator;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
@@ -99,14 +102,11 @@ public class RobotContainer
                                                                .deadband(OperatorConstants.DEADBAND)
                                                                .scaleTranslation(0.8)
                                                                .allianceRelativeControl(true);
-
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
-  private double me = 0;
-
-  
-
+                                                               
+                            //INISTALIZING SUBSYSTEMS AND COMMANDS ^
+//--------------------------------------------------------------------------------------------------------------------------------------- 
+                            //DEFUALT COMMANDS v
+                            
   public void setDefaultCommands()
   {
     elevator.setDefaultCommand(elevator.setPower(0));
@@ -114,6 +114,16 @@ public class RobotContainer
     coralArm.setDefaultCommand(coralArm.setPower(0));
     coralIntake.setDefaultCommand(coralIntake.wristRest());
   }
+
+                            //DEFAULT COMMANDS ^
+//---------------------------------------------------------------------------------------------------------------------------------------
+                            //ROBOT CONTAINER
+
+
+/**
+ * The container for the robot. Contains subsystems, OI devices, and commands.
+ */
+
 
   public RobotContainer()
   {
@@ -126,6 +136,11 @@ public class RobotContainer
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     setDefaultCommands();
+
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+                            //TESTING COMMANDS v
+
     boolean scoreCoralTesting = false;
     if (scoreCoralTesting)
     {
@@ -217,6 +232,10 @@ public class RobotContainer
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
   }
 
+                            //ROBOT CONTAINER ^
+//---------------------------------------------------------------------------------------------------------------------------------------
+                            //CONFIGURE BINDINGS v
+
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the
@@ -245,42 +264,35 @@ public class RobotContainer
                                                     .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
                                                     .andThen(scoringSystem.scoreCoral()));
 
+//Loading pose for HP
+    m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());
 
-    m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
+//Algae Load L23
+    m_OperatorController1.button(11).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
+                                                    .andThen(loadingSystem.algaeLoad(Elevator.Algae.L23, Arm.Algae.L23)));
 
-    m_OperatorController1.button(11).onTrue(
-        targetingSystem.setTargetCommand(
-            TargetingSystem.ReefBranch.J,
-            //I just need the height of the levels, not the specific branch, how to do that
-            TargetingSystem.ReefBranchLevel.L2).andThen(loadingSystem.algaeLoad(42, 14)));
+//Algae Load L34
+    m_OperatorController1.button(12).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+                                                    .andThen(loadingSystem.algaeLoad(Elevator.Algae.L34, Arm.Algae.L34)));
 
-    m_OperatorController1.button(12).onTrue(
-        targetingSystem.setTargetCommand(
-            TargetingSystem.ReefBranch.J,
-            //I just need the height of the levels, not the specific branch, how to do that
-            TargetingSystem.ReefBranchLevel.L3).andThen(loadingSystem.algaeLoad(42, 44)));
+//Score Net 
+    m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet());
 
-    m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet()); //does not move elevator down
-    m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
+//Score Processor
+    m_OperatorController1.button(14).onTrue(drivebase.driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
 
     m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-    m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1().repeatedly());
-    m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2().repeatedly());
+    m_OperatorController1.button(15).whileTrue(drivebase.driveToLeftHP());
+    m_OperatorController1.button(16).whileTrue(drivebase.driveToRightHP());
 
 
   }
-
-  private void changeMe()
-  {
-    me = 1;
-  }
-
-  private double getMe()
-  {
-    return me;
-  }
-
+//END OF CONFIG BINDINGS ^
+//----------------------------------------------------------------------------------------------------------------------------------
+// MISC METHODS AND COMMANDS v
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

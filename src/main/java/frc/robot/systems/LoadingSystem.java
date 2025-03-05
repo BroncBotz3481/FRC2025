@@ -56,10 +56,10 @@ public class LoadingSystem
   {
     // Put algae arm out, roll in
     double algaeArmLoadingAngleDegrees   = angle;
-    double elevatorExtendedHeightMeters = 0;
+    double elevatorExtendedHeightMeters = elevatorHeight;
             //Units.inchesToMeters(elevatorHeight) > ElevatorConstants.kElevatorUnextendedHeight?
             //Units.inchesToMeters(elevatorHeight) : 0 ;
-    double algaeElevatorHighHeightMeters =  elevatorExtendedHeightMeters + Units.inchesToMeters(3.0);// The ball is higher than Branches
+    double algaeElevatorHighHeightMeters =  elevatorExtendedHeightMeters;// The ball is higher than Branches
     double algaeElevatorLowHeightMeters  = elevatorExtendedHeightMeters - Units.inchesToMeters(3.0);// change it back to 1.0
 
     return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
