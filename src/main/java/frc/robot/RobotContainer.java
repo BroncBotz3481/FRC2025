@@ -105,27 +105,7 @@ public class RobotContainer
    */
   private double me = 0;
 
-  /**
-   * TO DO Change keyboard settings - add All pose in target system *get interns to do - Add all the buttons *get
-   * interns to do
-   * <p>
-   * Fix Arm simulation, change angle of arm on start up, currently -90 -difference between the goal and the actual
-   * location it reaches-because of consuming extra power?-pid tuning -it takes really long to move each arm????But all
-   * three sim is working
-   * <p>
-   * set MAX MIN ANGLE for arm, ask cad team?-no limits (360 degrees Change height of elevator.max height of the barge.
-   * currently in meters change that HEIGHT AND ANGLE FOR EACH LEVEL(ARM LENGTH?)-no idea yet
-   * <p>
-   * (Bumpers: 6 inch Elevator alone Min: 39.25 Unextended:41 1/2(from the ground)  Extended Elevator:71.094 so Second
-   * half of the elevator:29.594 For the net: extended elev + algaeAngle(val?)
-   * <p>
-   * -start from horizontal(degrees) -L4 +80 `   Copy Math class Copy code from yagsl test code.
-   * <p>
-   * Add sensors -for algae, using algaeInArm.get()?
-   * <p>
-   * <p>
-   * FIX QUESTION AND ASK LIMITS
-   */
+  
 
   public void setDefaultCommands()
   {
@@ -146,7 +126,7 @@ public class RobotContainer
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     setDefaultCommands();
-    boolean scoreCoralTesting = true;
+    boolean scoreCoralTesting = false;
     if (scoreCoralTesting)
     {
       m_driverController.button(1).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
@@ -248,19 +228,24 @@ public class RobotContainer
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
+//L1 Score Coral
+    m_OperatorController1.button(1).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
+                                                    .andThen(scoringSystem.scoreCoral()));
+//L2 Score Coral
+    m_OperatorController1.button(2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
+                                                    .andThen(scoringSystem.scoreCoral()));
+//L3 Score Coral
+    m_OperatorController1.button(3).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+                                                    .andThen(scoringSystem.scoreCoral()));
+//L4 Score Coral
+    m_OperatorController1.button(4).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+                                                    .andThen(scoringSystem.scoreCoral()));
 
-    m_OperatorController1.button(1).onTrue(Commands.print("Level 1 selected"));
-    m_OperatorController1.button(2).onTrue(Commands.print("Level 2 selected"));
-    m_OperatorController1.button(3).onTrue(Commands.print("Level 3 selected"));
-    m_OperatorController1.button(4).onTrue(Commands.print("Level 4 selected"));
 
-    m_OperatorController1.button(5).onTrue(Commands.print("Left Side selected"));
-    m_OperatorController1.button(6).onTrue(Commands.print("Right Side selected"));
-
-    m_OperatorController1.button(7).onTrue(Commands.print("Launch Command"));
-    m_OperatorController1.button(8).onTrue(Commands.print("Cancel Selected Command"));
-
-    m_OperatorController1.button(9).onTrue(Commands.print("Outtake Coral"));
     m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());// Maybe does work and we just dont see it????
 
     m_OperatorController1.button(11).onTrue(
@@ -283,12 +268,6 @@ public class RobotContainer
     m_OperatorController1.button(15).whileTrue(driveToHumanPlayer1().repeatedly());
     m_OperatorController1.button(16).whileTrue(driveToHumanPlayer2().repeatedly());
 
-    m_driverController.button(17).whileTrue(
-        targetingSystem.autoTargetCommand(drivebase::getPose)
-                       .andThen(Commands.defer(() -> drivebase.driveToPose(targetingSystem.getTargetPose()),
-                                               Set.of(drivebase)))
-                       .andThen(Commands.defer(scoringSystem::scoreCoral,
-                                               Set.of(elevator, algaeArm, coralArm, drivebase))));
 
   }
 
