@@ -26,15 +26,13 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -58,17 +56,21 @@ import frc.robot.Constants;
 import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.RobotMath.Elevator;
+import frc.robot.Setpoints;
+import frc.robot.systems.TargetingSystem;
+import frc.robot.systems.TargetingSystem.ReefBranchLevel;
+import java.util.Map;
 
 public class ElevatorSubsystem extends SubsystemBase
 {
 
   // This gearbox represents a gearbox containing 1 Neo
-  private final DCMotor         m_elevatorGearbox = DCMotor.getNEO(2);
-  private final SparkMax        m_motor           = new SparkMax(ElevatorConstants.elevatorMotorID,
-                                                                 MotorType.kBrushless);
-  private final SparkMax        m_motorRight      = new SparkMax(ElevatorConstants.elevatorMotorRightID, MotorType.kBrushless);
+  private final DCMotor  m_elevatorGearbox = DCMotor.getNEO(2);
+  private final SparkMax m_motor           = new SparkMax(ElevatorConstants.elevatorMotorID,
+                                                          MotorType.kBrushless);
+  private final SparkMax m_motorRight      = new SparkMax(ElevatorConstants.elevatorMotorRightID, MotorType.kBrushless);
 
-  private final RelativeEncoder m_encoder         = m_motor.getEncoder();
+  private final RelativeEncoder m_encoder = m_motor.getEncoder();
 
   // Closed Loop Controller + Feedback
   private final ProfiledPIDController m_controller  = new ProfiledPIDController(ElevatorConstants.kElevatorKp,
@@ -152,10 +154,10 @@ public class ElevatorSubsystem extends SubsystemBase
 
     SparkMaxConfig followerConfig = new SparkMaxConfig();
     followerConfig
-            .idleMode(IdleMode.kCoast)
-            .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
-            .closedLoopRampRate(ElevatorConstants.kElevatorRampRate)
-            .follow(m_motor, true);
+        .idleMode(IdleMode.kCoast)
+        .smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
+        .closedLoopRampRate(ElevatorConstants.kElevatorRampRate)
+        .follow(m_motor, true);
 
     m_motorRight.configure(followerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -226,7 +228,8 @@ public class ElevatorSubsystem extends SubsystemBase
 
     // Update elevator visualization with position
     Constants.kElevatorTower.setLength(getHeightMeters());
-    Constants.kElevatorCarriage.setPosition(AlgaeArmConstants.kAlgaeArmLength, getHeightMeters() + ElevatorConstants.kElevatorUnextendedHeight);
+    Constants.kElevatorCarriage.setPosition(AlgaeArmConstants.kAlgaeArmLength,
+                                            getHeightMeters() + ElevatorConstants.kElevatorUnextendedHeight);
   }
 
   /**
@@ -251,12 +254,14 @@ public class ElevatorSubsystem extends SubsystemBase
     } else
     {
       Measurement seedMeasurement = m_elevatorLaserCan.getMeasurement();
-      while(seedMeasurement == null)
+      while (seedMeasurement == null)
+      {
         seedMeasurement = m_elevatorLaserCan.getMeasurement();
+      }
 
-     m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
-                                       m_elevatorLaserCan.getMeasurement().distance_mm - ElevatorConstants.kLaserCANOffset.in(Millimeters)))
-                                   .in(Rotations));
+      m_encoder.setPosition(Elevator.convertDistanceToRotations(Millimeters.of(
+                                        m_elevatorLaserCan.getMeasurement().distance_mm - ElevatorConstants.kLaserCANOffset.in(Millimeters)))
+                                    .in(Rotations));
     }
   }
 
@@ -337,7 +342,9 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public Command setGoal(double goal)
   {
-    return run(() -> reachGoal(goal));
+    return startRun(() -> {
+      m_controller.reset(getHeightMeters());
+    }, () -> reachGoal(goal));
   }
 
 
@@ -349,7 +356,7 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public Command setElevatorHeight(double height)
   {
-    return setGoal(height).beforeStarting(()->m_controller.reset(getHeightMeters())).until(() -> aroundHeight(height));
+    return setGoal(height).until(() -> aroundHeight(height));
   }
 
 
@@ -373,9 +380,10 @@ public class ElevatorSubsystem extends SubsystemBase
   {
     // seedElevatorMotorPosition();
     Measurement laserCanMeasurement = m_elevatorLaserCan.getMeasurement();
-    if(laserCanMeasurement != null)
+    if (laserCanMeasurement != null)
     {
-      SmartDashboard.putNumber("Elevator LaserCAN (Meters)", Millimeters.of(laserCanMeasurement.distance_mm).in(Meters));
+      SmartDashboard.putNumber("Elevator LaserCAN (Meters)",
+                               Millimeters.of(laserCanMeasurement.distance_mm).in(Meters));
     }
     SmartDashboard.putNumber("Elevator Height (Meters)", getHeightMeters());
   }
@@ -404,16 +412,83 @@ public class ElevatorSubsystem extends SubsystemBase
   }
 
 
-public Command setPower(double d) {
-  return run(()->m_motor.set(d));
-}
+  public Command setPower(double d)
+  {
+    return run(() -> m_motor.set(d));
+  }
 
-private double holdPoint = 0;
-public Command hold() {
-  return startRun(()->{holdPoint=MathUtil.clamp(getHeightMeters(),0.01,6);m_controller.reset(holdPoint);},()->reachGoal(holdPoint));
-}
+  private double holdPoint = 0;
+
+  public Command hold()
+  {
+    return startRun(() -> {
+      holdPoint = MathUtil.clamp(getHeightMeters(), 0.01, 6);
+      m_controller.reset(holdPoint);
+    }, () -> reachGoal(holdPoint));
+  }
+
+  // Scoring heights
+  public Command CoralL1()
+  {
+    return setPower(0);//setElevatorHeight(Setpoints.Elevator.Coral.L1);
+  }
+
+  public Command CoralL2()
+  {
+    return setElevatorHeight(Setpoints.Elevator.Coral.L2);
+  }
+
+  public Command CoralL3()
+  {
+    return setElevatorHeight(Setpoints.Elevator.Coral.L3);
+  }
+
+  public Command CoralL4()
+  {
+    return setElevatorHeight(Setpoints.Elevator.Coral.L4);
+  }
+
+  public Command CoralHP()
+  {
+    return setPower(0);//setElevatorHeight(Setpoints.Elevator.Coral.HP);
+  }
+
+  public Command AlgaeL23()
+  {
+    return setElevatorHeight(Setpoints.Elevator.Algae.L23);
+  }
+
+  public Command AlgaeL34()
+  {
+    return setElevatorHeight(Setpoints.Elevator.Algae.L34);
+  }
+
+  public Command AlgaeNET()
+  {
+    return setElevatorHeight(Setpoints.Elevator.Algae.NET);
+  }
+
+  public Command AlgaePROCESSOR()
+  {
+    return setElevatorHeight(Setpoints.Elevator.Algae.PROCESSOR);
+  }
+
+  private final Map<ReefBranchLevel, Command>                 coralCommandMap = Map.of(ReefBranchLevel.L1, CoralL1(),
+                                                                                       ReefBranchLevel.L2, CoralL2(),
+                                                                                       ReefBranchLevel.L3, CoralL3(),
+                                                                                       ReefBranchLevel.L4, CoralL4());
+  private final Map<TargetingSystem.ReefBranchLevel, Command> algaeCommandMap = Map.of(ReefBranchLevel.L2, AlgaeL23(),
+                                                                                       ReefBranchLevel.L3, AlgaeL34());
+
+  public Command getCoralCommand(TargetingSystem targetingSystem)
+  {
+    return Commands.select(coralCommandMap, targetingSystem::getTargetBranchLevel);
+  }
 
 
-
+  public Command getAlgaeCommand(TargetingSystem targetingSystem)
+  {
+    return Commands.select(algaeCommandMap, targetingSystem::getTargetBranchLevel);
+  }
 
 }

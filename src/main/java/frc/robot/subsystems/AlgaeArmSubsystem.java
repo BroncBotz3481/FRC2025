@@ -14,14 +14,11 @@ import com.reduxrobotics.sensors.canandcolor.Canandcolor;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
@@ -36,7 +33,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
@@ -44,6 +40,7 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -51,6 +48,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.RobotMath.AlgaeArm;
+import frc.robot.Setpoints.Arm.Algae;
+import frc.robot.systems.TargetingSystem;
+import frc.robot.systems.TargetingSystem.ReefBranchLevel;
+import java.util.Map;
 
 
 public class AlgaeArmSubsystem extends SubsystemBase
@@ -62,12 +63,12 @@ public class AlgaeArmSubsystem extends SubsystemBase
       = new Trigger(() -> getAngle().gte(AlgaeArmConstants.kAlgaeArmMaxAngle.minus(Degrees.of(5))));
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor                   m_armGearbox = DCMotor.getNEO(1);
-  private final SparkMax                  m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
-                                                                      MotorType.kBrushless);
-  private final AbsoluteEncoder       m_absEncoder     = m_motor.getAbsoluteEncoder();
+  private final DCMotor         m_armGearbox = DCMotor.getNEO(1);
+  private final SparkMax        m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
+                                                            MotorType.kBrushless);
+  private final AbsoluteEncoder m_absEncoder = m_motor.getAbsoluteEncoder();
 
-  private       Canandcolor        armLoaded              = new Canandcolor(AlgaeArmConstants.algaeCanandColor);
+  private Canandcolor armLoaded = new Canandcolor(AlgaeArmConstants.algaeCanandColor);
 
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
@@ -97,10 +98,10 @@ public class AlgaeArmSubsystem extends SubsystemBase
                    .voltage(
                        m_appliedVoltage.mut_replace(m_motor.getAppliedOutput() *
                                                     RobotController.getBatteryVoltage(), Volts))
-                  //  .angularPosition(m_angle.mut_replace(m_absEncoder.getPosition(), Rotations))
-                  //  .angularVelocity(m_velocity.mut_replace(m_absEncoder.getVelocity(), RPM));
-               .angularPosition(m_angle.mut_replace(getAngle()))
-               .angularVelocity(m_velocity.mut_replace(getVelocity()));
+                   //  .angularPosition(m_angle.mut_replace(m_absEncoder.getPosition(), Rotations))
+                   //  .angularVelocity(m_velocity.mut_replace(m_absEncoder.getVelocity(), RPM));
+                   .angularPosition(m_angle.mut_replace(getAngle()))
+                   .angularVelocity(m_velocity.mut_replace(getVelocity()));
               },
               this));
   // Standard classes for controlling our arm
@@ -114,7 +115,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim               =
+  private final SingleJointedArmSim m_armSim     =
       new SingleJointedArmSim(
           m_armGearbox,
           AlgaeArmConstants.kAlgaeArmReduction,
@@ -127,8 +128,8 @@ public class AlgaeArmSubsystem extends SubsystemBase
           0.02 / 4096.0,
           0.0 // Add noise with a std-dev of 1 tick
       );
-  private final SparkMaxSim         m_motorSim             = new SparkMaxSim(m_motor, m_armGearbox);
-  private       DIOSim              armLoadedSim           = new DIOSim(0);
+  private final SparkMaxSim         m_motorSim   = new SparkMaxSim(m_motor, m_armGearbox);
+  private       DIOSim              armLoadedSim = new DIOSim(0);
 
 
   public AlgaeArmSubsystem()
@@ -151,7 +152,6 @@ public class AlgaeArmSubsystem extends SubsystemBase
                                                 new Constraints(AlgaeArmConstants.kAlgaeArmMaxVelocityRPM,
                                                                 AlgaeArmConstants.kAlgaeArmMaxAccelerationRPMperSecond));
     // m_pidController.setTolerance(0.01);
-
 
   }
 
@@ -186,51 +186,15 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   }
 
-
-  /**
-   * Near the maximum Angle of the arm within X degrees.
-   *
-   * @param toleranceDegrees Degrees close to maximum of the Arm.
-   * @return is near the maximum of the arm.
-   */
-  public boolean nearMax(double toleranceDegrees)
-  {
-    if (getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees)))
-    {
-      System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println(
-          "At max:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees)));
-    }
-    return getAngle().isNear(AlgaeArmConstants.kAlgaeArmMaxAngle, Degrees.of(toleranceDegrees));
-
-  }
-
-  /**
-   * Near the minimum angle of the Arm in within X degrees.
-   *
-   * @param toleranceDegrees Tolerance of the Arm.
-   * @return is near the minimum of the arm.
-   */
-  public boolean nearMin(double toleranceDegrees)
-  {
-    if (getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees)))
-    {
-      System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println(
-          "At min:" + getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees)));
-    }
-    return getAngle().isNear(AlgaeArmConstants.kAlgaeArmMinAngle, Degrees.of(toleranceDegrees));
-
-  }
-
   /**
    * Synchronizes the NEO encoder with the attached Absolute Encoder.
    */
   public void synchronizeAbsoluteEncoder()
   {
-    
+
     m_encoder.setPosition(AlgaeArm.convertAlgaeAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
-                          .minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero)).in(Rotations));
+                                                                           .minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero))
+                                  .in(Rotations));
   }
 
   /**
@@ -249,12 +213,12 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public void reachSetpoint(double setPointDegree)
   {
-    double  goalPosition = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations);
+    double goalPosition  = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(setPointDegree)).in(Rotations);
     double pidOutput     = m_pidController.calculate(m_encoder.getPosition(), goalPosition);
     State  setpointState = m_pidController.getSetpoint();
     m_motor.setVoltage(pidOutput +
-                        m_feedforward.calculate(setpointState.position,
-                                                setpointState.velocity)
+                       m_feedforward.calculate(setpointState.position,
+                                               setpointState.velocity)
                       );
   }
 
@@ -283,12 +247,14 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public Command setGoal(double degree)
   {
-    return run(() -> reachSetpoint(degree));
+    return startRun(() -> {
+      m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(getAngle()).in(Rotations));
+    }, () -> reachSetpoint(degree));
   }
 
   public Command setAlgaeArmAngle(double degree)
   {
-    return setGoal(degree).beforeStarting(()->{m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(getAngle()).in(Rotations));}).until(() -> aroundAngle(degree));
+    return setGoal(degree).until(() -> aroundAngle(degree));
   }
 
 
@@ -301,8 +267,9 @@ public class AlgaeArmSubsystem extends SubsystemBase
   public void periodic()
   {
     SmartDashboard.putNumber("Algae Arm Sensor (Rotations)", m_encoder.getPosition());
-    SmartDashboard.putNumber("Algae Arm Angle (Degrees)",  getAngle().in(Degrees));
-    SmartDashboard.putNumber("Algae Arm Angle Absolute (Degrees)",  Rotations.of(m_absEncoder.getPosition()).in(Degrees));
+    SmartDashboard.putNumber("Algae Arm Angle (Degrees)", getAngle().in(Degrees));
+    SmartDashboard.putNumber("Algae Arm Angle Absolute (Degrees)",
+                             Rotations.of(m_absEncoder.getPosition()).in(Degrees));
     //    System.out.println(getAngle());
     //    System.out.println(Units.radiansToDegrees(m_AlgaeArmSim.getAngleRads()));
   }
@@ -325,29 +292,51 @@ public class AlgaeArmSubsystem extends SubsystemBase
   }
 
 
-public Command setPower(double d) {
-  return run(()->m_motor.set(d)).until(atMax);
-}
+  public Command setPower(double d)
+  {
+    return run(() -> m_motor.set(d)).until(atMax);
+  }
 
-public double angleHold=0;
+  public double angleHold = 0;
 
-public Command hold() {
-  return startRun(()->{angleHold=getAngle().in(Degrees);m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(angleHold)).in(Rotations));}, ()->{reachSetpoint(angleHold);});
-}
+  public Command hold()
+  {
+    return startRun(() -> {
+      angleHold = getAngle().in(Degrees);
+      m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(angleHold)).in(Rotations));
+    }, () -> {
+      reachSetpoint(angleHold);
+    });
+  }
 
+  // Scoring Angles
 
+  public Command L34()
+  {
+    return setAlgaeArmAngle(Algae.L34);
+  }
 
+  public Command L23()
+  {
+    return setAlgaeArmAngle(Algae.L23);
+  }
 
+  public Command NET()
+  {
+    return setAlgaeArmAngle(Algae.NET);
+  }
 
+  public Command PROCESSOR()
+  {
+    return setAlgaeArmAngle(Algae.PROCESSOR);
+  }
 
-  /*
-  public void close() {
-    m_motor.close();
-    m_encoder.close();
-    m_mech2d.close();
-    m_armPivot.close();
-    m_controller.close();
-    m_arm.close();
-  }*/
+  private Map<TargetingSystem.ReefBranchLevel, Command> algaeCommandMap = Map.of(ReefBranchLevel.L2, L23(),
+                                                                                 ReefBranchLevel.L3, L34());
+
+  public Command getAlgaeCommand(TargetingSystem targetingSystem)
+  {
+    return Commands.select(algaeCommandMap, targetingSystem::getTargetBranchLevel);
+  }
 
 }

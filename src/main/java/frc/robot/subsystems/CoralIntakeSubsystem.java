@@ -154,7 +154,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
   public Command spitCoralOut(double speed, double angle)
   {
     return run(() -> {
-      wristController.setReference(Degrees.of(angle).in(Rotations), ControlType.kPosition);
+      wristController.setReference(angle, ControlType.kPosition);
       m_rollerMotor.set(speed);
     });
   }
@@ -190,6 +190,21 @@ public class CoralIntakeSubsystem extends SubsystemBase
   public Command setCoralIntakePower(double i)
   {
     return run(() -> m_rollerMotor.set(i));
+  }
+
+  public Command wristIntake()
+  {
+    return spitCoralOut(-0.1,0);
+  }
+
+  public Command wristRest()
+  {
+    return spitCoralOut(0,0.27);
+  }
+
+  public Command wristOuttake()
+  {
+    return spitCoralOut(1,0);
   }
 
 }
