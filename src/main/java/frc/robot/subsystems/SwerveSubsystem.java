@@ -24,11 +24,17 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Setpoints;
+import frc.robot.Setpoints.AutoScoring;
+import frc.robot.Setpoints.AutoScoring.HumanPlayer.Left;
+import frc.robot.systems.field.FieldConstants.CoralStation;
+import frc.robot.systems.field.FieldConstants.Processor;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -328,21 +334,36 @@ public class SwerveSubsystem extends SubsystemBase
     return swerveDrive.getYaw();
   }
 
-  public Command LineUpHP()
+  public Command driveToLeftHP()
   {
-    return run(() -> {
+    return defer(() -> {
+      Pose2d startingPose = CoralStation.leftCenterFace;
+      SmartDashboard.putString("Station Targetted Pose without Offset (Meters)", startingPose.toString());
+      Pose2d scorePose = startingPose.plus(Left.offset);
+      SmartDashboard.putString("Station Targetted Pose with Offset (Meters)", scorePose.toString());
+      return driveToPose(scorePose);
     });
   }
 
-  public Command LineUpReef()
+  public Command driveToRightHP()
   {
-    return run(() -> {
+    return defer(() -> {
+      Pose2d startingPose = CoralStation.rightCenterFace;
+      SmartDashboard.putString("Station Targetted Pose without Offset (Meters)", startingPose.toString());
+      Pose2d scorePose = startingPose.plus(Setpoints.AutoScoring.HumanPlayer.Right.offset);
+      SmartDashboard.putString("Station Targetted Pose with Offset (Meters)", scorePose.toString());
+      return driveToPose(scorePose);
     });
   }
 
-  public Command lineUpProcessor()
+  public Command driveToProcessor()
   {
-    return run(() -> {
+    return defer(() -> {
+      Pose2d startingPose = Processor.centerFace;
+      SmartDashboard.putString("Processor Targetted Pose without Offset (Meters)", startingPose.toString());
+      Pose2d scorePose = startingPose.plus(AutoScoring.Processor.offset);
+      SmartDashboard.putString("Processor Targetted Pose with Offset (Meters)", scorePose.toString());
+      return driveToPose(scorePose);
     });
   }
 
@@ -350,7 +371,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       swerveDrive.drive(new Translation2d(Units.inchesToMeters(4), 0), 0, false, false);
-    });
+    }).withTimeout(1);
   }
 
   public Command lockPos()

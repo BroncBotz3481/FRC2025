@@ -50,15 +50,15 @@ public class ScoringSystem
   {
     // Arm down, elevator down, drive backwards x in
     return m_targetSystem.driveToTarget(m_swerve)
-                         .andThen(
-                             Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                                               m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
-                                               m_coralIntake.wristScore()).withTimeout(2)
-                                     .until(m_elevator.atCoralHeight(m_targetSystem)
-                                                      .and(m_coralArm.atCoralAngle(m_targetSystem)))
-                                     .andThen(m_coralArm.score())
-                                     .alongWith(m_swerve.lockPos())
-                                     .until(() -> m_coralArm.coralScored()));
+                         .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+                                                    m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
+                                                    m_coralIntake.wristScore()).withTimeout(2)
+                                          .until(m_elevator.atCoralHeight(m_targetSystem)
+                                                           .and(m_coralArm.atCoralAngle(m_targetSystem)))
+                                          .andThen(m_coralArm.score())
+                                          .alongWith(m_swerve.lockPos())
+                                          .until(() -> m_coralArm.coralScored())
+                                 );
 
 //    return new ParallelDeadlineGroup(
 //        m_elevator.setElevatorHeight(elevatorHeightMeters).withName("ScoreCoralElevatorHeight")

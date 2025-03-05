@@ -69,19 +69,18 @@ public class FieldConstants
     public static final double shallowHeight = Units.inchesToMeters(30.125);
   }
 
-  public static class CoralStation
-  {
-
-    public static final Pose2d leftCenterFace  =
-    AllianceFlipUtil.flip(new Pose2d(
-            Units.inchesToMeters(33.526 + 20),
-            Units.inchesToMeters(291.176 - 20),
-            Rotation2d.fromDegrees(90 - 144.011-180)));
+  public static class CoralStation {
+    public static final double stationLength = Units.inchesToMeters(79.750);
     public static final Pose2d rightCenterFace =
-    AllianceFlipUtil.flip(new Pose2d(
-            Units.inchesToMeters(33.526 + 20),
-            Units.inchesToMeters(25.824 + 20),
-            Rotation2d.fromDegrees(144.011 - 90-180)));
+        new Pose2d(
+            Units.inchesToMeters(33.526),
+            Units.inchesToMeters(25.824),
+            Rotation2d.fromDegrees(144.011 - 90));
+    public static final Pose2d leftCenterFace =
+        new Pose2d(
+            rightCenterFace.getX(),
+            fieldWidth - rightCenterFace.getY(),
+            Rotation2d.fromRadians(-rightCenterFace.getRotation().getRadians()));
   }
 
   public static class Reef
