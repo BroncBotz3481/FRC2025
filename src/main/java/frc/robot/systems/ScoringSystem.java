@@ -60,7 +60,7 @@ public class ScoringSystem
                                                                                                       m_targetSystem)))
                                                                                  .andThen(m_coralArm.score())
                                                                                  .alongWith(m_swerve.lockPos())
-                                                                                 .until(() -> !m_coralArm.coralScored()));
+                                                                                 .until(() -> m_coralArm.coralScored()));
 
 //    return new ParallelDeadlineGroup(
 //        m_elevator.setElevatorHeight(elevatorHeightMeters).withName("ScoreCoralElevatorHeight")
