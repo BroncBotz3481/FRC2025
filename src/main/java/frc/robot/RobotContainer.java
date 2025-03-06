@@ -283,9 +283,6 @@ public class RobotContainer
                                                          .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
                                                          .andThen(scoringSystem.scoreCoral()));
 
-      //Loading pose for HP
-      launchpad.getButton(7, 1).onTrue(loadingSystem.coralLoad());
-
       //Algae Load L23
       launchpad.getButton(1, 2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                          .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
@@ -304,8 +301,8 @@ public class RobotContainer
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-      launchpad.getButton(8, 1).whileTrue(drivebase.driveToLeftHP());
-      launchpad.getButton(8, 2).whileTrue(drivebase.driveToRightHP());
+      launchpad.getButton(8, 1).whileTrue(loadingSystem.coralLoadLeft());
+      launchpad.getButton(8, 2).whileTrue(loadingSystem.coralLoadRight());
 
       //LAUNCH PAD ^
     } else
@@ -329,9 +326,7 @@ public class RobotContainer
                                                                .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
                                                                .andThen(scoringSystem.scoreCoral()));
 
-      //Loading pose for HP
-      m_OperatorController1.button(10).onTrue(loadingSystem.coralLoad());
-
+      
       //Algae Load L23
       m_OperatorController1.button(11).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                                 .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
@@ -350,8 +345,8 @@ public class RobotContainer
 
       m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-      m_OperatorController1.button(15).whileTrue(drivebase.driveToLeftHP());
-      m_OperatorController1.button(16).whileTrue(drivebase.driveToRightHP());
+      m_OperatorController1.button(15).whileTrue(loadingSystem.coralLoadLeft());
+      m_OperatorController1.button(16).whileTrue(loadingSystem.coralLoadRight());
 
     }
   }

@@ -202,6 +202,12 @@ public class CoralIntakeSubsystem extends SubsystemBase
     return new Trigger(() -> MathUtil.isNear(Wrist.active, m_absEncoder.getPosition(), 0.01));
   }
 
+  public Trigger atRestingAngle()
+  {
+    return new Trigger(() -> MathUtil.isNear(Wrist.rest, m_absEncoder.getPosition(), 0.01));
+  }
+
+
   public Command wristScore()
   {
     return setWristAngle(Wrist.active);

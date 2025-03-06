@@ -19,6 +19,7 @@ public class LoadingSystem
   private CoralIntakeSubsystem m_wrist;
   private TargetingSystem      m_targetSystem;
   private AlgaeIntakeSubsystem m_algaeIntake;
+  private CoralIntakeSubsystem m_coralIntake;
   private SwerveSubsystem m_swerve;
 
 
@@ -36,37 +37,48 @@ public class LoadingSystem
     m_wrist = coralIntake;
     m_targetSystem = targetSys;
     m_algaeIntake = algaeIntake;
+    m_coralIntake = coralIntake;
     m_swerve = swerve;
   }
 
   //For testing, set the sensor to low voltage first
   //The elevator needs to rise first for the arm to come out
 
-  public Command coralLoad()
+  public Command coralLoadLeft()
   {
 
-
-    return Commands.parallel(m_elevator.CoralHP().repeatedly(), 
-                            m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly())
-                            .until((m_elevator.aroundCoralHP())
-                            .and(m_coralArm.aroundCoralHPAngle()))
-                            .withTimeout(5)
-                            .andThen(m_wrist.wristScore().repeatedly())
-                            .withDeadline(m_coralArm.load())
-                            .withTimeout(1)
-                            .until(() -> m_coralArm.coralLoaded());
-
-
-  //   double coralArmLoadingAngleDegrees   = -8;
-  //   double coralStationHeightMeters = Units.feetToMeters(3) + Units.inchesToMeters(1.5);
-  //   double coralElevatorHighHeightMeters = 0;
-
-  //   return m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
-  //                   .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
-  //                           .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
-  //                           .alongWith(m_wrist.setWristAngle(90)))
-  //                    .until(() -> m_coralArm.coralLoaded());
+    return m_swerve.driveToLeftHP()
+    .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(), //Drive to HP and Move ELEVATOR AND ARM
+                               m_swerve.lockPos()))
+                               .until(m_elevator.aroundCoralHP()
+                              .and(m_coralArm.aroundCoralHPAngle()))
+                              .withTimeout(5) //Move Intake angle to 0
+                              .andThen(m_coralIntake.wristRest().until(m_coralIntake.atRestingAngle())) 
+                              .andThen(Commands.parallel(
+                              m_swerve.lockPos())
+                    .withDeadline(m_coralArm.load()) //end command
+                    .withTimeout(1)
+                    .until(() -> m_coralArm.coralLoaded()));
+ 
    }
+
+   public Command coralLoadRight()
+   {
+ 
+     return m_swerve.driveToRightHP()
+     .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(), //Drive to HP and Move ELEVATOR AND ARM
+                                m_swerve.lockPos()))
+                                .until(m_elevator.aroundCoralHP()
+                               .and(m_coralArm.aroundCoralHPAngle()))
+                               .withTimeout(5) //Move Intake angle to 0
+                               .andThen(m_coralIntake.wristRest().until(m_coralIntake.atRestingAngle())) 
+                               .andThen(Commands.parallel(
+                               m_swerve.lockPos())
+                     .withDeadline(m_coralArm.load()) //end command
+                     .withTimeout(1)
+                     .until(() -> m_coralArm.coralLoaded()));
+  
+    }
 
   public Command algaeLoad()//fix angle
   {
