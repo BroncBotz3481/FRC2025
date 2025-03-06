@@ -304,7 +304,7 @@ if (launchpadTesting){
       launchpad.getButton(0,0).whileTrue(scoringSystem.scoreAlgaeNet());
 
   //Score Processor
-     launchpad.getButton(1,0).whileTrue(drivebase.driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
+     launchpad.getButton(1,0).whileTrue(scoringSystem.scoreAlgaeProcessor());
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
@@ -349,7 +349,7 @@ if (launchpadTesting){
       m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet());
 
   //Score Processor
-      m_OperatorController1.button(14).onTrue(drivebase.driveToProcessor().andThen(scoringSystem.scoreAlgaeProcessor()));
+      m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
 
       m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 

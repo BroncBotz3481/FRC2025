@@ -2,7 +2,7 @@ package frc.robot.systems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Setpoints;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -90,12 +90,26 @@ public class ScoringSystem
     //set elevator height, set algae angle, spit out ball, drive pose
     double algaeArmAngleDegrees = Setpoints.Arm.Algae.PROCESSOR;
     double elevatorHeightMeters = Setpoints.Elevator.Algae.PROCESSOR;
+    return m_swerve.driveToProcessor()
+            .andThen(Commands.parallel(m_elevator.AlgaePROCESSOR().repeatedly(),
+                            m_algaeArm.PROCESSOR().repeatedly(),
+                            m_swerve.lockPos())
+                    .until(() -> m_elevator.aroundHeight(elevatorHeightMeters)
+                              && m_algaeArm.aroundAngle(algaeArmAngleDegrees))
+                    .withTimeout(5))
+            .andThen(Commands.parallel(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds),
+                            m_elevator.AlgaePROCESSOR().repeatedly(),
+                            m_algaeArm.PROCESSOR().repeatedly(),
+                            m_swerve.lockPos())
+                    .until(() -> !m_algaeArm.algaeLoaded())
+                    .withTimeout(1)
+            );
 
-    return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
-                     .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
-                     .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
-                     .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds)
-                                           .until(() -> !m_algaeArm.algaeLoaded()));
+//    return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
+//                     .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
+//                     .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
+//                     .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds)
+//                                           .until(() -> !m_algaeArm.algaeLoaded()));
   }
 
   public Command scoreAlgaeNet()
@@ -106,7 +120,7 @@ public class ScoringSystem
     return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
                      .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
                      .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
-                     .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds))
+                     .andThen(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds))
                      .until(() -> !m_algaeArm.algaeLoaded());
   }
 
