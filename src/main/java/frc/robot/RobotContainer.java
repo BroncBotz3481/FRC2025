@@ -301,8 +301,8 @@ public class RobotContainer
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-      launchpad.getButton(8, 1).whileTrue(loadingSystem.coralLoadLeft());
-      launchpad.getButton(8, 2).whileTrue(loadingSystem.coralLoadRight());
+      launchpad.getButton(8, 1).whileTrue(drivebase.driveToLeftHP().andThen(loadingSystem.coralLoad()));
+      launchpad.getButton(8, 2).whileTrue(drivebase.driveToLeftHP().andThen(loadingSystem.coralLoad()));
 
       //LAUNCH PAD ^
     } else
@@ -345,8 +345,8 @@ public class RobotContainer
 
       m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-      m_OperatorController1.button(15).whileTrue(loadingSystem.coralLoadLeft());
-      m_OperatorController1.button(16).whileTrue(loadingSystem.coralLoadRight());
+      m_OperatorController1.button(15).whileTrue(drivebase.driveToLeftHP().andThen(loadingSystem.coralLoad()));
+      m_OperatorController1.button(16).whileTrue(drivebase.driveToRightHP().andThen(loadingSystem.coralLoad()));
 
     }
   }

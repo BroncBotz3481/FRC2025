@@ -44,29 +44,12 @@ public class LoadingSystem
   //For testing, set the sensor to low voltage first
   //The elevator needs to rise first for the arm to come out
 
-  public Command coralLoadLeft()
-  {
-
-    return m_swerve.driveToLeftHP()
-    .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(), //Drive to HP and Move ELEVATOR AND ARM
-                               m_swerve.lockPos()))
-                               .until(m_elevator.aroundCoralHP()
-                              .and(m_coralArm.aroundCoralHPAngle()))
-                              .withTimeout(5) //Move Intake angle to 0
-                              .andThen(m_coralIntake.wristRest().until(m_coralIntake.atRestingAngle())) 
-                              .andThen(Commands.parallel(
-                              m_swerve.lockPos())
-                    .withDeadline(m_coralArm.load()) //end command
-                    .withTimeout(1)
-                    .until(() -> m_coralArm.coralLoaded()));
  
-   }
 
-   public Command coralLoadRight()
+   public Command coralLoad()
    {
  
-     return m_swerve.driveToRightHP()
-     .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(), //Drive to HP and Move ELEVATOR AND ARM
+     return (Commands.parallel(m_elevator.CoralHP().repeatedly(), //Drive to HP and Move ELEVATOR AND ARM
                                 m_swerve.lockPos()))
                                 .until(m_elevator.aroundCoralHP()
                                .and(m_coralArm.aroundCoralHPAngle()))
@@ -79,6 +62,20 @@ public class LoadingSystem
                      .until(() -> m_coralArm.coralLoaded()));
   
     }
+
+    public Command coralLoadAuto()
+    {
+  
+      return (Commands.parallel(m_elevator.CoralHP().repeatedly())) //Drive to HP and Move ELEVATOR AND ARM
+                                 .until(m_elevator.aroundCoralHP()
+                                .and(m_coralArm.aroundCoralHPAngle()))
+                                .withTimeout(5) //Move Intake angle to 0
+                                .andThen(m_coralIntake.wristRest().until(m_coralIntake.atRestingAngle())) 
+                      .withTimeout(1)
+                      .until(() -> m_coralArm.coralLoaded());
+   
+     }
+ 
 
   public Command algaeLoad()//fix angle
   {
