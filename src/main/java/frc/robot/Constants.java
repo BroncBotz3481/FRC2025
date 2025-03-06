@@ -124,9 +124,6 @@ public final class Constants
     public static final double  kAlgaeArmKa                     = 0.00023069; // volts per acceleration (V/(RPM/s))
     public static final double  kAlgaeArmkG                     = 0.16271; // volts (V)
     public static final double  kAlgaeArmReduction              = 112.0;
-    public static final Angle   kAlgaeArmAllowedClosedLoopError
-                                                                = AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(
-        0.01));
     public static final double  kAlgaeArmMass                   = Units.lbsToKilograms(15); // Kilograms
     public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(-60);
@@ -203,7 +200,7 @@ public final class Constants
     public static final double   kElevatorSproketTeeth    = 22;
     public static final double   kElevatorPitch           = Units.inchesToMeters(0.25);
     public static final double   kElevatorDrumRadius      = (kElevatorSproketTeeth * kElevatorPitch) / (2 * Math.PI);
-// radius = Circumference / (2 pi)
+    // radius = Circumference / (2 pi)
     public static final double   kCarriageMass            = Units.lbsToKilograms(16); // kg
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
     public static final double   kMinElevatorHeightMeters = Units.inchesToMeters(0);//min height / 10
@@ -235,7 +232,7 @@ public final class Constants
   public static class ClimberConstants
   {
 
-    public static final double kClimbSpeed         = 0.8;
+    public static final double kClimbSpeed = 0.8;
 
   }
 }
