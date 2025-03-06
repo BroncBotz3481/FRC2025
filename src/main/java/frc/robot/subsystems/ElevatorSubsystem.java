@@ -55,6 +55,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.HWMap;
 import frc.robot.RobotMath.Elevator;
 import frc.robot.Setpoints;
 import frc.robot.Setpoints.Arm.Algae;
@@ -68,9 +69,9 @@ public class ElevatorSubsystem extends SubsystemBase
 
   // This gearbox represents a gearbox containing 1 Neo
   private final DCMotor  m_elevatorGearbox = DCMotor.getNEO(2);
-  private final SparkMax m_motor           = new SparkMax(ElevatorConstants.elevatorMotorID,
+  private final SparkMax m_motor           = new SparkMax(HWMap.Elevator.elevatorLeftMotorID,
                                                           MotorType.kBrushless);
-  private final SparkMax m_motorRight      = new SparkMax(ElevatorConstants.elevatorMotorRightID, MotorType.kBrushless);
+  private final SparkMax m_motorRight      = new SparkMax(HWMap.Elevator.elevatorRightMotorID, MotorType.kBrushless);
 
   private final RelativeEncoder m_encoder = m_motor.getEncoder();
 
@@ -129,8 +130,8 @@ public class ElevatorSubsystem extends SubsystemBase
   private final SparkMaxSim       m_motorSim       = new SparkMaxSim(m_motor, m_elevatorGearbox);
 
   // Sensors
-  private final LaserCan         m_elevatorLaserCan     = new LaserCan(ElevatorConstants.rightLaserCAN);
-  private final LaserCanSim      m_elevatorLaserCanSim  = new LaserCanSim(ElevatorConstants.rightLaserCAN);
+  private final LaserCan         m_elevatorLaserCan     = new LaserCan(HWMap.Elevator.elevatorRightLaserCanID);
+  private final LaserCanSim      m_elevatorLaserCanSim  = new LaserCanSim(HWMap.Elevator.elevatorRightLaserCanID);
   private final RegionOfInterest m_laserCanROI          = new RegionOfInterest(0, 0, 16, 16);
   private final TimingBudget     m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
   private final Alert            m_laserCanFailure      = new Alert("LaserCAN failed to configure.",

@@ -15,11 +15,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
+import frc.robot.HWMap;
+import frc.robot.HWMap.Algae;
 
 public class AlgaeIntakeSubsystem extends SubsystemBase
 {
 
-  private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.algaeRollerMotorID, MotorType.kBrushless);
+  private final SparkMax m_rollerMotor = new SparkMax(Algae.algaeRollerID, MotorType.kBrushless);
 
   private final DCMotor m_rollerMotorGearbox = DCMotor.getNEO(1);
 

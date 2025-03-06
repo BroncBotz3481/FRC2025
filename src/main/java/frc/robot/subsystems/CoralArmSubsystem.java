@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.CoralArmConstants;
+import frc.robot.HWMap;
 import frc.robot.RobotMath.CoralArm;
 import frc.robot.Setpoints.Arm.Coral;
 import frc.robot.systems.TargetingSystem;
@@ -70,7 +71,7 @@ public class CoralArmSubsystem extends SubsystemBase
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   private final DCMotor                   m_armGearbox = DCMotor.getNEO(1);
-  private final SparkMax                  m_motor      = new SparkMax(CoralArmConstants.coralArmMotorID,
+  private final SparkMax                  m_motor      = new SparkMax(HWMap.Coral.coralArmMotorID,
                                                                       MotorType.kBrushless);
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
@@ -140,8 +141,8 @@ public class CoralArmSubsystem extends SubsystemBase
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
   private       DigitalInput        armLoaded         = new DigitalInput(4);
   private       DIOSim              armLoadedSim      = new DIOSim(armLoaded);
-  private final LaserCan            coralDistance     = new LaserCan(CoralArmConstants.laserCANv2);
-  private final LaserCanSim         coralDistanceSim  = new LaserCanSim(CoralArmConstants.laserCANv2);
+  private final LaserCan            coralDistance     = new LaserCan(HWMap.Coral.coralLaserCanV2);
+  private final LaserCanSim         coralDistanceSim  = new LaserCanSim(HWMap.Coral.coralLaserCanV2);
   private final Alert               m_laserCanFailure = new Alert("LaserCAN failed to configure.",
                                                                   AlertType.kError);
 

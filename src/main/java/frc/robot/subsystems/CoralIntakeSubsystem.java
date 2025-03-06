@@ -40,6 +40,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Constants.WristConstants.RollerConstants;
+import frc.robot.HWMap;
+import frc.robot.HWMap.Coral;
 import frc.robot.Setpoints;
 import frc.robot.Setpoints.Wrist;
 
@@ -48,21 +50,13 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   private final DCMotor m_wristGearbox = DCMotor.getNEO(1);
 
-  private final SparkMax m_wristMotor  = new SparkMax(IntakeConstants.coralWristMotorID, MotorType.kBrushless);
-  private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.coralRollerMotorID, MotorType.kBrushless);
+  private final SparkMax m_wristMotor  = new SparkMax(Coral.coralWristMotorID, MotorType.kBrushless);
+  private final SparkMax m_rollerMotor = new SparkMax(Coral.coralRollerMotorID, MotorType.kBrushless);
 
   private final AbsoluteEncoder           m_wristENcoder2 = m_wristMotor.getAbsoluteEncoder();
   private final SparkClosedLoopController wristController = m_wristMotor.getClosedLoopController();
   private final RelativeEncoder           m_wristEncoder  = m_wristMotor.getEncoder();
   private final AbsoluteEncoder           m_absEncoder    = m_wristMotor.getAbsoluteEncoder();
-
-  private final LaserCan         m_intakeLaserCAN       = new LaserCan(IntakeConstants.rightLaserCAN);
-  private final LaserCanSim      m_intakeLaserCANSim    = new LaserCanSim(IntakeConstants.rightLaserCAN);
-  private final RegionOfInterest m_laserCanROI          = new RegionOfInterest(0, 0, 16, 16);
-  private final TimingBudget     m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
-  private final Alert            m_laserCanFailure      = new Alert("LaserCAN failed to configure.",
-                                                                    AlertType.kError);
-
 
   // Simulation stuff
   private final DCMotor m_wristMotorGearbox  = DCMotor.getNEO(1);

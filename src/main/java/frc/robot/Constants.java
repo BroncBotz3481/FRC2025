@@ -97,14 +97,6 @@ public final class Constants
     public static final double DEADBAND                 = 0.05;
   }
 
-  public static class targetingConstants
-  {
-
-    public static final double positiveScootch = Units.inchesToMeters(5);
-    public static final double negitiveScootch = Units.inchesToMeters(-5);
-    public static final double scootchBack     = Units.inchesToMeters(12);
-  }
-
   public static class WristConstants
   {
 
@@ -154,8 +146,6 @@ public final class Constants
     public static final int     kAlgaeArmStallCurrentLimitAmps  = 40;
 
     public static final double kAlgaeAngleAllowableError = 0.001;//degree, for testing whether it's aroundAngle
-    public static final int    algaeCanandColor          = 22;
-    public static       int    algaeArmMotorID           = 16; // Checked
 
   }
 
@@ -193,8 +183,6 @@ public final class Constants
                                                                           .in(RPM.per(Second));
     public static final int     kCoralArmStallCurrentLimitAmps  = 40;
 
-    public static final int coralArmMotorID = 15;  // Checked
-    public static final int laserCANv2      = 20;
   }
 
 
@@ -223,18 +211,11 @@ public final class Constants
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
     public static final Distance kLaserCANOffset          = Meters.of(0.27);
 
-    //public static final double kElevatorMaxVelocity = 3.5;
-    //public static final double kElevatorMaxAcceleration = 2.5;
     public static final Distance kStartingHeightSim        = Meters.of(0);
     public static final Distance kMinElevatorHeight        = Meters.of(kMinElevatorHeightMeters);
     public static final Distance kMaxElevatorHeight        = Meters.of(kMaxElevatorHeightMeters);
     public static final double   kElevatorAllowableError   = RobotBase.isSimulation() ? Units.inchesToMeters(1)
                                                                                       : Units.inchesToMeters(0.005);
-    public static final double   kLowerToScoreHeight       = Units.inchesToMeters(6);
-    public static       int      elevatorMotorID           = 13;
-    public static final int      leftLaserCAN              = 23;
-    public static final int      rightLaserCAN             = 24;
-    public static       int      elevatorMotorRightID      = 14;
     public static       double   kElevatorRampRate         = 0.1;
     public static       int      kElevatorCurrentLimit     = 40;
     public static final double   kElevatorUnextendedHeight = Units.inchesToMeters(41.5);
@@ -246,29 +227,14 @@ public final class Constants
     public static final double AlgaeIntakeSpeeds  = 0.8;
     public static final double AlgaeOuttakeSpeeds = -0.8;
 
-    public static final int    coralWristMotorID   = 17;
-    public static final int    coralRollerMotorID  = 18;
-    public static       int    algaeRollerMotorID  = 19;
-    public static final int    rightLaserCAN       = 20;
-    public static final int    leftLaserCAN        = 21;
-    public static final double defaultrRollerSpeed = 0;
-    public static final double kIntakeReduction    = 0;
-
     public static final int    k_wristCurrentLimit       = 40;
     public static final double k_wristClosedLoopRampRate = 0.25;
 
-    public static Angle  kMinAngle       = Degrees.of(-20);
-    public static Angle  kMaxAngle       = Degrees.of(220);
-    public static double kIntakeLength   = Inches.of(10).in(Meters);
-    public static double kWristReduction = 1;
-    public static double kIntakeMass     = 2.27; //kg
   }
 
   public static class ClimberConstants
   {
 
-    public static final int    climberMotorID      = 20;
-    public static final int    climberMotorRightID = 21;
     public static final double kClimbSpeed         = 0.8;
 
   }

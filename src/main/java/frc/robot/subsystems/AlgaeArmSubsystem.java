@@ -47,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeArmConstants;
+import frc.robot.HWMap;
 import frc.robot.RobotMath.AlgaeArm;
 import frc.robot.Setpoints.Arm.Algae;
 import frc.robot.systems.TargetingSystem;
@@ -64,11 +65,11 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   private final DCMotor         m_armGearbox = DCMotor.getNEO(1);
-  private final SparkMax        m_motor      = new SparkMax(AlgaeArmConstants.algaeArmMotorID,
+  private final SparkMax        m_motor      = new SparkMax(HWMap.Algae.algaeArmMotorID,
                                                             MotorType.kBrushless);
   private final AbsoluteEncoder m_absEncoder = m_motor.getAbsoluteEncoder();
 
-  private Canandcolor armLoaded = new Canandcolor(AlgaeArmConstants.algaeCanandColor);
+  private Canandcolor armLoaded = new Canandcolor(HWMap.Algae.algaeCanAndColorID);
 
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
