@@ -2,15 +2,13 @@ package frc.robot.subsystems;
 
 
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,21 +21,21 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
 
   private final SparkMax m_rollerMotor = new SparkMax(IntakeConstants.algaeRollerMotorID, MotorType.kBrushless);
 
-  private final DCMotor                 m_rollerMotorGearbox = DCMotor.getNEO(1);
+  private final DCMotor m_rollerMotorGearbox = DCMotor.getNEO(1);
 
-    private final FlywheelSim             m_rollerSim          = new FlywheelSim(LinearSystemId.createFlywheelSystem(
+  private final FlywheelSim m_rollerSim = new FlywheelSim(LinearSystemId.createFlywheelSystem(
       m_rollerMotorGearbox,
       RollerConstants.kWristMomentOfInertia,
       RollerConstants.kWristGearRatio), m_rollerMotorGearbox, 1.0 / 4096.0);
 
-  private final SparkMaxSim             m_rollerMotorSim     = new SparkMaxSim(m_rollerMotor, m_rollerMotorGearbox);
+  private final SparkMaxSim m_rollerMotorSim = new SparkMaxSim(m_rollerMotor, m_rollerMotorGearbox);
 
 
   public AlgaeIntakeSubsystem()
   {
     SparkMaxConfig config = new SparkMaxConfig();
     config.smartCurrentLimit(40)
-    .inverted(true);
+          .inverted(true);
     m_rollerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) done
     //       in the constructor or in the robot coordination class, such as RobotContainer.
@@ -45,7 +43,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
     //       such as SpeedControllers, Encoders, DigitalInputs, etc.
   }
 
-   @Override
+  @Override
   public void simulationPeriodic()
   {
     // In this method, we update our simulation of what our arm is doing
@@ -57,23 +55,31 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
     //m_encoderSim.setDistance(m_coralArmSim.getAngleRads());
-   
+
     m_rollerMotorSim.iterate(m_rollerSim.getAngularVelocityRPM(),
                              RoboRioSim.getVInVoltage(),
                              // Simulated battery voltage, in Volts
                              0.02);
 
 
-    
   }
-
 
 
   public Command setAlgaeIntakeRoller(double speed)
   {
     return run(() -> {
-      m_rollerMotor.set(speed );
+      m_rollerMotor.set(speed);
     });
+  }
+
+  public Command out()
+  {
+    return setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds);
+  }
+
+  public Command in()
+  {
+    return setAlgaeIntakeRoller(IntakeConstants.AlgaeIntakeSpeeds);
   }
 }
 

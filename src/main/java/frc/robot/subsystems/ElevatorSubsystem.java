@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -476,6 +475,16 @@ public class ElevatorSubsystem extends SubsystemBase
   public Command AlgaePROCESSOR()
   {
     return setElevatorHeight(Setpoints.Elevator.Algae.PROCESSOR);
+  }
+
+  public Trigger aroundAlgaePROCESSOR()
+  {
+    return new Trigger(() -> aroundHeight(Setpoints.Elevator.Algae.PROCESSOR));
+  }
+
+  public Trigger aroundAlgaeNET()
+  {
+    return new Trigger(() -> aroundHeight(Setpoints.Elevator.Algae.NET));
   }
 
 
