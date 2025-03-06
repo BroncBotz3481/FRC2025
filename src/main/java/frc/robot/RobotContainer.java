@@ -86,7 +86,8 @@ public class RobotContainer
                                                                     elevator,
                                                                     coralIntake,
                                                                     targetingSystem,
-                                                                    algaeIntake);
+                                                                    algaeIntake,
+                                                                    drivebase);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
                                                                     drivebase,
@@ -292,12 +293,12 @@ if (launchpadTesting){
   //Algae Load L23
       launchpad.getButton(1,2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
-                                                      .andThen(loadingSystem.algaeLoad(Elevator.Algae.L23, Arm.Algae.L23)));
+                                                      .andThen(loadingSystem.algaeLoad()));
 
   //Algae Load L34
       launchpad.getButton(1,3).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                      .andThen(loadingSystem.algaeLoad(Elevator.Algae.L34, Arm.Algae.L34)));
+                                                      .andThen(loadingSystem.algaeLoad()));
 
   //Score Net 
       launchpad.getButton(0,0).whileTrue(scoringSystem.scoreAlgaeNet());
@@ -337,12 +338,12 @@ if (launchpadTesting){
   //Algae Load L23
       m_OperatorController1.button(11).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
-                                                      .andThen(loadingSystem.algaeLoad(Elevator.Algae.L23, Arm.Algae.L23)));
+                                                      .andThen(loadingSystem.algaeLoad()));
 
   //Algae Load L34
       m_OperatorController1.button(12).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                      .andThen(loadingSystem.algaeLoad(Elevator.Algae.L34, Arm.Algae.L34)));
+                                                      .andThen(loadingSystem.algaeLoad()));
 
   //Score Net 
       m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet());

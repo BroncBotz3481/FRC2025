@@ -385,9 +385,9 @@ public class CoralArmSubsystem extends SubsystemBase
   }
 
 
-  public Command setPower(double d)
+  public Command setPower(double power)
   {
-    return run(() -> m_motor.set(d));
+    return run(() -> m_motor.set(power));
   }
 
   private double angleHold = 0;

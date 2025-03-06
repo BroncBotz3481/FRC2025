@@ -51,8 +51,8 @@ public class ScoringSystem
   {
     // Arm down, elevator down, drive backwards x in
     return m_targetSystem.driveToTarget(m_swerve)
-                         .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                                                    m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
+                         .andThen(Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
+                                                    m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly(),
                                                     m_swerve.lockPos())
                                           .until(m_elevator.atCoralHeight(m_targetSystem)
                                                            .and(m_coralArm.atCoralAngle(m_targetSystem)))

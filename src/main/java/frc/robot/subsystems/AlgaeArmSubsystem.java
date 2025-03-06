@@ -48,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeArmConstants;
 import frc.robot.RobotMath.AlgaeArm;
+import frc.robot.RobotMath.CoralArm;
 import frc.robot.Setpoints.Arm.Algae;
 import frc.robot.systems.TargetingSystem;
 import frc.robot.systems.TargetingSystem.ReefBranchLevel;
@@ -347,6 +348,20 @@ public class AlgaeArmSubsystem extends SubsystemBase
       }
       return false;
     });
+  
+
   }
+
+
+
+  public Command load()
+  {
+    return startRun(() -> {
+      angleHold = getAngle().minus(Degrees.of(10)).in(Degrees);
+      m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(getAngle()).in(Rotations));
+    }, () -> reachSetpoint(angleHold));
+  }
+
+
 
 }
