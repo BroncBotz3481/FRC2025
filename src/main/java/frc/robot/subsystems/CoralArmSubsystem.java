@@ -59,7 +59,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.CoralArmConstants;
 import frc.robot.HWMap;
+import frc.robot.RobotMath.AlgaeArm;
 import frc.robot.RobotMath.CoralArm;
+import frc.robot.Setpoints;
 import frc.robot.Setpoints.Arm.Coral;
 import frc.robot.systems.TargetingSystem;
 import frc.robot.systems.TargetingSystem.ReefBranchLevel;
@@ -348,6 +350,15 @@ public class CoralArmSubsystem extends SubsystemBase
     return armLoaded.get();//m_coralInBin.get()||m_coralInArm.get();
   }//Sim
 
+  
+  public Command load()
+  {
+    return startRun(() -> {
+      angleHold = getAngle().minus(Degrees.of(10)).in(Degrees);
+      m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));
+    }, () -> reachSetpoint(angleHold));
+  }
+
 
   public boolean coralScored()
   {
@@ -409,6 +420,11 @@ public class CoralArmSubsystem extends SubsystemBase
     }, () -> reachSetpoint(angleHold));
   }
 
+  public Trigger aroundCoralHPAngle()
+  {
+    return new Trigger(() -> aroundAngle(Setpoints.Arm.Coral.HP));
+  }
+
   // Scoring Angles
   public Command L1()
   {
@@ -464,5 +480,6 @@ public class CoralArmSubsystem extends SubsystemBase
       return false;
     });
   }
+
 
 }

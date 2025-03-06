@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
+import frc.robot.Setpoints;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 
@@ -43,16 +44,29 @@ public class LoadingSystem
 
   public Command coralLoad()
   {
-    double coralArmLoadingAngleDegrees   = -8;
-    double coralStationHeightMeters = Units.feetToMeters(3) + Units.inchesToMeters(1.5);
-    double coralElevatorHighHeightMeters = 0;
 
-    return m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
-                    .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
-                            .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
-                            .alongWith(m_wrist.setWristAngle(90)))
-                     .until(() -> m_coralArm.coralLoaded());
-  }
+
+    return Commands.parallel(m_elevator.CoralHP().repeatedly(), 
+                            m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly())
+                            .until((m_elevator.aroundCoralHP())
+                            .and(m_coralArm.aroundCoralHPAngle()))
+                            .withTimeout(5)
+                            .andThen(m_wrist.wristScore().repeatedly())
+                            .withDeadline(m_coralArm.load())
+                            .withTimeout(1)
+                            .until(() -> m_coralArm.coralLoaded());
+
+
+  //   double coralArmLoadingAngleDegrees   = -8;
+  //   double coralStationHeightMeters = Units.feetToMeters(3) + Units.inchesToMeters(1.5);
+  //   double coralElevatorHighHeightMeters = 0;
+
+  //   return m_elevator.setElevatorHeight(coralElevatorHighHeightMeters)
+  //                   .andThen(m_elevator.setElevatorHeight(coralElevatorHighHeightMeters).repeatedly()
+  //                           .alongWith(m_coralArm.setCoralArmAngle(coralArmLoadingAngleDegrees).repeatedly())
+  //                           .alongWith(m_wrist.setWristAngle(90)))
+  //                    .until(() -> m_coralArm.coralLoaded());
+   }
 
   public Command algaeLoad()//fix angle
   {

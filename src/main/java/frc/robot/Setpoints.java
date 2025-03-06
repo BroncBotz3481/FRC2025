@@ -43,6 +43,7 @@ public class Setpoints
     public static class Coral
     {
 
+      public static double HP = -8;// TOtAl GuesS
       public static double L1 = 0;
       public static double L2 = 10;
       public static double L3 = 36.14;
