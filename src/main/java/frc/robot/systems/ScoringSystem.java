@@ -49,8 +49,8 @@ public class ScoringSystem
   /// intact.
   public Command scoreCoralAuto()
   {
-    return Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                             m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly())
+    return Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+                             m_coralArm.getCoralCommand(m_targetSystem).repeatedly())
                    .until(m_elevator.atCoralHeight(m_targetSystem)
                                     .and(m_coralArm.atCoralAngle(m_targetSystem)))
                    .withTimeout(5)

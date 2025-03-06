@@ -79,19 +79,41 @@ public class LoadingSystem
      }
  
 
-  public Command algaeLoad()//fix angle
-  {
+  public Command algaeLoadAuto(){
 
+  
+    return Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
+                                m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly(),
+                                m_swerve.lockPos())
+                      .until(m_elevator.atAlgaeHeight(m_targetSystem)
+                                        .and(m_algaeArm.atAlgaeAngle(m_targetSystem)))
+                      .withTimeout(5)
+                      .andThen(Commands.parallel(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds),
+                                                  m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
+                                                  m_swerve.lockPos())
+                                        .withDeadline(m_algaeArm.load())
+                                        .withTimeout(1)
+                                        .until(() -> m_algaeArm.algaeLoaded())) .andThen((m_elevator.getAlgaeCommand(m_targetSystem)
+                                                            .repeatedly())
+                                        .withTimeout(1)
+                              );
+
+
+  }
+
+  public Command algaeLoad(){
+
+  
     return m_targetSystem.driveToCoralTarget(m_swerve)
                          .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                                                    m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
-                                                    m_swerve.lockPos())
+                                                    m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly()
+                                                    )
                                           .until(m_elevator.atAlgaeHeight(m_targetSystem)
                                                            .and(m_algaeArm.atAlgaeAngle(m_targetSystem)))
                                           .withTimeout(5))
                                           .andThen(Commands.parallel(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds),
-                                                                     m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                                                                     m_swerve.lockPos())
+                                                                     m_elevator.getAlgaeCommand(m_targetSystem).repeatedly()
+                                                                     )
                                                            .withDeadline(m_algaeArm.load())
                                                            .withTimeout(1)
                                                            .until(() -> m_algaeArm.algaeLoaded())) .andThen(m_swerve.driveForwards()
@@ -101,42 +123,14 @@ public class LoadingSystem
                                                   );
 
 
-
-
-
-
-    // Put algae arm out, roll in
-    // double algaeArmLoadingAngleDegrees   = angle;
-    // double elevatorExtendedHeightMeters = elevatorHeight;
-            //Units.inchesToMeters(elevatorHeight) > ElevatorConstants.kElevatorUnextendedHeight?
-            //Units.inchesToMeters(elevatorHeight) : 0 ;
-    // double algaeElevatorHighHeightMeters =  elevatorExtendedHeightMeters;// The ball is higher than Branches
-    // double algaeElevatorLowHeightMeters  = elevatorExtendedHeightMeters - Units.inchesToMeters(3.0);// change it back to 1.0
-
-    // return m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
-    //                  .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters).repeatedly()
-    //                          .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly()))
-    //                  .andThen(m_elevator.setElevatorHeight(algaeElevatorLowHeightMeters).repeatedly()
-    //                           .alongWith(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly())
-    //                          .alongWith(m_algaeIntake.setAlgaeIntakeRoller(0.5)))  // Remember to change the default intake speed
-    //                  .until(() -> m_algaeArm.algaeLoaded())
-    //                          .andThen(m_elevator.setElevatorHeight(algaeElevatorHighHeightMeters)
-    //                                  .deadlineFor(m_algaeArm.setAlgaeArmAngle(algaeArmLoadingAngleDegrees).repeatedly()));
-
   }
+
 
   public Command coralLock()
   {
     // Set arm to target angle, elev target height
     return m_coralArm.getCoralCommand(m_targetSystem).repeatedly()
         .alongWith(m_elevator.getCoralCommand(m_targetSystem).repeatedly(), m_wrist.wristScore());
-//    double coralArmLockingAngleDegrees      = m_targetSystem.getTargetBranchCoralArmAngle();
-//    double coralElevatorLockingHeightMeters = m_targetSystem.getTargetBranchHeightMeters();
-//    return m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters)
-//            .andThen(m_elevator.setElevatorHeight(coralElevatorLockingHeightMeters).repeatedly()
-//                    .alongWith(m_coralArm.setCoralArmAngle(coralArmLockingAngleDegrees).repeatedly())
-//                     .alongWith(m_wrist.setWristAngle(90).repeatedly()));
-
   }
 
   public Command algaeLockProcessor()
