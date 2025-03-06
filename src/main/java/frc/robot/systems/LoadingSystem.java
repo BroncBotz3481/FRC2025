@@ -50,6 +50,7 @@ public class LoadingSystem
    {
  
      return (Commands.parallel(m_elevator.CoralHP().repeatedly(), //Drive to HP and Move ELEVATOR AND ARM
+                                m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP),
                                 m_swerve.lockPos()))
                                 .until(m_elevator.aroundCoralHP()
                                .and(m_coralArm.aroundCoralHPAngle()))
@@ -66,7 +67,8 @@ public class LoadingSystem
     public Command coralLoadAuto()
     {
   
-      return (Commands.parallel(m_elevator.CoralHP().repeatedly())) //Drive to HP and Move ELEVATOR AND ARM
+      return (Commands.parallel(m_elevator.CoralHP().repeatedly(), 
+                                m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP)))
                                  .until(m_elevator.aroundCoralHP()
                                 .and(m_coralArm.aroundCoralHPAngle()))
                                 .withTimeout(5) //Move Intake angle to 0
