@@ -108,26 +108,51 @@ public class TargetingSystem
     return targetBranch;
   }
 
-  public Command driveToTarget(SwerveSubsystem swerveDrive)
+  public Command driveToCoralTarget(SwerveSubsystem swerveDrive)
   {
     return Commands.print("GOING TO POSE")
                    .andThen(Commands.runOnce(() -> {
                      swerveDrive.getSwerveDrive().field.getObject("target")
-                                                       .setPose(getTargetPose());
+                                                       .setPose(getCoralTargetPose());
                    }))
-                   .andThen(swerveDrive.driveToPose(this::getTargetPose))
+                   .andThen(swerveDrive.driveToPose(this::getCoralTargetPose))
                    .andThen(Commands.print("DONE GOING TO POSE"));
   }
 
-  public Pose2d getTargetPose()
+  public Command driveToAlgaeTarget(SwerveSubsystem swerveDrive)
+  {
+    return Commands.print("GOING TO POSE")
+                   .andThen(Commands.runOnce(() -> {
+                     swerveDrive.getSwerveDrive().field.getObject("target")
+                                                       .setPose(getAlgaeTargetPose());
+                   }))
+                   .andThen(swerveDrive.driveToPose(this::getAlgaeTargetPose))
+                   .andThen(Commands.print("DONE GOING TO POSE"));
+  }
+
+  public Pose2d getCoralTargetPose()
   {
     Pose2d scoringPose = Pose2d.kZero;
     if (targetBranch != null)
     {
       Pose2d startingPose = Reef.branchPositions.get(targetBranch.ordinal()).get(ReefHeight.L2).toPose2d();
-      SmartDashboard.putString("Targetted Pose without Offset (Meters)", startingPose.toString());
-      scoringPose = startingPose.plus(AutoScoring.Reef.offset);
-      SmartDashboard.putString("Targetted Pose with Offset (Meters)", scoringPose.toString());
+      SmartDashboard.putString("Targetted Coral Pose without Offset (Meters)", startingPose.toString());
+      scoringPose = startingPose.plus(AutoScoring.Reef.coralOffset);
+      SmartDashboard.putString("Targetted Coral Pose with Offset (Meters)", scoringPose.toString());
+
+    }
+    return AllianceFlipUtil.apply(scoringPose);
+  }
+
+  public Pose2d getAlgaeTargetPose()
+  {
+    Pose2d scoringPose = Pose2d.kZero;
+    if (targetBranch != null)
+    {
+      Pose2d startingPose = Reef.branchPositions.get(targetBranch.ordinal()).get(ReefHeight.L2).toPose2d();
+      SmartDashboard.putString("Targetted Algae Pose without Offset (Meters)", startingPose.toString());
+      scoringPose = startingPose.plus(AutoScoring.Reef.algaeOffset);
+      SmartDashboard.putString("Targetted Algae Pose with Offset (Meters)", scoringPose.toString());
 
     }
     return AllianceFlipUtil.apply(scoringPose);

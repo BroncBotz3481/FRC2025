@@ -50,7 +50,7 @@ public class ScoringSystem
   public Command scoreCoral()
   {
     // Arm down, elevator down, drive backwards x in
-    return m_targetSystem.driveToTarget(m_swerve)
+    return m_targetSystem.driveToCoralTarget(m_swerve)
                          .andThen(Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
                                                     m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly(),
                                                     m_swerve.lockPos())
@@ -70,19 +70,6 @@ public class ScoringSystem
                                                      m_coralIntake.wristScore())
                                           .withTimeout(1)
                                  );
-
-//    return new ParallelDeadlineGroup(
-//        m_elevator.setElevatorHeight(elevatorHeightMeters).withName("ScoreCoralElevatorHeight")
-//                  .andThen(m_coralIntake.spitCoralOut(IntakeConstants.defaultrRollerSpeed, 90))
-//                  .andThen(Commands.print("Tell me why aint nothing but a mistake"))
-//                  .andThen(m_elevator.setElevatorHeight(
-//                                         elevatorHeightMeters - Constants.ElevatorConstants.kLowerToScoreHeight)
-//                                     .withName("ScoreCoralElevatorHeightLower"))
-//                  //.alongWith(m_coralArm.setCoralArmAngle(coralArmAngleDegrees)).repeatedly()
-//                  .andThen(Commands.print("Tell me why aint nothing but an heart ache")),
-//        m_coralArm.setCoralArmAngle(coralArmAngleDegrees).withName("ScoreCoralArmAngle").repeatedly(),
-//        m_swerve.lockPos().withName("LockPose")
-//    );
   }
 
   public Command scoreAlgaeProcessor()
@@ -91,25 +78,20 @@ public class ScoringSystem
     double algaeArmAngleDegrees = Setpoints.Arm.Algae.PROCESSOR;
     double elevatorHeightMeters = Setpoints.Elevator.Algae.PROCESSOR;
     return m_swerve.driveToProcessor()
-            .andThen(Commands.parallel(m_elevator.AlgaePROCESSOR().repeatedly(),
-                            m_algaeArm.PROCESSOR().repeatedly(),
-                            m_swerve.lockPos())
-                    .until(() -> m_elevator.aroundHeight(elevatorHeightMeters)
-                              && m_algaeArm.aroundAngle(algaeArmAngleDegrees))
-                    .withTimeout(5))
-            .andThen(Commands.parallel(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds),
-                            m_elevator.AlgaePROCESSOR().repeatedly(),
-                            m_algaeArm.PROCESSOR().repeatedly(),
-                            m_swerve.lockPos())
-                    .until(() -> !m_algaeArm.algaeLoaded())
-                    .withTimeout(1)
-            );
+                   .andThen(Commands.parallel(m_elevator.AlgaePROCESSOR().repeatedly(),
+                                              m_algaeArm.PROCESSOR().repeatedly(),
+                                              m_swerve.lockPos())
+                                    .until(() -> m_elevator.aroundHeight(elevatorHeightMeters)
+                                                 && m_algaeArm.aroundAngle(algaeArmAngleDegrees))
+                                    .withTimeout(5))
+                   .andThen(Commands.parallel(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds),
+                                              m_elevator.AlgaePROCESSOR().repeatedly(),
+                                              m_algaeArm.PROCESSOR().repeatedly(),
+                                              m_swerve.lockPos())
+                                    .until(() -> m_algaeArm.algaeScored())
+                                    .withTimeout(1)
+                           );
 
-//    return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
-//                     .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
-//                     .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
-//                     .andThen(m_algaeIntake.setAlgaeIntakeRoller(Constants.IntakeConstants.AlgaeOuttakeSpeeds)
-//                                           .until(() -> !m_algaeArm.algaeLoaded()));
   }
 
   public Command scoreAlgaeNet()
@@ -117,11 +99,11 @@ public class ScoringSystem
     //set elevator height, set alage angle, spit out ball, drive pose
     double algaeArmAngleDegrees = Setpoints.Arm.Algae.NET;
     double elevatorHeightMeters = Setpoints.Elevator.Algae.NET;
-    return m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly()
-                     .alongWith(m_elevator.setElevatorHeight(elevatorHeightMeters))
-                     .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
-                     .andThen(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds))
-                     .until(() -> !m_algaeArm.algaeLoaded());
+    return Commands.parallel(m_algaeArm.setAlgaeArmAngle(algaeArmAngleDegrees).repeatedly(),
+                             m_elevator.setElevatorHeight(elevatorHeightMeters))
+                   .until(() -> m_elevator.aroundHeight(elevatorHeightMeters))
+                   .andThen(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds))
+                   .until(() -> m_algaeArm.algaeScored());
   }
 
 }

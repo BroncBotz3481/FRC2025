@@ -281,6 +281,11 @@ public class AlgaeArmSubsystem extends SubsystemBase
     return armLoaded.getProximity() < 0.85;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
+  public boolean algaeScored()
+  {
+    return armLoaded.getProximity() > 0.95;//m_algaeInBin.get()|| m_algaeInArm.get();
+  }
+
   public boolean aroundAngle(double degree, double allowableError)
   {
     //get current angle compare to aimed angle

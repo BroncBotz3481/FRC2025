@@ -4,10 +4,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
-import frc.robot.Constants.CoralArmConstants;
 
 ;
 
@@ -59,7 +57,7 @@ public class LoadingSystem
   public Command algaeLoad()//fix angle
   {
 
-    return m_targetSystem.driveToTarget(m_swerve)
+    return m_targetSystem.driveToCoralTarget(m_swerve)
                          .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
                                                     m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
                                                     m_swerve.lockPos())
