@@ -85,14 +85,12 @@ public class LoadingSystem
   {
 
     return Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                             m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly(),
-                             m_swerve.lockPos())
+                             m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly())
                    .until(m_elevator.atAlgaeHeight(m_targetSystem)
                                     .and(m_algaeArm.atAlgaeAngle(m_targetSystem)))
                    .withTimeout(5)
                    .andThen(Commands.parallel(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds),
-                                              m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                                              m_swerve.lockPos())
+                                              m_elevator.getAlgaeCommand(m_targetSystem).repeatedly())
                                     .withDeadline(m_algaeArm.load())
                                     .withTimeout(1)
                                     .until(() -> m_algaeArm.algaeLoaded()))
@@ -106,14 +104,15 @@ public class LoadingSystem
   {
 
     return m_targetSystem.driveToCoralTarget(m_swerve)
-                         .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                                                    m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly()
-                                                   )
+                         .andThen(Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
+                                                    m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly(),                     
+                             m_swerve.lockPos())
                                           .until(m_elevator.atAlgaeHeight(m_targetSystem)
                                                            .and(m_algaeArm.atAlgaeAngle(m_targetSystem)))
                                           .withTimeout(5))
                          .andThen(Commands.parallel(m_algaeIntake.setAlgaeIntakeRoller(IntakeConstants.AlgaeOuttakeSpeeds),
-                                                    m_elevator.getAlgaeCommand(m_targetSystem).repeatedly())
+                                                    m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
+                                                    m_swerve.lockPos())
                                           .withDeadline(m_algaeArm.load())
                                           .withTimeout(1)
                                           .until(() -> m_algaeArm.algaeLoaded()))
