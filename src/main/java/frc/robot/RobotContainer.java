@@ -7,6 +7,9 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.reduxrobotics.canand.CanandEventLoop;
+
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -70,7 +73,7 @@ public class RobotContainer
 
   private final ElevatorSubsystem    elevator    = new ElevatorSubsystem();
   private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
-  private final ClimberSubsystem     climb       = new ClimberSubsystem();
+  // private final ClimberSubsystem     climb       = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
   private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
@@ -131,18 +134,33 @@ public class RobotContainer
 
   public RobotContainer()
   {
+    CanandEventLoop.getInstance();
+    CanBridge.runTCP();
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
     DriverStation.silenceJoystickConnectionWarning(true);
     // configureBindings();
-    drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+    // drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
-    setDefaultCommands();
+    // setDefaultCommands();
 
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
+
+    boolean armSensorTesting = false;
+    if(armSensorTesting)
+    {
+      algaeArm.setDefaultCommand(algaeArm.setAlgaeArmAngle(0));
+      coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0));
+      algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
+      coralIntake.setDefaultCommand(coralIntake.wristRest());
+      m_driverController.x().whileTrue(algaeIntake.in());
+      m_driverController.y().whileTrue(algaeIntake.out());
+      m_driverController.a().whileTrue(coralIntake.wristIntake());
+      m_driverController.b().whileTrue(coralIntake.wristOuttake());
+    }
 
     boolean scoreCoralTesting = false;
     if (scoreCoralTesting)
@@ -157,17 +175,17 @@ public class RobotContainer
     }
 
     // Elevator Testing
-    boolean elevatorTesting = false;
+    boolean elevatorTesting = true;
     if (elevatorTesting)
     {
-      m_driverController.y().whileTrue(elevator.setPower(0.2).until(elevator.atMax));
-      m_driverController.x().whileTrue(elevator.setPower(-0.2).until(elevator.atMax));
-      m_OperatorController1.x().whileTrue(elevator.CoralL4()); // l4
-      m_OperatorController1.y().whileTrue(elevator.CoralL3()); // l3
-      m_OperatorController1.povRight().whileTrue(elevator.AlgaeL23()); // l2 algae
-      m_OperatorController1.povLeft().whileTrue(elevator.AlgaeL34()); // l3 algae
-      m_OperatorController1.start().whileTrue(elevator.CoralL2()); // l2
-      m_OperatorController1.povLeft().whileTrue(elevator.AlgaeNET()); // barge
+      m_driverController.leftBumper().whileTrue(elevator.setPower(0.2).until(elevator.atMax));
+      m_driverController.rightBumper().whileTrue(elevator.setPower(-0.2).until(elevator.atMax));
+      m_driverController.x().whileTrue(elevator.CoralL4()); // l4
+      m_driverController.y().whileTrue(elevator.CoralL3()); // l3
+      m_driverController.povRight().whileTrue(elevator.AlgaeL23().repeatedly()); // l2 algae
+      m_driverController.povLeft().whileTrue(elevator.AlgaeL34().repeatedly()); // l3 algae
+      m_driverController.start().whileTrue(elevator.CoralL2().repeatedly()); // l2
+      m_driverController.povLeft().whileTrue(elevator.AlgaeNET().repeatedly()); // barge
 
       // m_driverController.button(2).whileTrue(elevator.runSysIdRoutine());
       // m_driverController.button(3).whileTrue(elevator.setElevatorHeight(0.35).repeatedly());
@@ -181,11 +199,11 @@ public class RobotContainer
     {
       m_driverController.b().whileTrue(algaeArm.setPower(0.2));
       m_driverController.a().whileTrue(algaeArm.setPower(-0.2));
-      m_driverController.povLeft().whileTrue(algaeArm.setGoal(33.2).andThen(Commands.waitSeconds(2))
-                                                     .andThen(algaeArm.setGoal(35))); // l3 algae
-      m_driverController.povRight().whileTrue(algaeArm.setGoal(2.637).andThen(Commands.waitSeconds(2))
-                                                      .andThen(algaeArm.setGoal(8))); // l2 algae
-      m_OperatorController1.povLeft().whileTrue(algaeArm.setGoal(90)); // barge
+      m_driverController.povLeft().whileTrue(algaeArm.setAlgaeArmAngle(33.2).andThen(Commands.waitSeconds(2))
+                                                     .andThen(algaeArm.setAlgaeArmAngle(35))); // l3 algae
+      m_driverController.povRight().whileTrue(algaeArm.setAlgaeArmAngle(2.637).andThen(Commands.waitSeconds(2))
+                                                      .andThen(algaeArm.setAlgaeArmAngle(8))); // l2 algae
+      m_driverController.povLeft().whileTrue(algaeArm.setAlgaeArmAngle(90)); // barge
 
       // m_driverController.button(2).whileTrue(algaeArm.runSysIdRoutine());
       // m_driverController.button(3).whileTrue(algaeArm.setAlgaeArmAngle(0).repeatedly());
@@ -195,7 +213,7 @@ public class RobotContainer
       m_driverController.rightBumper().whileTrue(algaeIntake.setAlgaeIntakeRoller(-0.8));
 
       algaeIntake.setDefaultCommand(algaeIntake.setAlgaeIntakeRoller(0));
-      algaeArm.setDefaultCommand(algaeArm.hold());
+      algaeArm.setDefaultCommand(algaeArm.setPower(0));
     }
 
     boolean coralArmTesting = false;
@@ -203,9 +221,10 @@ public class RobotContainer
     {
       m_driverController.povUp().whileTrue(coralArm.setPower(0.1));
       m_driverController.povDown().whileTrue(coralArm.setPower(-0.1));
-      m_OperatorController1.x().whileTrue(coralArm.setGoal(57.9)); // l4
-      m_OperatorController1.y().whileTrue(coralArm.setGoal(36.14)); // l3
+      m_driverController.x().whileTrue(coralArm.setCoralArmAngle(57.9)); // l4
+      m_driverController.y().whileTrue(coralArm.setCoralArmAngle(36.14)); // l3
       m_OperatorController1.start().whileTrue(coralArm.setGoal(10)); // l2
+      m_driverController.a().whileTrue(coralArm.setCoralArmAngle(90)); 
       m_OperatorController1.povDown().whileTrue(coralArm.score());
 
       // m_driverController.button(2).whileTrue(coralArm.runSysIdRoutine());
@@ -248,8 +267,8 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    m_driverController.povUp().whileTrue(climb.climbUp());
-    m_driverController.povDown().whileTrue(climb.climbDown());
+    // m_driverController.povUp().whileTrue(climb.climbUp());
+    // m_driverController.povDown().whileTrue(climb.climbDown());
 
     m_driverController.leftBumper()
                       .whileTrue(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.4))); // Slow mode

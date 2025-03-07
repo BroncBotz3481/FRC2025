@@ -278,12 +278,12 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeLoaded()
   {
-    return armLoaded.getProximity() < 0.85;//m_algaeInBin.get()|| m_algaeInArm.get();
+    return armLoaded.getProximity() < 0.31;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean algaeScored()
   {
-    return armLoaded.getProximity() > 0.95;//m_algaeInBin.get()|| m_algaeInArm.get();
+    return armLoaded.getProximity() > 0.40;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean aroundAngle(double degree, double allowableError)

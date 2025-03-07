@@ -142,7 +142,7 @@ public final class Constants
                                                                           .in(RPM.per(Second));
     public static final int     kAlgaeArmStallCurrentLimitAmps  = 40;
 
-    public static final double kAlgaeAngleAllowableError = 0.001;//degree, for testing whether it's aroundAngle
+    public static final double kAlgaeAngleAllowableError = RobotBase.isSimulation() ? 0.001 : 0.4;//degree, for testing whether it's aroundAngle
 
   }
 
@@ -157,7 +157,7 @@ public final class Constants
     public static final double kCoralArmKv               = 0.11319; // volts per velocity (V/RPM)
     public static final double kCoralArmKa               = 0.028083; // volts per acceleration (V/(RPM/s))
     public static final double kCoralArmkG               = 0.023981; // volts (V)
-    public static final double kCoralAngleAllowableError = RobotBase.isSimulation() ? 5 : 0.1;
+    public static final double kCoralAngleAllowableError = RobotBase.isSimulation() ? 5 : 0.8;
 //degree, for testing whether it's aroundAngle
 
     public static final double  kCoralArmReduction              = 112.0;
@@ -212,7 +212,7 @@ public final class Constants
     public static final Distance kMinElevatorHeight        = Meters.of(kMinElevatorHeightMeters);
     public static final Distance kMaxElevatorHeight        = Meters.of(kMaxElevatorHeightMeters);
     public static final double   kElevatorAllowableError   = RobotBase.isSimulation() ? Units.inchesToMeters(1)
-                                                                                      : Units.inchesToMeters(0.005);
+                                                                                      : 0.05;
     public static       double   kElevatorRampRate         = 0.1;
     public static       int      kElevatorCurrentLimit     = 40;
     public static final double   kElevatorUnextendedHeight = Units.inchesToMeters(41.5);

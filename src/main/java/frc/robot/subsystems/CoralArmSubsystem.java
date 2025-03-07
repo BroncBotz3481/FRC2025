@@ -340,14 +340,24 @@ public class CoralArmSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Coral Arm Angle (Degrees)", getAngle().in(Degrees));
     SmartDashboard.putNumber("Coral Arm Angle Absolute (Degrees)",
                              Rotations.of(m_absEncoder.getPosition()).in(Degrees));
-
     //    System.out.println(getAngle());
     //    System.out.println(Units.radiansToDegrees(m_coralArmSim.getAngleRads()));
   }
 
   public boolean coralLoaded()
   {
-    return armLoaded.get();//m_coralInBin.get()||m_coralInArm.get();
+    if (RobotBase.isSimulation())
+    {
+      return coralDistanceSim.getMeasurement().distance_mm < 0.03;
+    } else
+    {
+      Measurement measure = coralDistance.getMeasurement();
+      if (measure != null && measure.status == LASERCAN_STATUS_VALID_MEASUREMENT)
+      {
+        return measure.distance_mm < 0.03;
+      }
+    }
+    return false;
   }//Sim
 
   
@@ -364,13 +374,13 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     if (RobotBase.isSimulation())
     {
-      return coralDistanceSim.getMeasurement().distance_mm > Inches.of(6).in(Millimeters);
+      return coralDistanceSim.getMeasurement().distance_mm > 0.12;
     } else
     {
       Measurement measure = coralDistance.getMeasurement();
       if (measure != null && measure.status == LASERCAN_STATUS_VALID_MEASUREMENT)
       {
-        return measure.distance_mm > Inches.of(6).in(Millimeters);
+        return measure.distance_mm > 0.12;
       }
     }
     return false;
