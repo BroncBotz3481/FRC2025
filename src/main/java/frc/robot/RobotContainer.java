@@ -251,7 +251,7 @@ public class RobotContainer
       coralIntake.setDefaultCommand(coralIntake.wristRest());
     }
 
-    NamedCommands.registerCommand("scoreCoral", scoringSystem.scoreCoralAuto());
+    NamedCommands.registerCommand("scoreCoral", targetingSystem.setBranchLevel(ReefBranchLevel.L4).andThen(scoringSystem.scoreCoralAuto()));
     NamedCommands.registerCommand("scoreProcessor", scoringSystem.scoreAlgaeProcessorAuto());
     NamedCommands.registerCommand("loadCoral", loadingSystem.coralLoadAuto());
     NamedCommands.registerCommand("loadAlgae", loadingSystem.algaeLoadAuto());

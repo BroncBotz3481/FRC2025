@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeavePath"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ToHP1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "loadCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "To Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ToHP2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "loadCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "To Score2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreCoral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
