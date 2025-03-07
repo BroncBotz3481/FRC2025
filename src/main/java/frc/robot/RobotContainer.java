@@ -372,21 +372,21 @@ public class RobotContainer
       //L1 Score Coral
       m_OperatorController1.button(1).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                                .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
-                                                               .andThen(scoringSystem.scoreCoral()));
+                                                               );
       //L2 Score Coral
       m_OperatorController1.button(2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                                .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
-                                                               .andThen(scoringSystem.scoreCoral()));
+                                                               );
       //L3 Score Coral
       m_OperatorController1.button(3).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                                .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                               .andThen(scoringSystem.scoreCoral()));
+                                                               );
       //L4 Score Coral
       m_OperatorController1.button(4).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                                .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                               .andThen(scoringSystem.scoreCoral()));
+                                                               );
 
-      
+      m_OperatorController1.button(5).whileTrue(scoringSystem.scoreCoral());
       //Algae Load L23
       m_OperatorController1.button(11).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                                 .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
