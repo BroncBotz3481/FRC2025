@@ -186,13 +186,13 @@ public final class Constants
   public static class ElevatorConstants
   {
 
-    public static final double   kElevatorKp              = 52.29;
+    public static final double   kElevatorKp              = 33.966;
     public static final double   kElevatorKi              = 0;
-    public static final double   kElevatorKd              = 15.57;
-    public static final double   kElevatorkS              = 0.26737; // volts (V)
-    public static final double   kElevatorkV              = 9.9682;//10.773; // volt per velocity (V/(m/s))
-    public static final double   kElevatorkA              = 0.1931; // volt per acceleration (V/(m/s²))
-    public static final double   kElevatorkG              = 0.39266; // volts (V)
+    public static final double   kElevatorKd              = 9.4456;
+    public static final double   kElevatorkS              = 0.21471; // volts (V)
+    public static final double   kElevatorkV              = 10.39;//10.773; // volt per velocity (V/(m/s))
+    public static final double   kElevatorkA              = 0.19736; // volt per acceleration (V/(m/s²))
+    public static final double   kElevatorkG              = 0.23861; // volts (V)
     public static       double   kMaxVelocity             = Meters.of(1).per(Second).in(MetersPerSecond);
     public static       double   kMaxAcceleration         = Meters.of(0.5).per(Second).per(Second).in(
         MetersPerSecondPerSecond);
