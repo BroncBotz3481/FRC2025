@@ -145,7 +145,7 @@ public class RobotContainer
      drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
     SmartDashboard.putData(CommandScheduler.getInstance());
 
-    // setDefaultCommands();
+     setDefaultCommands();
 
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
@@ -251,7 +251,10 @@ public class RobotContainer
       coralIntake.setDefaultCommand(coralIntake.wristRest());
     }
 
-    NamedCommands.registerCommand("test", Commands.print("Hello World"));
+    NamedCommands.registerCommand("scoreCoral", scoringSystem.scoreCoralAuto());
+    NamedCommands.registerCommand("scoreProcessor", scoringSystem.scoreAlgaeProcessorAuto());
+    NamedCommands.registerCommand("loadCoral", loadingSystem.coralLoadAuto());
+    NamedCommands.registerCommand("loadAlgae", loadingSystem.algaeLoadAuto());
   }
 
   //ROBOT CONTAINER ^
@@ -323,7 +326,7 @@ public class RobotContainer
     launchpad.getButton(8, 1).onFalse( Commands.runOnce(()->launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.HPPressed))));    
 
-
+//-------------------------------------------------------------------------------------------------------------------------------------------------
 
       //L1 Score Coral
       launchpad.getButton(0, 4).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
@@ -410,6 +413,7 @@ public class RobotContainer
 
     }
   }
+
 //END OF CONFIG BINDINGS ^
 //----------------------------------------------------------------------------------------------------------------------------------
 // MISC METHODS AND COMMANDS v
