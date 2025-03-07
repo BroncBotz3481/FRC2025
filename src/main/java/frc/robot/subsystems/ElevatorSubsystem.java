@@ -107,9 +107,9 @@ public class ElevatorSubsystem extends SubsystemBase
   private final SysIdRoutine      m_sysIdRoutine   =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(Volts.per(Second).of(1),
-                                  Volts.of(3),
-                                  Seconds.of(10)),
+          new SysIdRoutine.Config(Volts.per(Second).of(2),
+                                  Volts.of(2),
+                                  Seconds.of(30)),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motor(s).
               m_motor::setVoltage,
@@ -345,9 +345,8 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public Command setGoal(double goal)
   {
-    return startRun(() -> {
-      m_controller.reset(getHeightMeters());
-    }, () -> reachGoal(goal));
+    return /*startRun(()->m_controller.reset(getHeightMeters()),*/
+                    run(() -> reachGoal(goal));
   }
 
 
