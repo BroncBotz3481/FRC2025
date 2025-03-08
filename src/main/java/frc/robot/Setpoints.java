@@ -72,10 +72,10 @@ public class Setpoints
 
       public static final Transform2d coralOffset = new Transform2d(Inches.of(24).in(Meters),
                                                                     Inches.of(0).in(Meters),
-                                                                    Rotation2d.fromDegrees(0));
+                                                                    Rotation2d.fromDegrees(180));
       public static final Transform2d algaeOffset = new Transform2d(Inches.of(24).in(Meters),
                                                                     Inches.of(0).in(Meters),
-                                                                    Rotation2d.fromDegrees(0));
+                                                                    Rotation2d.fromDegrees(180));
     }
 
     public static class HumanPlayer
