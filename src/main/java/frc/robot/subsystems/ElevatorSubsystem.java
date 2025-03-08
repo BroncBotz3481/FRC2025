@@ -490,6 +490,11 @@ public class ElevatorSubsystem extends SubsystemBase
   {
     return new Trigger(() -> aroundHeight(Setpoints.Elevator.Coral.HP));
   }
+  public Trigger aroundCoralL4()
+  {
+    return new Trigger(() -> aroundHeight(Setpoints.Elevator.Coral.L4));
+  }
+
 
 
   public Command getCoralCommand(TargetingSystem targetingSystem)

@@ -5,9 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "LeavePath"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LeavePath"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsUp"
+                }
+              }
+            ]
           }
         },
         {
@@ -17,15 +30,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "ToHP1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsDown"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToHP1"
+                }
+              }
+            ]
           }
         },
         {
@@ -35,9 +55,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "To Score"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "To Score"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsUp"
+                }
+              }
+            ]
           }
         },
         {
@@ -47,15 +80,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "ToHP2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsDown"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToHP2"
+                }
+              }
+            ]
           }
         },
         {
@@ -65,9 +105,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "To Score2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "To Score2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsUp"
+                }
+              }
+            ]
           }
         },
         {

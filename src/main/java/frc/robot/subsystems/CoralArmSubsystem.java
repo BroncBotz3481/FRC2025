@@ -434,6 +434,11 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     return new Trigger(() -> aroundAngle(Setpoints.Arm.Coral.HP));
   }
+  public Trigger aroundCoralL4()
+  {
+    return new Trigger(() -> aroundAngle(Setpoints.Arm.Coral.L4));
+  }
+
 
   // Scoring Angles
   public Command L1()

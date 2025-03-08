@@ -117,8 +117,8 @@ public class RobotContainer
 
   public void setDefaultCommands()
   {
-    elevator.setDefaultCommand(elevator.setPower(0));
-    algaeArm.setDefaultCommand(algaeArm.setPower(0));
+    elevator.setDefaultCommand((elevator.setGoal(0.003)));
+    algaeArm.setDefaultCommand((algaeArm.setAlgaeArmAngle(-60)));
     coralArm.setDefaultCommand(coralArm.setPower(0));
     coralIntake.setDefaultCommand(coralIntake.wristRest());
   }
@@ -255,6 +255,14 @@ public class RobotContainer
     NamedCommands.registerCommand("scoreProcessor", scoringSystem.scoreAlgaeProcessorAuto());
     NamedCommands.registerCommand("loadCoral", loadingSystem.coralLoadAuto());
     NamedCommands.registerCommand("loadAlgae", loadingSystem.algaeLoadAuto());
+    NamedCommands.registerCommand("LimbsDown", ( elevator.CoralHP()
+                                                    .alongWith(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP)
+                                                    .until(elevator.aroundCoralHP()
+                                                    .and(coralArm.aroundCoralHPAngle())))));         
+    NamedCommands.registerCommand("LimbsUp", (elevator.CoralL4()
+                                                  .alongWith(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.L4)
+                                                  .until(elevator.aroundCoralL4()
+                                                  .and(coralArm.aroundCoralL4())))));
   }
 
   //ROBOT CONTAINER ^
