@@ -23,6 +23,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "loadCoral"
@@ -44,6 +50,12 @@
           "type": "path",
           "data": {
             "pathName": "ToHP2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {

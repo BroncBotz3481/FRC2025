@@ -58,7 +58,10 @@ public class LoadingSystem
         .until(m_elevator.aroundCoralHP()
                          .and(m_coralArm.aroundCoralHPAngle()))
         .withTimeout(5) //Move Intake angle to 0
-        .andThen(m_coralIntake.wristRest().until(m_coralIntake.atRestingAngle()))
+        .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(),
+                                   m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly(),
+                                   m_coralIntake.wristIntake())
+        .until(m_coralIntake.atScoringAngle()))
         .andThen(Commands.parallel(m_coralIntake.wristIntake(),m_swerve.lockPos())
                          .withDeadline(m_coralArm.load()) //end command
                          .withTimeout(1)
@@ -74,7 +77,10 @@ public class LoadingSystem
         .until(m_elevator.aroundCoralHP()
                          .and(m_coralArm.aroundCoralHPAngle()))
         .withTimeout(5) //Move Intake angle to 0
-        .andThen(m_coralIntake.wristRest().until(m_coralIntake.atRestingAngle()))
+        .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(),
+                                   m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly(),
+                                   m_coralIntake.wristIntake())
+        .until(m_coralIntake.atScoringAngle()))
         .andThen(m_coralIntake.wristIntake())
         .withTimeout(1)
         .until(() -> m_coralArm.coralLoaded());
