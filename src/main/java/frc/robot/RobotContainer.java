@@ -321,7 +321,7 @@ public class RobotContainer
     //Score Coral                              
     launchpad.getButton(8, 8).onFalse( Commands.runOnce(()->launchpad.changeLED(8,8, new Color8Bit(ButtonColours.ScoreCoral))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,8, new Color8Bit(ButtonColours.IsPressed)))
-                                  .alongWith(levelHighlighter4()));    
+                                  .alongWith(levelDeselect()));    
     //Algae
     launchpad.getButton(1, 2).onFalse( Commands.runOnce(()->launchpad.changeLED(1,2, new Color8Bit(ButtonColours.AlgaeColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(1,2, new Color8Bit(ButtonColours.IsPressed))));    
