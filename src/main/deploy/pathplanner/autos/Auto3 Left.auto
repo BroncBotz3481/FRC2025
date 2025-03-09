@@ -19,14 +19,33 @@
                 "data": {
                   "name": "LimbsUp"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climberDOWN"
+                }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "scoreCoral"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "scoreCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climberUP"
+                }
+              }
+            ]
           }
         },
         {
