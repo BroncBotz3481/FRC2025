@@ -80,6 +80,7 @@ public class RobotContainer
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
   private final CoralIntakeSubsystem coralIntake = new CoralIntakeSubsystem();
 
+
   private final TargetingSystem targetingSystem = new TargetingSystem();
   private final LoadingSystem   loadingSystem   = new LoadingSystem(coralArm,
                                                                     algaeArm,
@@ -97,7 +98,6 @@ public class RobotContainer
                                                                     targetingSystem,
                                                                     coralIntake,
                                                                     driveAngularVelocity);
-
 
   Command driveRobotOrientedAngularVelocity = drivebase.drive(driveAngularVelocity);
 
@@ -304,19 +304,24 @@ public class RobotContainer
 
     //Coral Level Select
     launchpad.getButton(0, 4).onFalse( Commands.runOnce(()->launchpad.changeLED(0,4, new Color8Bit(ButtonColours.CoralLevelColour))))
-                                 .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,4, new Color8Bit(ButtonColours.IsPressed))));    
+                                 .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,4, new Color8Bit(ButtonColours.IsPressed)))
+                                 .alongWith(levelHighlighter1())); 
 
     launchpad.getButton(0, 3).onFalse( Commands.runOnce(()->launchpad.changeLED(0,3, new Color8Bit(ButtonColours.CoralLevelColour))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,3, new Color8Bit(ButtonColours.IsPressed))));    
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,3, new Color8Bit(ButtonColours.IsPressed)))
+                                  .alongWith(levelHighlighter2()));  
 
     launchpad.getButton(0, 2).onFalse( Commands.runOnce(()->launchpad.changeLED(0,2, new Color8Bit(ButtonColours.CoralLevelColour))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,2, new Color8Bit(ButtonColours.IsPressed))));    
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,2, new Color8Bit(ButtonColours.IsPressed)))
+                                  .alongWith(levelHighlighter3()));   
                                 
     launchpad.getButton(0, 1).onFalse( Commands.runOnce(()->launchpad.changeLED(0,1, new Color8Bit(ButtonColours.CoralLevelColour))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,1, new Color8Bit(ButtonColours.IsPressed))));    
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,1, new Color8Bit(ButtonColours.IsPressed)))
+                                  .alongWith(levelHighlighter4()));   
     //Score Coral                              
     launchpad.getButton(8, 8).onFalse( Commands.runOnce(()->launchpad.changeLED(8,8, new Color8Bit(ButtonColours.ScoreCoral))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,8, new Color8Bit(ButtonColours.IsPressed))));    
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,8, new Color8Bit(ButtonColours.IsPressed)))
+                                  .alongWith(levelHighlighter4()));    
     //Algae
     launchpad.getButton(1, 2).onFalse( Commands.runOnce(()->launchpad.changeLED(1,2, new Color8Bit(ButtonColours.AlgaeColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(1,2, new Color8Bit(ButtonColours.IsPressed))));    
@@ -489,6 +494,37 @@ public class RobotContainer
   {
     return new ParallelCommandGroup(coralArm.setGoal(coralAngle), algaeArm.setGoal(algaeAngle));
   }
+  public Command levelHighlighter1 (){
+    return     Commands.runOnce(()->launchpad.changeLED(0,5, new Color8Bit(ButtonColours.notSelectedColour)))
+    .alongWith(Commands.runOnce(()->launchpad.changeLED(0,6, new Color8Bit(ButtonColours.notSelectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,7, new Color8Bit(ButtonColours.notSelectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,8, new Color8Bit(ButtonColours.selectedColour))));
+}
 
+public Command levelHighlighter2 (){
+    return     Commands.runOnce(()->launchpad.changeLED(0,5, new Color8Bit(ButtonColours.notSelectedColour)))
+    .alongWith(Commands.runOnce(()->launchpad.changeLED(0,6, new Color8Bit(ButtonColours.notSelectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,7, new Color8Bit(ButtonColours.selectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,8, new Color8Bit(ButtonColours.notSelectedColour))));
+}
 
+public Command levelHighlighter3 (){
+    return     Commands.runOnce(()->launchpad.changeLED(0,5, new Color8Bit(ButtonColours.notSelectedColour)))
+    .alongWith(Commands.runOnce(()->launchpad.changeLED(0,6, new Color8Bit(ButtonColours.selectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,7, new Color8Bit(ButtonColours.notSelectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,8, new Color8Bit(ButtonColours.notSelectedColour))));
+}
+
+public Command levelHighlighter4 (){
+    return     Commands.runOnce(()->launchpad.changeLED(0,5, new Color8Bit(ButtonColours.selectedColour)))
+    .alongWith(Commands.runOnce(()->launchpad.changeLED(0,6, new Color8Bit(ButtonColours.notSelectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,7, new Color8Bit(ButtonColours.notSelectedColour))),
+               Commands.runOnce(()->launchpad.changeLED(0,8, new Color8Bit(ButtonColours.notSelectedColour))));
+}
+public Command levelDeselect (){
+  return     Commands.runOnce(()->launchpad.changeLED(0,5, new Color8Bit(ButtonColours.notSelectedColour)))
+  .alongWith(Commands.runOnce(()->launchpad.changeLED(0,6, new Color8Bit(ButtonColours.notSelectedColour))),
+             Commands.runOnce(()->launchpad.changeLED(0,7, new Color8Bit(ButtonColours.notSelectedColour))),
+             Commands.runOnce(()->launchpad.changeLED(0,8, new Color8Bit(ButtonColours.notSelectedColour))));
+}
 }
