@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeavePath"
+                  "pathName": "LeavePath 2"
                 }
               },
               {
@@ -133,6 +133,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "LeftAuto",
   "choreoAuto": false
 }

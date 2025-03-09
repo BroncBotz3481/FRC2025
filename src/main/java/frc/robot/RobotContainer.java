@@ -263,6 +263,8 @@ public class RobotContainer
                                                   .alongWith(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.L4)
                                                   .until(elevator.aroundCoralL4()
                                                   .and(coralArm.aroundCoralL4())))));
+    NamedCommands.registerCommand("climber UP", Commands.print("Climber UP"));
+    NamedCommands.registerCommand("climber DOWN", Commands.print("Climber DOWN"));
   }
 
   //ROBOT CONTAINER ^

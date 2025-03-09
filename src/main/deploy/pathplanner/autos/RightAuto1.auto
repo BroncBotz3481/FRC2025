@@ -1,0 +1,163 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of Copy of LeavePath 3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climberDOWN"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsUp"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "scoreCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climberUP"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of ToHP1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsDown"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climberUP"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "loadCoral"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of ToScore"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsUp"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreCoral"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of ToHP2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsDown"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "loadCoral"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of of ToScore2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LimbsUp"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreCoral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
