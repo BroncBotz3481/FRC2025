@@ -74,7 +74,7 @@ public class RobotContainer
 
   private final ElevatorSubsystem    elevator    = new ElevatorSubsystem();
   private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
-  // private final ClimberSubsystem     climb       = new ClimberSubsystem();
+  private final ClimberSubsystem     climb       = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
   private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
@@ -121,6 +121,8 @@ public class RobotContainer
     algaeArm.setDefaultCommand((algaeArm.setAlgaeArmAngle(-60)));
     coralArm.setDefaultCommand(coralArm.setPower(0));
     coralIntake.setDefaultCommand(coralIntake.wristRest());
+    drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+
 
     launchpad.changeLED(0,5, new Color8Bit(ButtonColours.notSelectedColour));
     launchpad.changeLED(0,6, new Color8Bit(ButtonColours.notSelectedColour));
@@ -146,14 +148,23 @@ public class RobotContainer
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
     DriverStation.silenceJoystickConnectionWarning(true);
-     configureBindings();
-     drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+    // setDefaultCommands();
+    // configureBindings();
     SmartDashboard.putData(CommandScheduler.getInstance());
 
-     setDefaultCommands();
 
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
+
+    boolean climberTesting = true;
+    if(climberTesting)
+    {
+      m_driverController.y().whileTrue(climb.up());
+      m_driverController.x().whileTrue(climb.down());
+      m_driverController.b().whileTrue(climb.setPOwer(0.5));
+      m_driverController.a().whileTrue(climb.setPOwer(-0.5));
+      climb.setDefaultCommand(climb.setPOwer(0));
+    }
 
     boolean armSensorTesting = false;
     if(armSensorTesting)
