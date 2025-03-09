@@ -88,6 +88,7 @@ public class RobotContainer
                                                                     coralIntake,
                                                                     targetingSystem,
                                                                     algaeIntake,
+                                                                    climb,
                                                                     drivebase);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
@@ -120,6 +121,7 @@ public class RobotContainer
     elevator.setDefaultCommand((elevator.setGoal(0.003)));
     algaeArm.setDefaultCommand((algaeArm.setAlgaeArmAngle(-60)));
     coralArm.setDefaultCommand(coralArm.setPower(0));
+    climb.setDefaultCommand(climb.setPOwer(0));
     coralIntake.setDefaultCommand(coralIntake.wristRest());
     drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
@@ -163,7 +165,9 @@ public class RobotContainer
       m_driverController.x().whileTrue(climb.down());
       m_driverController.b().whileTrue(climb.setPOwer(0.5));
       m_driverController.a().whileTrue(climb.setPOwer(-0.5));
+      m_driverController.leftBumper().whileTrue(loadingSystem.dislodgeAlgaeArm());
       climb.setDefaultCommand(climb.setPOwer(0));
+
     }
 
     boolean armSensorTesting = false;
