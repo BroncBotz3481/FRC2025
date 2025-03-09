@@ -121,6 +121,11 @@ public class RobotContainer
     algaeArm.setDefaultCommand((algaeArm.setAlgaeArmAngle(-60)));
     coralArm.setDefaultCommand(coralArm.setPower(0));
     coralIntake.setDefaultCommand(coralIntake.wristRest());
+
+    launchpad.changeLED(0,5, new Color8Bit(ButtonColours.notSelectedColour));
+    launchpad.changeLED(0,6, new Color8Bit(ButtonColours.notSelectedColour));
+    launchpad.changeLED(0,7, new Color8Bit(ButtonColours.notSelectedColour));
+    launchpad.changeLED(0,8, new Color8Bit(ButtonColours.notSelectedColour));
   }
 
   //DEFAULT COMMANDS ^
