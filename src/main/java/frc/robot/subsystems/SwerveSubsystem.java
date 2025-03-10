@@ -33,6 +33,7 @@ import frc.robot.Constants;
 import frc.robot.Setpoints;
 import frc.robot.Setpoints.AutoScoring;
 import frc.robot.Setpoints.AutoScoring.HumanPlayer.Left;
+import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants.CoralStation;
 import frc.robot.systems.field.FieldConstants.Processor;
 import java.io.File;
@@ -341,7 +342,7 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putString("Station Targetted Pose without Offset (Meters)", startingPose.toString());
       Pose2d scorePose = startingPose.plus(Left.offset);
       SmartDashboard.putString("Station Targetted Pose with Offset (Meters)", scorePose.toString());
-      return driveToPose(scorePose);
+      return driveToPose(AllianceFlipUtil.apply(scorePose));
     });
   }
 
@@ -352,7 +353,7 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putString("Station Targetted Pose without Offset (Meters)", startingPose.toString());
       Pose2d scorePose = startingPose.plus(Setpoints.AutoScoring.HumanPlayer.Right.offset);
       SmartDashboard.putString("Station Targetted Pose with Offset (Meters)", scorePose.toString());
-      return driveToPose(scorePose);
+      return driveToPose(AllianceFlipUtil.apply(scorePose));
     });
   }
 
@@ -363,7 +364,7 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putString("Processor Targetted Pose without Offset (Meters)", startingPose.toString());
       Pose2d scorePose = startingPose.plus(AutoScoring.Processor.offset);
       SmartDashboard.putString("Processor Targetted Pose with Offset (Meters)", scorePose.toString());
-      return driveToPose(scorePose);
+      return driveToPose(AllianceFlipUtil.apply(scorePose));
     });
   }
 
