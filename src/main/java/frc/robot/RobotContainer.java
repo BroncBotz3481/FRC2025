@@ -450,7 +450,7 @@ public class RobotContainer
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
       launchpad.getButton(6, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly().alongWith(coralIntake.wristIntake()));
       launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(-40).repeatedly());
-      launchpad.getButton(7, 2).whileTrue(algaeIntake.out());
+      launchpad.getButton(7, 2).whileTrue(algaeArm.PROCESSOR().alongWith(algaeIntake.out()));
 
 
       //LAUNCH PAD ^
