@@ -29,11 +29,10 @@ public class Setpoints
 
     public static class Algae
     {
-
       public static final double L23       = 0.039;
       public static final double L34       = 0.0566;
       public static final double NET       = 0.735;
-      public static final double PROCESSOR = 0.014;
+      public static final double PROCESSOR = 0.059;
     }
   }
 
@@ -46,17 +45,17 @@ public class Setpoints
       public static double HP = -8;// TOtAl GuesS
       public static double L1 = 0;
       public static double L2 = 10;
-      public static double L3 = 36.14;
+      public static double L3 = 33.14;
       public static double L4 = 57.9;
     }
 
     public static class Algae
     {
 
-      public static final double L23       = 33.2;
-      public static final double L34       = 2.637;
+      public static final double L34       = 32.2;
+      public static final double L23       = 2.637;
       public static final double NET       = 90;
-      public static final double PROCESSOR = -50; // Guess
+      public static final double PROCESSOR = -32; // Guess
     }
   }
 
@@ -70,11 +69,11 @@ public class Setpoints
     public static class Reef
     {
 
-      public static final Transform2d coralOffset = new Transform2d(Inches.of(24).in(Meters),
-                                                                    Inches.of(0).in(Meters),
+      public static final Transform2d coralOffset = new Transform2d(Inches.of(28).in(Meters),
+                                                                    Inches.of(6).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
-      public static final Transform2d algaeOffset = new Transform2d(Inches.of(24).in(Meters),
-                                                                    Inches.of(0).in(Meters),
+      public static final Transform2d algaeOffset = new Transform2d(Inches.of(30).in(Meters),
+                                                                    Inches.of(-13).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
     }
 

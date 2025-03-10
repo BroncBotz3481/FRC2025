@@ -354,7 +354,7 @@ public class CoralArmSubsystem extends SubsystemBase
       Measurement measure = coralDistance.getMeasurement();
       if (measure != null && measure.status == LASERCAN_STATUS_VALID_MEASUREMENT)
       {
-        return measure.distance_mm < 0.03;
+        return measure.distance_mm < 0.07;
       }
     }
     return false;
@@ -417,7 +417,7 @@ public class CoralArmSubsystem extends SubsystemBase
   public Command score()
   {
     return startRun(() -> {
-      angleHold = getAngle().minus(Degrees.of(20)).in(Degrees);
+      angleHold = getAngle().minus(Degrees.of(30)).in(Degrees);
       m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));
     }, () -> reachSetpoint(angleHold));
   }

@@ -73,26 +73,34 @@ public class ScoringSystem
   public Command scoreCoral()
   {
     // Arm down, elevator down, drive backwards x in
-    return m_targetSystem.driveToCoralTarget(m_swerve)
-                         .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                                                    m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
-                                                    m_swerve.lockPos())
+    return Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+                                              m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
+                                              Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
                                           .until(m_elevator.atCoralHeight(m_targetSystem)
-                                                           .and(m_coralArm.atCoralAngle(m_targetSystem)))
-                                          .withTimeout(5))
+                                                           .and(m_coralArm.atCoralAngle(m_targetSystem))
+                                                           .and(m_coralIntake.atScoringAngle()))
+                                          .withTimeout(3)
+                                          .andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+                                          m_coralArm.getCoralCommand(m_targetSystem).repeatedly(),
+                                          Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
+                                          .withDeadline(m_targetSystem.driveToCoralTarget(m_swerve)))
+                                          .andThen(m_coralIntake.wristScore().withDeadline(m_coralArm.score()))
+                                          .andThen(m_swerve.driveBackwards().alongWith(m_coralIntake.wristIntake()));
+                                          /*
                          .andThen(m_coralIntake.wristScore().until(m_coralIntake.atScoringAngle()))
+                         .andThen(m_coralArm.getCoralCommand(m_targetSystem).withDeadline(m_targetSystem.driveToCoralTarget(m_swerve)))
                          .andThen(Commands.parallel(m_coralIntake.wristScore(),
                                                     m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
                                                     m_swerve.lockPos())
                                           .withDeadline(m_coralArm.score())
                                           .withTimeout(1)
                                           .until(() -> m_coralArm.coralScored()))
-                         .andThen(m_swerve.driveForwards()
+                         .andThen(m_swerve.driveBackwards()
                                           .alongWith(m_elevator.getCoralCommand(m_targetSystem)
                                                                .repeatedly(),
                                                      m_coralIntake.wristScore())
                                           .withTimeout(1)
-                                 );
+                                 );*/
   }
 
   ///  Autonomous command for scoring the algae arm

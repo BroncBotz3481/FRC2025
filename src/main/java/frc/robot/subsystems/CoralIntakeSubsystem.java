@@ -199,7 +199,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public Trigger atScoringAngle()
   {
-    return new Trigger(() -> MathUtil.isNear(Wrist.active, m_absEncoder.getPosition(), 0.01));
+    return new Trigger(() -> MathUtil.isNear(Wrist.active, m_absEncoder.getPosition(), 0.05));
   }
 
   public Trigger atRestingAngle()
@@ -215,7 +215,8 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public Command wristIntake()
   {
-    return spitCoralOut(-0.1, Wrist.active);
+
+    return spitCoralOut(0.5, Wrist.rest);
   }
 
   public Command wristRest()
@@ -225,7 +226,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public Command wristOuttake()
   {
-    return spitCoralOut(1, Wrist.active);
+    return spitCoralOut(-1, Wrist.active);
   }
 
 }

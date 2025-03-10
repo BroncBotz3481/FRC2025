@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Second;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -45,6 +48,7 @@ import frc.robot.systems.field.FieldConstants.CoralStation;
 import frc.robot.systems.field.FieldConstants.Processor;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -105,6 +109,7 @@ public class SwerveSubsystem extends SubsystemBase
                                           Units.inchesToMeters(12),
                                           Units.inchesToMeters(10.5),
                                           new Rotation3d(0, 0, Units.degreesToRadians(45))))
+             .withArilTagIdFilter(List.of(17.0,18.0,19.0,20.0,21.0,22.0,6.0,7.0,8.0,9.0,10.0,11.0))
              .save();
     limelightPoseEstimator = limelight.getPoseEstimator(true);
 
@@ -138,6 +143,7 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
   private int outofAreaReading = 0;
+  private boolean initialReading = false;
 
   @Override
   public void periodic()
@@ -171,11 +177,14 @@ public class SwerveSubsystem extends SubsystemBase
       {
         // Pose2d estimatorPose = poseEstimate.pose.toPose2d();
         Pose2d usefulPose    = result.getBotPose2d(Alliance.Blue);
-        if(usefulPose.getTranslation().getDistance(swerveDrive.getPose().getTranslation()) < 1 || outofAreaReading > 10)
+        double distanceToPose = usefulPose.getTranslation().getDistance(swerveDrive.getPose().getTranslation());
+        if( distanceToPose < 0.5 || (outofAreaReading>10)|| (outofAreaReading > 10 && !initialReading))
         {
+          if(!initialReading)
+            initialReading = true;
           outofAreaReading = 0;
           // System.out.println(usefulPose.toString());
-          swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.015,0.02,0.05));
+          swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.05,0.05,0.022));
           // System.out.println(result.timestamp_LIMELIGHT_publish);
           // System.out.println(result.timestamp_RIOFPGA_capture);
         swerveDrive.addVisionMeasurement(usefulPose, Timer.getTimestamp());
@@ -310,8 +319,8 @@ public class SwerveSubsystem extends SubsystemBase
     return defer(() -> {
 // Create the constraints to use while pathfinding
       PathConstraints constraints = new PathConstraints(
-          swerveDrive.getMaximumChassisVelocity(), 4.0,
-          swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+          0.5, 0.25,
+          Degrees.of(90).per(Second).in(RadiansPerSecond), Units.degreesToRadians(10));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
       return AutoBuilder.pathfindToPose(

@@ -278,7 +278,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeLoaded()
   {
-    return armLoaded.getProximity() < 0.31;//m_algaeInBin.get()|| m_algaeInArm.get();
+    return armLoaded.getProximity() < 0.35;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public Trigger algaeLoadedTrigger()
@@ -288,12 +288,13 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeScored()
   {
-    return armLoaded.getProximity() > 0.40;//m_algaeInBin.get()|| m_algaeInArm.get();
+    return armLoaded.getProximity() > 0.31;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public boolean aroundAngle(double degree, double allowableError)
   {
-    //get current angle compare to aimed angle
+    // System.out.println(degree + " - " + getAngle().in(Degrees) + " = "+(degree-getAngle().in(Degrees)) + " allowable "+allowableError + " == "+MathUtil.isNear(degree, getAngle().in(Degrees), allowableError));
+    // get current angle compare to aimed angle
     return MathUtil.isNear(degree, getAngle().in(Degrees), allowableError);
   }
 
@@ -353,8 +354,13 @@ public class AlgaeArmSubsystem extends SubsystemBase
     return new Trigger(() -> {
       switch (targetingSystem.getTargetBranchLevel())
       {
-        case L2 -> aroundAngle(Algae.L23);
-        case L3 -> aroundAngle(Algae.L34);
+        case L2 ->
+        {
+          return aroundAngle(Algae.L23);
+        }
+        case L3 -> {
+          return aroundAngle(Algae.L34);
+        }
       }
       return false;
     });

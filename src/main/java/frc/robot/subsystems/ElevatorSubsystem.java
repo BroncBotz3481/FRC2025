@@ -399,8 +399,8 @@ public class ElevatorSubsystem extends SubsystemBase
    */
   public boolean aroundHeight(double height, double allowableError)
   {
-//    System.out.println("Current Height: " + getHeightMeters() + " Desired Height: " + height + " Allowable Error: " +
-//                       allowableError);
+  //  System.out.println("Current Height: " + getHeightMeters() + " Desired Height: " + height + " Allowable Error: " +
+  //                     (height-getHeightMeters()));
     return MathUtil.isNear(height, getHeightMeters(), allowableError);
   }
 
@@ -547,11 +547,11 @@ public class ElevatorSubsystem extends SubsystemBase
       {
         case L2 ->
         {
-          return aroundHeight(Algae.L23);
+          return aroundHeight(Setpoints.Elevator.Algae.L23);
         }
         case L3 ->
         {
-          return aroundHeight(Algae.L34);
+          return aroundHeight(Setpoints.Elevator.Algae.L34);
         }
       }
       return false;
