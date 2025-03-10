@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -17,7 +18,9 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -33,16 +36,21 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Setpoints;
 import frc.robot.Setpoints.AutoScoring;
-import frc.robot.Setpoints.AutoScoring.HumanPlayer;
 import frc.robot.Setpoints.AutoScoring.HumanPlayer.Left;
 import frc.robot.systems.field.AllianceFlipUtil;
-import frc.robot.systems.field.FieldConstants;
 import frc.robot.systems.field.FieldConstants.CoralStation;
 import frc.robot.systems.field.FieldConstants.Processor;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import limelight.Limelight;
+import limelight.networktables.AngularVelocity3d;
+import limelight.networktables.LimelightPoseEstimator;
+import limelight.networktables.LimelightResults;
+import limelight.networktables.Orientation3d;
+import limelight.networktables.PoseEstimate;
 import org.json.simple.parser.ParseException;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -57,8 +65,10 @@ public class SwerveSubsystem extends SubsystemBase
    * Creates a new ExampleSubsystem.
    */
 
-  File        directory = new File(Filesystem.getDeployDirectory(), "swerve");
-  SwerveDrive swerveDrive;
+  File                   directory = new File(Filesystem.getDeployDirectory(), "swerve");
+  SwerveDrive            swerveDrive;
+  Limelight              limelight;
+  LimelightPoseEstimator limelightPoseEstimator;
 
   public SwerveSubsystem()
   {
@@ -77,6 +87,22 @@ public class SwerveSubsystem extends SubsystemBase
     }
     setupPathPlanner();
   }
+
+
+  public void setupLimelight()
+  {
+    swerveDrive.stopOdometryThread();
+    limelight = new Limelight("limelight");
+    limelight.getSettings()
+             .withCameraOffset(new Pose3d(Units.inchesToMeters(12),
+                                          Units.inchesToMeters(-12),
+                                          0,
+                                          new Rotation3d(0, 0, Units.degreesToRadians(45))))
+             .save();
+    limelightPoseEstimator = limelight.getPoseEstimator(true);
+
+  }
+
 
   /**
    * Example command factory method.
@@ -107,6 +133,40 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+
+    swerveDrive.updateOdometry();
+
+    limelight.getSettings()
+             .withRobotOrientation(new Orientation3d(new Rotation3d(swerveDrive.getOdometryHeading()),
+                                                     new AngularVelocity3d(DegreesPerSecond.of(0),
+                                                                           DegreesPerSecond.of(0),
+                                                                           DegreesPerSecond.of(0))))
+             .save();
+    Optional<PoseEstimate>     poseEstimates = limelightPoseEstimator.getPoseEstimate();
+    Optional<LimelightResults> results       = limelight.getLatestResults();
+    if (results.isPresent() && poseEstimates.isPresent())
+    {
+      LimelightResults result       = results.get();
+      PoseEstimate     poseEstimate = poseEstimates.get();
+      SmartDashboard.putNumber("Avg Tag Ambiguity", poseEstimate.getAvgTagAmbiguity());
+      SmartDashboard.putNumber("Min Tag Ambiguity", poseEstimate.getMinTagAmbiguity());
+      SmartDashboard.putNumber("Max Tag Ambiguity", poseEstimate.getMaxTagAmbiguity());
+      SmartDashboard.putNumber("Avg Distance", poseEstimate.avgTagDist);
+      SmartDashboard.putNumber("Avg Tag Area", poseEstimate.avgTagArea);
+      SmartDashboard.putNumber("Odom Pose/x", swerveDrive.getPose().getX());
+      SmartDashboard.putNumber("Odom Pose/y", swerveDrive.getPose().getY());
+      SmartDashboard.putNumber("Odom Pose/degrees", swerveDrive.getPose().getRotation().getDegrees());
+      SmartDashboard.putNumber("Limelight Pose/x", poseEstimate.pose.getX());
+      SmartDashboard.putNumber("Limelight Pose/y", poseEstimate.pose.getY());
+      SmartDashboard.putNumber("Limelight Pose/degrees", poseEstimate.pose.toPose2d().getRotation().getDegrees());
+      if (result.valid && poseEstimate.hasData)
+      {
+        Pose2d estimatorPose = poseEstimate.pose.toPose2d();
+        Pose2d usefulPose    = result.getBotPose2d(Alliance.Blue);
+//        swerveDrive.addVisionMeasurement(usefulPose, result.timestamp_RIOFPGA_capture);
+//        swerveDrive.addVisionMeasurement(estimatorPose, poseEstimate.timestampSeconds);
+      }
+    }
     // This method will be called once per scheduler run
   }
 
@@ -345,7 +405,10 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putString("Station Targetted Pose without Offset (Meters)", startingPose.toString());
       Pose2d scorePose = startingPose.plus(Left.offset);
       SmartDashboard.putString("Station Targetted Pose with Offset (Meters)", scorePose.toString());
-      return Commands.either(driveToPose(AllianceFlipUtil.flip(scorePose)), driveToPose(scorePose), ()->DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red);
+      return Commands.either(driveToPose(AllianceFlipUtil.flip(scorePose)),
+                             driveToPose(scorePose),
+                             () -> DriverStation.getAlliance().isPresent() &&
+                                   DriverStation.getAlliance().get() == Alliance.Red);
 
     });
   }
@@ -357,7 +420,10 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putString("Station Targetted Pose without Offset (Meters)", startingPose.toString());
       Pose2d scorePose = startingPose.plus(Setpoints.AutoScoring.HumanPlayer.Right.offset);
       SmartDashboard.putString("Station Targetted Pose with Offset (Meters)", scorePose.toString());
-      return Commands.either(driveToPose(AllianceFlipUtil.flip(scorePose)), driveToPose(scorePose), ()->DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red);
+      return Commands.either(driveToPose(AllianceFlipUtil.flip(scorePose)),
+                             driveToPose(scorePose),
+                             () -> DriverStation.getAlliance().isPresent() &&
+                                   DriverStation.getAlliance().get() == Alliance.Red);
 
     });
   }
@@ -369,7 +435,10 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putString("Processor Targetted Pose without Offset (Meters)", startingPose.toString());
       Pose2d scorePose = startingPose.plus(AutoScoring.Processor.offset);
       SmartDashboard.putString("Processor Targetted Pose with Offset (Meters)", scorePose.toString());
-      return Commands.either(driveToPose(AllianceFlipUtil.flip(scorePose)), driveToPose(scorePose), ()->DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red);
+      return Commands.either(driveToPose(AllianceFlipUtil.flip(scorePose)),
+                             driveToPose(scorePose),
+                             () -> DriverStation.getAlliance().isPresent() &&
+                                   DriverStation.getAlliance().get() == Alliance.Red);
 
     });
   }
@@ -378,14 +447,14 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
-    }).finallyDo(()->swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+    }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
   }
 
   public Command driveBackwards()
   {
     return run(() -> {
       swerveDrive.drive(new Translation2d(-1, 0), 0, false, false);
-    }).finallyDo(()->swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+    }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
   }
 
   public Command lockPos()
