@@ -168,7 +168,6 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
-    DriverStation.silenceJoystickConnectionWarning(true);
      setDefaultCommands();
      configureBindings();
     SmartDashboard.putData(CommandScheduler.getInstance());
@@ -177,7 +176,7 @@ public class RobotContainer
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
 
-    boolean climberTesting = true;
+    boolean climberTesting = false;
     if(climberTesting)
     {
       m_driverController.y().whileTrue(climb.up());
@@ -302,8 +301,8 @@ public class RobotContainer
                                                   .alongWith(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.L4)
                                                   .until(elevator.aroundCoralL4()
                                                   .and(coralArm.aroundCoralL4())))));
-    NamedCommands.registerCommand("climber UP", Commands.print("Climber UP"));
-    NamedCommands.registerCommand("climber DOWN", Commands.print("Climber DOWN"));
+    NamedCommands.registerCommand("climber UP", climb.up());
+    NamedCommands.registerCommand("climber DOWN", climb.down());
   }
 
   //ROBOT CONTAINER ^
@@ -328,6 +327,8 @@ public class RobotContainer
     m_driverController.leftBumper()
                       .whileFalse(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.8)));//Fast mode
 
+    m_driverController.povUp().whileTrue(climb.up());
+    m_driverController.povDown().whileTrue(climb.down());
     m_driverController.y().onTrue(Commands.print("Turn 90 Clockwise"));
     m_driverController.x().onTrue(Commands.print("Turn 90 Counter-Clockwise"));
 

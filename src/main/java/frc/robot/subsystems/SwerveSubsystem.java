@@ -17,6 +17,9 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -51,6 +54,8 @@ import limelight.networktables.LimelightPoseEstimator;
 import limelight.networktables.LimelightResults;
 import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
+
+import org.ejml.simple.SimpleMatrix;
 import org.json.simple.parser.ParseException;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -86,6 +91,7 @@ public class SwerveSubsystem extends SubsystemBase
       throw new RuntimeException(e);
     }
     setupPathPlanner();
+    setupLimelight();
   }
 
 
@@ -94,9 +100,10 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.stopOdometryThread();
     limelight = new Limelight("limelight");
     limelight.getSettings()
+    .withPipelineIndex(0)
              .withCameraOffset(new Pose3d(Units.inchesToMeters(12),
-                                          Units.inchesToMeters(-12),
-                                          0,
+                                          Units.inchesToMeters(12),
+                                          Units.inchesToMeters(10.5),
                                           new Rotation3d(0, 0, Units.degreesToRadians(45))))
              .save();
     limelightPoseEstimator = limelight.getPoseEstimator(true);
@@ -130,21 +137,22 @@ public class SwerveSubsystem extends SubsystemBase
     return false;
   }
 
+  private int outofAreaReading = 0;
+
   @Override
   public void periodic()
   {
 
-    swerveDrive.updateOdometry();
 
     limelight.getSettings()
-             .withRobotOrientation(new Orientation3d(new Rotation3d(swerveDrive.getOdometryHeading()),
+                 .withRobotOrientation(new Orientation3d(new Rotation3d(swerveDrive.getOdometryHeading().rotateBy(Rotation2d.kZero)),
                                                      new AngularVelocity3d(DegreesPerSecond.of(0),
                                                                            DegreesPerSecond.of(0),
                                                                            DegreesPerSecond.of(0))))
              .save();
     Optional<PoseEstimate>     poseEstimates = limelightPoseEstimator.getPoseEstimate();
     Optional<LimelightResults> results       = limelight.getLatestResults();
-    if (results.isPresent() && poseEstimates.isPresent())
+    if (results.isPresent()/* && poseEstimates.isPresent()*/)
     {
       LimelightResults result       = results.get();
       PoseEstimate     poseEstimate = poseEstimates.get();
@@ -159,14 +167,29 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putNumber("Limelight Pose/x", poseEstimate.pose.getX());
       SmartDashboard.putNumber("Limelight Pose/y", poseEstimate.pose.getY());
       SmartDashboard.putNumber("Limelight Pose/degrees", poseEstimate.pose.toPose2d().getRotation().getDegrees());
-      if (result.valid && poseEstimate.hasData)
+      if (result.valid )
       {
-        Pose2d estimatorPose = poseEstimate.pose.toPose2d();
+        // Pose2d estimatorPose = poseEstimate.pose.toPose2d();
         Pose2d usefulPose    = result.getBotPose2d(Alliance.Blue);
-//        swerveDrive.addVisionMeasurement(usefulPose, result.timestamp_RIOFPGA_capture);
+        if(usefulPose.getTranslation().getDistance(swerveDrive.getPose().getTranslation()) < 1 || outofAreaReading > 10)
+        {
+          outofAreaReading = 0;
+          // System.out.println(usefulPose.toString());
+          swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.015,0.02,0.05));
+          // System.out.println(result.timestamp_LIMELIGHT_publish);
+          // System.out.println(result.timestamp_RIOFPGA_capture);
+        swerveDrive.addVisionMeasurement(usefulPose, Timer.getTimestamp());
+        }
+        else
+        {
+          outofAreaReading += 1;
+        }
 //        swerveDrive.addVisionMeasurement(estimatorPose, poseEstimate.timestampSeconds);
       }
+
     }
+    swerveDrive.updateOdometry();
+
     // This method will be called once per scheduler run
   }
 
