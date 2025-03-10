@@ -281,6 +281,11 @@ public class AlgaeArmSubsystem extends SubsystemBase
     return armLoaded.getProximity() < 0.31;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
+  public Trigger algaeLoadedTrigger()
+  {
+    return new Trigger(() -> algaeLoaded());
+  }
+
   public boolean algaeScored()
   {
     return armLoaded.getProximity() > 0.40;//m_algaeInBin.get()|| m_algaeInArm.get();

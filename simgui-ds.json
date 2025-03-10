@@ -1,9 +1,4 @@
 {
-  "Joysticks": {
-    "window": {
-      "visible": false
-    }
-  },
   "Keyboard 0 Settings": {
     "window": {
       "visible": true
@@ -112,6 +107,16 @@
     {
       "guid": "Keyboard2"
     },
+    {
+      "guid": "0300000034120000adbe000000000000"
+    },
+    {
+      "guid": "0300000034120000adbe000000000000"
+    },
+    {
+      "guid": "0300000034120000adbe000000000000"
+    },
+    {},
     {
       "guid": "Keyboard0"
     }

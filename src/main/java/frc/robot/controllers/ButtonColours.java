@@ -28,6 +28,10 @@ public class ButtonColours {
     public static final Color IsPressed = Color.kOrange;
     public static final Color notSelectedColour = Color.kWhite;
     public static final Color selectedColour = Color.kBlue;
+    public static final Color CoralLoaded = Color.kMediumPurple;
+    public static final Color CoralUnloaded = Color.kWhite;
+    public static final Color AlgaeLoaded = Color.kLimeGreen;
+    public static final Color AlgaeUnloaded = Color.kWhite;
 
 
     }

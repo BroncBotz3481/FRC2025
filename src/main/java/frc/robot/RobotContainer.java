@@ -125,11 +125,26 @@ public class RobotContainer
     coralIntake.setDefaultCommand(coralIntake.wristRest());
     drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
-
+    launchpad.changeLED(2,0, new Color8Bit(ButtonColours.AlgaeColour));
+    launchpad.changeLED(0,1, new Color8Bit(ButtonColours.CoralLevelColour));
+    launchpad.changeLED(0,2, new Color8Bit(ButtonColours.CoralLevelColour));
+    launchpad.changeLED(0,3, new Color8Bit(ButtonColours.CoralLevelColour));
+    launchpad.changeLED(0,4, new Color8Bit(ButtonColours.CoralLevelColour));
     launchpad.changeLED(0,5, new Color8Bit(ButtonColours.notSelectedColour));
     launchpad.changeLED(0,6, new Color8Bit(ButtonColours.notSelectedColour));
     launchpad.changeLED(0,7, new Color8Bit(ButtonColours.notSelectedColour));
     launchpad.changeLED(0,8, new Color8Bit(ButtonColours.notSelectedColour));
+
+    launchpad.changeLED(1,0, new Color8Bit(ButtonColours.AlgaeColour));
+    launchpad.changeLED(1,2, new Color8Bit(ButtonColours.AlgaeColour));
+    launchpad.changeLED(1,3, new Color8Bit(ButtonColours.AlgaeColour));
+    launchpad.changeLED(1,7, new Color8Bit(ButtonColours.AlgaeUnloaded));
+    launchpad.changeLED(1,8, new Color8Bit(ButtonColours.CoralUnloaded));
+
+    launchpad.changeLED(6,1, new Color8Bit(ButtonColours.HP));
+    launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP));
+
+    launchpad.changeLED(7,8, new Color8Bit(ButtonColours.ScoreCoral));
   }
 
   //DEFAULT COMMANDS ^
@@ -150,8 +165,8 @@ public class RobotContainer
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
     DriverStation.silenceJoystickConnectionWarning(true);
-    // setDefaultCommands();
-    // configureBindings();
+     setDefaultCommands();
+     configureBindings();
     SmartDashboard.putData(CommandScheduler.getInstance());
 
 
@@ -303,7 +318,7 @@ public class RobotContainer
 
     // m_driverController.povUp().whileTrue(climb.climbUp());
     // m_driverController.povDown().whileTrue(climb.climbDown());
-
+    
     m_driverController.leftBumper()
                       .whileTrue(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.4))); // Slow mode
     m_driverController.leftBumper()
@@ -316,50 +331,56 @@ public class RobotContainer
 //--------------------------------------------------------------------------------------------------------------------------------------
     //OPERATOR CONTROLS - Launchpad v
 
-    boolean launchpadTesting = false;
+    
+    boolean launchpadTesting = true;
     if (launchpadTesting)
     {
-      
+    
+    coralArm.coralLoadedTrigger().whileFalse( Commands.runOnce(()->launchpad.changeLED(0,8, new Color8Bit(ButtonColours.CoralUnloaded))))
+                                 .whileTrue(Commands.runOnce(()->launchpad.changeLED(0,8, new Color8Bit(ButtonColours.CoralLoaded)))); 
+
+    algaeArm.algaeLoadedTrigger().whileFalse( Commands.runOnce(()->launchpad.changeLED(0,7, new Color8Bit(ButtonColours.AlgaeUnloaded))))
+                                 .whileTrue(Commands.runOnce(()->launchpad.changeLED(0,7, new Color8Bit(ButtonColours.AlgaeLoaded)))); 
     //Colours
 
     //Coral Level Select
-    launchpad.getButton(0, 4).onFalse( Commands.runOnce(()->launchpad.changeLED(0,4, new Color8Bit(ButtonColours.CoralLevelColour))))
+    launchpad.getButton(0, 4).whileFalse( Commands.runOnce(()->launchpad.changeLED(0,4, new Color8Bit(ButtonColours.CoralLevelColour))))
                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,4, new Color8Bit(ButtonColours.IsPressed)))
                                  .alongWith(levelHighlighter1())); 
 
-    launchpad.getButton(0, 3).onFalse( Commands.runOnce(()->launchpad.changeLED(0,3, new Color8Bit(ButtonColours.CoralLevelColour))))
+    launchpad.getButton(0, 3).whileFalse( Commands.runOnce(()->launchpad.changeLED(0,3, new Color8Bit(ButtonColours.CoralLevelColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,3, new Color8Bit(ButtonColours.IsPressed)))
                                   .alongWith(levelHighlighter2()));  
 
-    launchpad.getButton(0, 2).onFalse( Commands.runOnce(()->launchpad.changeLED(0,2, new Color8Bit(ButtonColours.CoralLevelColour))))
+    launchpad.getButton(0, 2).whileFalse( Commands.runOnce(()->launchpad.changeLED(0,2, new Color8Bit(ButtonColours.CoralLevelColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,2, new Color8Bit(ButtonColours.IsPressed)))
                                   .alongWith(levelHighlighter3()));   
                                 
-    launchpad.getButton(0, 1).onFalse( Commands.runOnce(()->launchpad.changeLED(0,1, new Color8Bit(ButtonColours.CoralLevelColour))))
+    launchpad.getButton(0, 1).whileFalse( Commands.runOnce(()->launchpad.changeLED(0,1, new Color8Bit(ButtonColours.CoralLevelColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,1, new Color8Bit(ButtonColours.IsPressed)))
                                   .alongWith(levelHighlighter4()));   
     //Score Coral                              
-    launchpad.getButton(8, 8).onFalse( Commands.runOnce(()->launchpad.changeLED(8,8, new Color8Bit(ButtonColours.ScoreCoral))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,8, new Color8Bit(ButtonColours.IsPressed)))
+    launchpad.getButton(7, 8).whileFalse( Commands.runOnce(()->launchpad.changeLED(7,8, new Color8Bit(ButtonColours.ScoreCoral))))
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(7,8, new Color8Bit(ButtonColours.IsPressed)))
                                   .alongWith(levelDeselect()));    
     //Algae
-    launchpad.getButton(1, 2).onFalse( Commands.runOnce(()->launchpad.changeLED(1,2, new Color8Bit(ButtonColours.AlgaeColour))))
+    launchpad.getButton(1, 2).whileFalse( Commands.runOnce(()->launchpad.changeLED(1,2, new Color8Bit(ButtonColours.AlgaeColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(1,2, new Color8Bit(ButtonColours.IsPressed))));    
          
-    launchpad.getButton(1, 3).onFalse( Commands.runOnce(()->launchpad.changeLED(1,3, new Color8Bit(ButtonColours.AlgaeColour))))
+    launchpad.getButton(1, 3).whileFalse( Commands.runOnce(()->launchpad.changeLED(1,3, new Color8Bit(ButtonColours.AlgaeColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(1,3, new Color8Bit(ButtonColours.IsPressed))));    
                                  
-    launchpad.getButton(0, 0).onFalse( Commands.runOnce(()->launchpad.changeLED(0,0, new Color8Bit(ButtonColours.AlgaeColour))))
+    launchpad.getButton(1, 0).whileFalse( Commands.runOnce(()->launchpad.changeLED(0,0, new Color8Bit(ButtonColours.AlgaeColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(0,0, new Color8Bit(ButtonColours.IsPressed))));    
     
-    launchpad.getButton(1, 0).onFalse( Commands.runOnce(()->launchpad.changeLED(1,0, new Color8Bit(ButtonColours.AlgaeColour))))
+    launchpad.getButton(2, 0).whileFalse( Commands.runOnce(()->launchpad.changeLED(1,0, new Color8Bit(ButtonColours.AlgaeColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(1,0, new Color8Bit(ButtonColours.IsPressed))));    
     //HP
-    launchpad.getButton(7, 1).onFalse( Commands.runOnce(()->launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.HPPressed))));    
+    launchpad.getButton(6, 1).onFalse( Commands.runOnce(()->launchpad.changeLED(6,1, new Color8Bit(ButtonColours.HP))))
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(6,1, new Color8Bit(ButtonColours.HPPressed))));    
 
-    launchpad.getButton(8, 1).onFalse( Commands.runOnce(()->launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.HPPressed))));    
+    launchpad.getButton(7, 1).whileFalse( Commands.runOnce(()->launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP))))
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HPPressed))));    
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -380,7 +401,7 @@ public class RobotContainer
                                                          .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
                                                          );
       //score coral
-      launchpad.getButton(8, 8).whileTrue(scoringSystem.scoreCoral());
+      launchpad.getButton(7, 8).whileTrue(scoringSystem.scoreCoral());
       //Algae Load L23
       launchpad.getButton(1, 2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                          .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
@@ -392,15 +413,15 @@ public class RobotContainer
                                                          .andThen(loadingSystem.algaeLoad()));
 
       //Score Net
-      launchpad.getButton(0, 0).whileTrue(scoringSystem.scoreAlgaeNet());
+      launchpad.getButton(1, 0).whileTrue(scoringSystem.scoreAlgaeNet());
 
       //Score Processor
-      launchpad.getButton(1, 0).whileTrue(scoringSystem.scoreAlgaeProcessor());
+      launchpad.getButton(2, 0).whileTrue(scoringSystem.scoreAlgaeProcessor());
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-      launchpad.getButton(7, 1).whileTrue(drivebase.driveToLeftHP().andThen(loadingSystem.coralLoad()));
-      launchpad.getButton(8, 1).whileTrue(drivebase.driveToRightHP().andThen(loadingSystem.coralLoad()));
+      launchpad.getButton(6, 1).whileTrue(drivebase.driveToLeftHP().andThen(loadingSystem.coralLoad()));
+      launchpad.getButton(7, 1).whileTrue(drivebase.driveToRightHP().andThen(loadingSystem.coralLoad()));
 
       //LAUNCH PAD ^
     } else
