@@ -112,12 +112,10 @@ public class ScoringSystem
 
   public Command scoreAlgaeProcessor()
   {
-    Pose2d startingPose = Processor.centerFace;
-    Pose2d scorePose = startingPose.plus(AutoScoring.Processor.offset);
-
+   
     //set elevator height, set algae angle, spit out ball, drive pose
-    return Commands.either(m_swerve.driveToPose(AllianceFlipUtil.flip(scorePose)), m_swerve.driveToPose(scorePose), ()->DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red)
-                   .andThen(Commands.parallel(m_elevator.AlgaePROCESSOR().repeatedly(),
+return m_swerve.driveToProcessor()
+    .andThen(Commands.parallel(m_elevator.AlgaePROCESSOR().repeatedly(),
                                               m_algaeArm.PROCESSOR().repeatedly(),
                                               m_swerve.lockPos())
                                     .until(m_elevator.aroundAlgaePROCESSOR().and(m_algaeArm.aroundPROCESSORAngle()))

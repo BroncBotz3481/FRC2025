@@ -369,7 +369,8 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putString("Processor Targetted Pose without Offset (Meters)", startingPose.toString());
       Pose2d scorePose = startingPose.plus(AutoScoring.Processor.offset);
       SmartDashboard.putString("Processor Targetted Pose with Offset (Meters)", scorePose.toString());
-      return driveToPose(scorePose);
+      return Commands.either(driveToPose(AllianceFlipUtil.flip(scorePose)), driveToPose(scorePose), ()->DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red);
+
     });
   }
 
