@@ -1,13 +1,20 @@
 package frc.robot.systems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Setpoints.AutoScoring;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.systems.field.AllianceFlipUtil;
+import frc.robot.systems.field.FieldConstants;
+import frc.robot.systems.field.FieldConstants.Processor;
 import swervelib.SwerveInputStream;
 
 
@@ -105,8 +112,11 @@ public class ScoringSystem
 
   public Command scoreAlgaeProcessor()
   {
+    Pose2d startingPose = Processor.centerFace;
+    Pose2d scorePose = startingPose.plus(AutoScoring.Processor.offset);
+
     //set elevator height, set algae angle, spit out ball, drive pose
-    return m_swerve.driveToProcessor()
+    return Commands.either(m_swerve.driveToPose(AllianceFlipUtil.flip(scorePose)), m_swerve.driveToPose(scorePose), ()->DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red)
                    .andThen(Commands.parallel(m_elevator.AlgaePROCESSOR().repeatedly(),
                                               m_algaeArm.PROCESSOR().repeatedly(),
                                               m_swerve.lockPos())
