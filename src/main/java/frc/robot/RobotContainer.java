@@ -516,50 +516,57 @@ public class RobotContainer
       launchpad.getButton(8,1).whileTrue(algaeArm.setAlgaeArmAngle(-60));
 
       //LAUNCH PAD ^
-    } else
-    { //--------------------------------------------------------------------------------------------------------------------
+    }
+      //--------------------------------------------------------------------------------------------------------------------
       //SIM BUTTON CONTROLS v
 
       //L1 Score Coral
-      m_OperatorController1.button(1).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                               .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
-                                                               );
-      //L2 Score Coral
-      m_OperatorController1.button(2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                               .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
-                                                               );
-      //L3 Score Coral
-      m_OperatorController1.button(3).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                               .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                               );
-      //L4 Score Coral
-      m_OperatorController1.button(4).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                               .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                               );
+      m_OperatorController1.a().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                        .andThen( Commands.runOnce(() ->
+                                                        drivebase.getSwerveDrive().field.getObject("target")))
+                                                        .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
+                                                        );
 
-      m_OperatorController1.button(5).whileTrue(scoringSystem.scoreCoral());
-      //Algae Load L23
-      m_OperatorController1.button(11).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                                .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                                .andThen(loadingSystem.algaeLoad()));
+      m_OperatorController1.b().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                        .andThen( Commands.runOnce(() ->
+                                                        drivebase.getSwerveDrive().field.getObject("target")))
+                                                        .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
+                                                        );
+
+      m_OperatorController1.x().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                        .andThen( Commands.runOnce(() ->
+                                                        drivebase.getSwerveDrive().field.getObject("target")))
+                                                        .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+                                                        );
+
+      m_OperatorController1.y().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                                        .andThen( Commands.runOnce(() ->
+                                                        drivebase.getSwerveDrive().field.getObject("target")))
+                                                        .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
+                                                        );
+
+      m_OperatorController1.rightTrigger().whileTrue(scoringSystem.scoreCoral());
+      m_OperatorController1.rightBumper().whileTrue(algaeIntake.out().finallyDo(()->algaeIntake.setAlgaeIntakeRoller(0)));
+
+      m_OperatorController1.povLeft().whileTrue(scoringSystem.scoreAlgaeNet());
+      m_OperatorController1.povRight().whileTrue(algaeArm.PROCESSOR().alongWith(algaeIntake.out()));
+
+      m_OperatorController1.povDown().whileTrue(targetingSystem.setBranchLevel(ReefBranchLevel.L2) 
+                                      .andThen( Commands.runOnce(() ->
+                                      drivebase.getSwerveDrive().field.getObject("target")))
+                                    .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
+                                    .andThen(loadingSystem.algaeLoad()));
 
       //Algae Load L34
-      m_OperatorController1.button(12).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                                .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
-                                                                .andThen(loadingSystem.algaeLoad()));
+      m_OperatorController1.povUp().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                    .andThen( Commands.runOnce(() ->
+                                    drivebase.getSwerveDrive().field.getObject("target")))
+                                  .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
+                                  .andThen(loadingSystem.algaeLoad()));
 
-      //Score Net
-      m_OperatorController1.button(13).onTrue(scoringSystem.scoreAlgaeNet());
-
-      //Score Processor
-      m_OperatorController1.button(14).onTrue(scoringSystem.scoreAlgaeProcessor());
-
-      m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
-
-      m_OperatorController1.button(15).whileTrue(drivebase.driveToLeftHP().andThen(loadingSystem.coralLoad()));
-      m_OperatorController1.button(16).whileTrue(drivebase.driveToRightHP().andThen(loadingSystem.coralLoad()));
-
-    }
+      m_OperatorController1.leftTrigger().whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP)
+                                        .alongWith(coralIntake.wristIntake()));
+    
   }
 
 //END OF CONFIG BINDINGS ^
