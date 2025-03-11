@@ -13,6 +13,7 @@ import au.grapplerobotics.CanBridge;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -357,8 +358,8 @@ public class RobotContainer
 
     m_driverController.povUp().whileTrue(climb.up());
     m_driverController.povDown().whileTrue(climb.down());
-    m_driverController.y().onTrue(Commands.print("Turn 90 Clockwise"));
-    m_driverController.x().onTrue(Commands.print("Turn 90 Counter-Clockwise"));
+    //m_driverController.y().onTrue(drivebase.rotateToHeading((Rotation2d.fromDegrees(90))).withTimeout(1));
+    m_driverController.button(1).onTrue(Commands.print("Turn 90 Counter-Clockwise"));
 
     m_driverController.b().onTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                   .andThen( Commands.runOnce(() ->

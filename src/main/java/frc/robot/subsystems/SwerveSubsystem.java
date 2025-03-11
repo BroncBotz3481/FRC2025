@@ -501,4 +501,13 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.drive(driveAngularVelocity.get());
     });
   }
+
+ 
+  public Command rotateToHeading(Rotation2d rotation2d)
+  {
+    return run(() -> swerveDrive.drive(new Translation2d(0, 0), 
+    swerveDrive.getSwerveController().headingCalculate(getHeading().getRadians(), getHeading().getRadians() - rotation2d.getRadians()),
+     false, true));
+  }
+
 }
