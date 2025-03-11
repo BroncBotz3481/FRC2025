@@ -32,6 +32,10 @@ public class ButtonColours {
     public static final Color CoralUnloaded = Color.kWhite;
     public static final Color AlgaeLoaded = Color.kLimeGreen;
     public static final Color AlgaeUnloaded = Color.kWhite;
+    public static final Color AlgaeOuttake = Color.kLimeGreen;
+    public static final Color CoralOuttake = Color.kMediumPurple;
+    public static final Color LimbsDown = Color.kAzure;
+
 
 
     }
