@@ -158,7 +158,8 @@ public class RobotContainer
     launchpad.changeLED(7,2, new Color8Bit(ButtonColours.HP));
     launchpad.changeLED(7,8, new Color8Bit(ButtonColours.ScoreCoral));
 
-    launchpad.changeLED(8, 1, new Color8Bit(ButtonColours.LimbsDown));
+    launchpad.changeLED(8, 1, new Color8Bit(Color.kLimeGreen));
+    launchpad.changeLED(8, 1, new Color8Bit(Color.kMediumPurple));
   }
 
   //DEFAULT COMMANDS ^
@@ -424,8 +425,11 @@ public class RobotContainer
     launchpad.getButton(7, 1).whileFalse( Commands.runOnce(()->launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HPPressed))));
 
-    launchpad.getButton(8, 1).whileFalse( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.LimbsDown))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.IsPressed))));    
+    launchpad.getButton(8, 1).whileFalse( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(Color.kLimeGreen))))
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.IsPressed))));
+                                  
+    launchpad.getButton(8, 2).whileFalse( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(Color.kMediumPurple))))
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.IsPressed))));  
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -484,7 +488,8 @@ public class RobotContainer
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
       launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly().alongWith(coralIntake.wristIntake()));
-      launchpad.getButton(8, 1).whileTrue(coralArm.setCoralArmAngle(-60).alongWith(algaeArm.setAlgaeArmAngle(-60)));
+      launchpad.getButton(8, 2).whileTrue(coralArm.setCoralArmAngle(-60));
+      launchpad.getButton(8,1).whileTrue(algaeArm.setAlgaeArmAngle(-60));
 
       //LAUNCH PAD ^
     } else
