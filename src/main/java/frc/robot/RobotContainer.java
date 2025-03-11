@@ -127,11 +127,11 @@ public class RobotContainer
   public void setDefaultCommands()
   {
     elevator.setDefaultCommand((elevator.setGoal(0.003)));
-    algaeArm.setDefaultCommand(algaeArm.setGoal(-50));
+    algaeArm.setDefaultCommand(algaeArm.hold());
     coralArm.setDefaultCommand(coralArm.hold());
     climb.setDefaultCommand(climb.setPOwer(0));
-    // coralIntake.setDefaultCommand(Commands.either(coralIntake.wristIntake(), coralIntake.wristRest(), coralArm::coralLoaded));
-    // algaeIntake.setDefaultCommand(Commands.either(algaeIntake.in(), algaeIntake.setAlgaeIntakeRoller(0), algaeArm::algaeLoaded));
+    coralIntake.setDefaultCommand(Commands.either(coralIntake.wristIntake(), coralIntake.wristRest(), coralArm::coralLoaded));
+    algaeIntake.setDefaultCommand(Commands.either(algaeIntake.in(), algaeIntake.setAlgaeIntakeRoller(0), algaeArm::algaeLoaded));
     // drivebase.setDefaultCommand(drivebase.driveFieldOriented(driveDirectAngle));
     drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
@@ -293,9 +293,9 @@ public class RobotContainer
       m_driverController.y().whileTrue(coralArm.setCoralArmAngle(36.14)); // l3
       m_OperatorController1.start().whileTrue(coralArm.setGoal(10)); // l2
       m_driverController.a().whileTrue(coralArm.setCoralArmAngle(90)); 
-      // m_OperatorController1.povDown().whileTrue(coralArm.score());
+      m_OperatorController1.povDown().whileTrue(coralArm.score());
 
-      m_driverController.a().whileTrue(coralArm.runSysIdRoutine());
+      // m_driverController.button(2).whileTrue(coralArm.runSysIdRoutine());
       // m_driverController.button(3).whileTrue(coralArm.setCoralArmAngle(90).repeatedly());
       // m_driverController.button(4).whileTrue(coralArm.setCoralArmAngle(50).repeatedly());
       // m_driverController.button(5).whileTrue(coralArm.setCoralArmAngle(-30).repeatedly());
@@ -352,9 +352,9 @@ public class RobotContainer
     // m_driverController.povDown().whileTrue(climb.climbDown());
     
     m_driverController.leftBumper()
-                      .onTrue(Commands.runOnce(() -> driveAngularVelocity.scaleTranslation(0.4))); // Slow mode
-    m_driverController.rightBumper()
-                      .onTrue(Commands.runOnce(() -> driveAngularVelocity.scaleTranslation(0.8)));//Fast mode
+                      .whileTrue(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.4))); // Slow mode
+    m_driverController.leftBumper()
+                      .whileFalse(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.8)));//Fast mode
 
     m_driverController.povUp().whileTrue(climb.up());
     m_driverController.povDown().whileTrue(climb.down());
@@ -460,7 +460,7 @@ public class RobotContainer
                                                         );
 
       launchpad.getButton(3, 0).whileTrue(coralIntake.wristOuttake());
-      launchpad.getButton(4, 0).whileTrue(algaeIntake.out().finallyDo(()->algaeIntake.setAlgaeIntakeRoller(0)));
+      launchpad.getButton(4, 0).whileTrue(algaeIntake.out());
 
       //score coral
       launchpad.getButton(7, 8).whileTrue(scoringSystem.scoreCoral());
@@ -468,14 +468,14 @@ public class RobotContainer
      
 
       //Algae Load L23
-      launchpad.getButton(1, 3).whileTrue(targetingSystem.setBranchLevel(ReefBranchLevel.L2) 
+      launchpad.getButton(1, 2).whileTrue(targetingSystem.setBranchLevel(ReefBranchLevel.L2) 
                                                           .andThen( Commands.runOnce(() ->
                                                           drivebase.getSwerveDrive().field.getObject("target")))
                                                          .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
                                                          .andThen(loadingSystem.algaeLoad()));
 
       //Algae Load L34
-      launchpad.getButton(1, 2).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+      launchpad.getButton(1, 3).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
                                                           .andThen( Commands.runOnce(() ->
                                                           drivebase.getSwerveDrive().field.getObject("target")))
                                                          .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
@@ -488,30 +488,7 @@ public class RobotContainer
       launchpad.getButton(2, 0).whileTrue(algaeArm.PROCESSOR().alongWith(algaeIntake.out()));
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
-      launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP)
-      .alongWith(coralIntake.wristIntake()));
-      launchpad.getButton(4, 3).whileTrue(coralIntake.wristIntake());
-      launchpad.changeLED(4, 3, new Color8Bit(Color.kRed));
-      launchpad.getButton(5, 3).whileTrue(coralIntake.wristRest());
-      launchpad.changeLED(5, 3, new Color8Bit(Color.kBlue));
-      launchpad.getButton(6, 3).whileTrue(coralIntake.wristOuttake());
-      launchpad.changeLED(6, 3, new Color8Bit(Color.kWhite));
-
-      launchpad.getButton(4, 4).whileTrue(algaeIntake.in());
-      launchpad.changeLED(4, 4, new Color8Bit(Color.kRed));
-      launchpad.getButton(5, 4).whileTrue(algaeIntake.setAlgaeIntakeRoller(0));
-      launchpad.changeLED(5, 4, new Color8Bit(Color.kBlue));
-      launchpad.getButton(6, 4).whileTrue(algaeIntake.out());
-      launchpad.changeLED(6, 4, new Color8Bit(Color.kWhite));
-
-      launchpad.getButton(4, 4).whileTrue(elevator.setPower(0.5).unless(elevator.atMax));
-      launchpad.changeLED(4, 4, new Color8Bit(Color.kRed));
-      launchpad.getButton(5, 4).whileTrue(elevator.hold());
-      launchpad.changeLED(5, 4, new Color8Bit(Color.kBlue));
-      launchpad.getButton(6, 4).whileTrue(elevator.setPower(-0.4).unless(elevator.atMin));
-      launchpad.changeLED(6, 4, new Color8Bit(Color.kWhite));
-
-
+      launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly().alongWith(coralIntake.wristIntake()));
       launchpad.getButton(8, 2).whileTrue(coralArm.setCoralArmAngle(-60));
       launchpad.getButton(8,1).whileTrue(algaeArm.setAlgaeArmAngle(-60));
 

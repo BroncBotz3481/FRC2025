@@ -149,9 +149,9 @@ public final class Constants
   {
 
     // The P gain for the PID controller that drives this arm.
-    public static final double kCoralArmKp               = 0.54152;
+    public static final double kCoralArmKp               = 0.74152;
     public static final double kCoralArmKi               = 0;
-    public static final double kCoralArmKd               = 0.08863;
+    public static final double kCoralArmKd               = 0.07863;
     public static final double kCoralArmkS               = 0.19214; // volts (V)
     public static final double kCoralArmKv               = 0.11319; // volts per velocity (V/RPM)
     public static final double kCoralArmKa               = 0.028083; // volts per acceleration (V/(RPM/s))
