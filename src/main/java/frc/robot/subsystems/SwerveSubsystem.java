@@ -17,11 +17,10 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -58,8 +57,6 @@ import limelight.networktables.LimelightPoseEstimator;
 import limelight.networktables.LimelightResults;
 import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
-
-import org.ejml.simple.SimpleMatrix;
 import org.json.simple.parser.ParseException;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -104,12 +101,12 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.stopOdometryThread();
     limelight = new Limelight("limelight");
     limelight.getSettings()
-    .withPipelineIndex(0)
+             .withPipelineIndex(0)
              .withCameraOffset(new Pose3d(Units.inchesToMeters(12),
                                           Units.inchesToMeters(12),
                                           Units.inchesToMeters(10.5),
                                           new Rotation3d(0, 0, Units.degreesToRadians(45))))
-             .withArilTagIdFilter(List.of(17.0,18.0,19.0,20.0,21.0,22.0,6.0,7.0,8.0,9.0,10.0,11.0))
+             .withArilTagIdFilter(List.of(17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0))
              .save();
     limelightPoseEstimator = limelight.getPoseEstimator(true);
 
@@ -142,16 +139,16 @@ public class SwerveSubsystem extends SubsystemBase
     return false;
   }
 
-  private int outofAreaReading = 0;
-  private boolean initialReading = false;
+  private int     outofAreaReading = 0;
+  private boolean initialReading   = false;
 
   @Override
   public void periodic()
   {
 
-
     limelight.getSettings()
-                 .withRobotOrientation(new Orientation3d(new Rotation3d(swerveDrive.getOdometryHeading().rotateBy(Rotation2d.kZero)),
+             .withRobotOrientation(new Orientation3d(new Rotation3d(swerveDrive.getOdometryHeading()
+                                                                               .rotateBy(Rotation2d.kZero)),
                                                      new AngularVelocity3d(DegreesPerSecond.of(0),
                                                                            DegreesPerSecond.of(0),
                                                                            DegreesPerSecond.of(0))))
@@ -173,23 +170,24 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putNumber("Limelight Pose/x", poseEstimate.pose.getX());
       SmartDashboard.putNumber("Limelight Pose/y", poseEstimate.pose.getY());
       SmartDashboard.putNumber("Limelight Pose/degrees", poseEstimate.pose.toPose2d().getRotation().getDegrees());
-      if (result.valid )
+      if (result.valid)
       {
         // Pose2d estimatorPose = poseEstimate.pose.toPose2d();
-        Pose2d usefulPose    = result.getBotPose2d(Alliance.Blue);
+        Pose2d usefulPose     = result.getBotPose2d(Alliance.Blue);
         double distanceToPose = usefulPose.getTranslation().getDistance(swerveDrive.getPose().getTranslation());
-        if( distanceToPose < 0.5 || (outofAreaReading>10)|| (outofAreaReading > 10 && !initialReading))
+        if (distanceToPose < 0.5 || (outofAreaReading > 10) || (outofAreaReading > 10 && !initialReading))
         {
-          if(!initialReading)
+          if (!initialReading)
+          {
             initialReading = true;
+          }
           outofAreaReading = 0;
           // System.out.println(usefulPose.toString());
-          swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.05,0.05,0.022));
+          swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.05, 0.05, 0.022));
           // System.out.println(result.timestamp_LIMELIGHT_publish);
           // System.out.println(result.timestamp_RIOFPGA_capture);
-        swerveDrive.addVisionMeasurement(usefulPose, Timer.getTimestamp());
-        }
-        else
+          swerveDrive.addVisionMeasurement(usefulPose, Timer.getTimestamp());
+        } else
         {
           outofAreaReading += 1;
         }
@@ -316,18 +314,19 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command driveToPose(Supplier<Pose2d> pose)
   {
+    PPHolonomicDriveController holo = new PPHolonomicDriveController(
+        // PPHolonomicController is the built in path following controller for holonomic drive trains
+        new PIDConstants(5.0, 0.0, 0.0),
+        // Translation PID constants
+        new PIDConstants(5.0, 0.0, 0.0)
+        // Rotation PID constants
+    );
     return defer(() -> {
-// Create the constraints to use while pathfinding
-      PathConstraints constraints = new PathConstraints(
-          0.5, 0.25,
-          Degrees.of(90).per(Second).in(RadiansPerSecond), Units.degreesToRadians(10));
-
-// Since AutoBuilder is configured, we can use it to build pathfinding commands
-      return AutoBuilder.pathfindToPose(
-          pose.get(),
-          constraints,
-          edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
-                                       );
+      PathPlannerTrajectoryState state = new PathPlannerTrajectoryState();
+      return startRun(() -> {
+        holo.reset(swerveDrive.getPose(), swerveDrive.getRobotVelocity());
+        state.pose = pose.get();
+      }, () -> swerveDrive.drive(holo.calculateRobotRelativeSpeeds(swerveDrive.getPose(), state)));
     });
   }
 
@@ -335,8 +334,8 @@ public class SwerveSubsystem extends SubsystemBase
   {
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        swerveDrive.getMaximumChassisVelocity(), 4.0,
-        swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+        0.5, 0.25,
+        Degrees.of(90).per(Second).in(RadiansPerSecond), Units.degreesToRadians(10));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
     return AutoBuilder.pathfindToPose(
@@ -502,12 +501,14 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
- 
+
   public Command rotateToHeading(Rotation2d rotation2d)
   {
-    return run(() -> swerveDrive.drive(new Translation2d(0, 0), 
-    swerveDrive.getSwerveController().headingCalculate(getHeading().getRadians(), getHeading().getRadians() - rotation2d.getRadians()),
-     false, true));
+    return run(() -> swerveDrive.drive(new Translation2d(0, 0),
+                                       swerveDrive.getSwerveController().headingCalculate(getHeading().getRadians(),
+                                                                                          getHeading().getRadians() -
+                                                                                          rotation2d.getRadians()),
+                                       false, true));
   }
 
 }
