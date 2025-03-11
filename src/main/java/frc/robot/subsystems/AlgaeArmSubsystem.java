@@ -278,7 +278,8 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeLoaded()
   {
-    return armLoaded.getProximity() < 0.35;//m_algaeInBin.get()|| m_algaeInArm.get();
+    SmartDashboard.putNumber("Algae Sensor", armLoaded.getProximity());
+    return armLoaded.getProximity() < 0.1;//m_algaeInBin.get()|| m_algaeInArm.get();
   }
 
   public Trigger algaeLoadedTrigger()

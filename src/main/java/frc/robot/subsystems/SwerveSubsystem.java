@@ -21,6 +21,8 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -312,21 +314,40 @@ public class SwerveSubsystem extends SubsystemBase
         3.0, 5.0, 3.0);
   }
 
+  public ChassisSpeeds limitSpeeds(ChassisSpeeds speeds, double translationMeters)
+  {
+    speeds.vxMetersPerSecond = Math.min(speeds.vxMetersPerSecond, translationMeters);
+    speeds.vyMetersPerSecond = Math.min(speeds.vyMetersPerSecond, translationMeters);
+    return speeds;
+  }
+
   public Command driveToPose(Supplier<Pose2d> pose)
   {
     PPHolonomicDriveController holo = new PPHolonomicDriveController(
         // PPHolonomicController is the built in path following controller for holonomic drive trains
-        new PIDConstants(5.0, 0.0, 0.0),
+        new PIDConstants(5, 0.0, 0.7),
         // Translation PID constants
-        new PIDConstants(5.0, 0.0, 0.0)
+        new PIDConstants(4, 0.0, 0.0)
         // Rotation PID constants
     );
+
+    double toleranceINMEters = 0.15;
+    double toleranceInDegrees = 5;
+    boolean close = false;
     return defer(() -> {
+      if(close){
       PathPlannerTrajectoryState state = new PathPlannerTrajectoryState();
       return startRun(() -> {
         holo.reset(swerveDrive.getPose(), swerveDrive.getRobotVelocity());
         state.pose = pose.get();
-      }, () -> swerveDrive.drive(holo.calculateRobotRelativeSpeeds(swerveDrive.getPose(), state)));
+      }, () -> swerveDrive.drive(limitSpeeds(holo.calculateRobotRelativeSpeeds(swerveDrive.getPose(), state), 0.7)))
+      .until(()->swerveDrive.getPose().getTranslation().getDistance(pose.get().getTranslation()) < toleranceINMEters && 
+      swerveDrive.getPose().getRotation().minus(pose.get().getRotation()).getDegrees() < toleranceInDegrees)
+      .andThen(lockPos());
+    }else
+    {
+      return driveToPose(pose.get());
+    }
     });
   }
 
@@ -334,7 +355,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        0.5, 0.25,
+        0.7, 0.3,
         Degrees.of(90).per(Second).in(RadiansPerSecond), Units.degreesToRadians(10));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
