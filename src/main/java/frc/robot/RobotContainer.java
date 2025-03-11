@@ -359,6 +359,11 @@ public class RobotContainer
     m_driverController.y().onTrue(Commands.print("Turn 90 Clockwise"));
     m_driverController.x().onTrue(Commands.print("Turn 90 Counter-Clockwise"));
 
+    m_driverController.b().onTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+                                  .andThen( Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject("target")))
+                                  );
+
     //DRIVER CONTROLS ^
 //--------------------------------------------------------------------------------------------------------------------------------------
     //OPERATOR CONTROLS - Launchpad v
