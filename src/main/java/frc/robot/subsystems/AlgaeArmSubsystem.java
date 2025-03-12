@@ -285,14 +285,10 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeLoaded()
   {
-<<<<<<< HEAD
-    return armLoaded.getProximity() < 0.35;//m_algaeInBin.get()|| m_algaeInArm.get();
-=======
     Measurement measurement = armLoaded.getMeasurement();
     if(measurement != null && measurement.status == LASERCAN_STATUS_VALID_MEASUREMENT)
       return measurement.distance_mm < 50;
     return false;
->>>>>>> cc3b9199d8f62e6be54873e03d0fc248292cc253
   }
 
   public Trigger algaeLoadedTrigger()

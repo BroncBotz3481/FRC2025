@@ -166,11 +166,7 @@ public final class Constants
     public static final Angle   kCoralArmMinAngle               = Degrees.of(-86);
     public static final Angle   kCoralArmMaxAngle               = Degrees.of(92);
     public static final double  kCoralArmRampRate               = 0.5;
-<<<<<<< HEAD
-    public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(293);
-=======
     public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(180);
->>>>>>> cc3b9199d8f62e6be54873e03d0fc248292cc253
     public static final boolean kCoralArmInverted               = true;
     public static final double  kCoralArmMaxVelocityRPM
                                                                 = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(

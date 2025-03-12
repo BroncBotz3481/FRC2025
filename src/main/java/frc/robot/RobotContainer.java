@@ -128,13 +128,6 @@ public class RobotContainer
   public void setDefaultCommands()
   {
     elevator.setDefaultCommand((elevator.setGoal(0.003)));
-<<<<<<< HEAD
-    algaeArm.setDefaultCommand(algaeArm.hold());
-    coralArm.setDefaultCommand(coralArm.hold());
-    climb.setDefaultCommand(climb.setPOwer(0));
-    coralIntake.setDefaultCommand(Commands.either(coralIntake.wristIntake(), coralIntake.wristRest(), coralArm::coralLoaded));
-    algaeIntake.setDefaultCommand(Commands.either(algaeIntake.in(), algaeIntake.setAlgaeIntakeRoller(0), algaeArm::algaeLoaded));
-=======
     algaeArm.setDefaultCommand(algaeArm.setGoal(-30));
     coralArm.setDefaultCommand(coralArm.setGoal(-30));
     climb.setDefaultCommand(climb.setPOwer(0));
@@ -142,7 +135,6 @@ public class RobotContainer
     coralIntake.setDefaultCommand(coralIntake.hold(coralArm::coralLoaded));
     // coralIntake.setDefaultCommand(Commands.either(coralIntake.wristIntake(), coralIntake.wristRest(), coralArm::coralLoaded));
     // algaeIntake.setDefaultCommand(Commands.either(algaeIntake.in(), algaeIntake.setAlgaeIntakeRoller(0), algaeArm::algaeLoaded));
->>>>>>> cc3b9199d8f62e6be54873e03d0fc248292cc253
     // drivebase.setDefaultCommand(drivebase.driveFieldOriented(driveDirectAngle));
     drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
@@ -501,9 +493,9 @@ public class RobotContainer
       launchpad.getButton(2, 0).whileTrue(algaeArm.PROCESSOR().repeatedly().alongWith(Commands.waitSeconds(0.3).andThen(algaeIntake.out())));
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
-<<<<<<< HEAD
+
       launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly().alongWith(coralIntake.wristIntake()));
-=======
+
       launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).alongWith(coralIntake.wristIntake()));
       launchpad.getButton(4, 3).whileTrue(coralIntake.wristIntake());
       launchpad.changeLED(4, 3, new Color8Bit(Color.kRed));
@@ -536,7 +528,7 @@ public class RobotContainer
 
 
 
->>>>>>> cc3b9199d8f62e6be54873e03d0fc248292cc253
+
       launchpad.getButton(8, 2).whileTrue(coralArm.setCoralArmAngle(-60));
       launchpad.getButton(8,1).whileTrue(algaeArm.setAlgaeArmAngle(-60));
 
