@@ -173,7 +173,7 @@ public class RobotContainer
 
 
     launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP));
-    launchpad.changeLED(7,2, new Color8Bit(ButtonColours.HP));
+
     launchpad.changeLED(7,8, new Color8Bit(ButtonColours.ScoreCoral));
 
     launchpad.changeLED(8, 1, new Color8Bit(Color.kLimeGreen));
@@ -512,11 +512,11 @@ public class RobotContainer
 
       launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).alongWith(coralIntake.wristIntake()));
       launchpad.getButton(4, 3).whileTrue(coralIntake.wristIntake());
-      launchpad.changeLED(4, 3, new Color8Bit(Color.kDarkMagenta));
+      launchpad.changeLED(4, 3, new Color8Bit(Color.kRed));
       launchpad.getButton(5, 3).whileTrue(coralIntake.wristScore());
-      launchpad.changeLED(5, 3, new Color8Bit(Color.kBlue));
+      launchpad.changeLED(5, 3, new Color8Bit(Color.kWhite));
       launchpad.getButton(6, 3).whileTrue(coralIntake.wristOuttake());
-      launchpad.changeLED(6, 3, new Color8Bit(Color.kWhite));
+      launchpad.changeLED(6, 3, new Color8Bit(Color.kPurple));
 
       launchpad.getButton(4, 4).whileTrue(algaeIntake.in());
       launchpad.changeLED(4, 4, new Color8Bit(Color.kDarkGreen));
@@ -526,13 +526,13 @@ public class RobotContainer
       launchpad.changeLED(6, 4, new Color8Bit(Color.kLimeGreen));
 
       launchpad.getButton(4, 5).whileTrue(elevator.setPower(0.5).unless(elevator.atMax));
-      launchpad.changeLED(4, 5, new Color8Bit(Color.kLightBlue));
+      launchpad.changeLED(4, 5, new Color8Bit(Color.kYellow));
       launchpad.getButton(5,5).whileTrue(elevator.hold());
       launchpad.changeLED(5,5, new Color8Bit(Color.kWhite));
       launchpad.getButton(6,5).whileTrue(elevator.setPower(-0.4).unless(elevator.atMin));
-      launchpad.changeLED(6, 5, new Color8Bit(Color.kDarkBlue));
+      launchpad.changeLED(6, 5, new Color8Bit(Color.kChocolate));
 
-      launchpad.changeLED(6,8, new Color8Bit(Color.kMintcream));
+      launchpad.changeLED(6,8, new Color8Bit(Color.kGreen));
       launchpad.getButton(6,8).whileTrue(elevator.setElevatorHeight(0.3).repeatedly().alongWith(Commands.waitSeconds(0.3)
       .andThen(algaeArm.setAlgaeArmAngle(-20).repeatedly())));
 
