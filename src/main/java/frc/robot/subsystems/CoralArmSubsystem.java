@@ -303,7 +303,7 @@ public class CoralArmSubsystem extends SubsystemBase
 
   public void setAngleEncoderPosition(Angle degrees)
   {
-    m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(degrees.minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
+    m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(degrees)
                                   .in(Rotations));
   }
 
