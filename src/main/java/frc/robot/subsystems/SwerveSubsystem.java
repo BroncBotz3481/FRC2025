@@ -317,6 +317,11 @@ public class SwerveSubsystem extends SubsystemBase
     return defer(() -> driveToPose(pose.get()));
   }
 
+  public Command printCurrentPose()
+  {
+    return Commands.deferredProxy(()->Commands.print("Current Pose: "+getPose().toString()));
+  }
+
   public Command driveToPose(Pose2d pose)
   {
 // Create the constraints to use while pathfinding
