@@ -315,8 +315,7 @@ public class SwerveSubsystem extends SubsystemBase
   public Command driveToPose(Supplier<Pose2d> pose)
   {
     double tooCloseMeters = 0.5; // If the bot is too close by this much it needs to drive back a little bit.
-    return defer(() -> Commands.either(driveBackwards().withTimeout(0.1).andThen(driveToPose(pose.get())),driveToPose(pose.get()),
-                                       ()->getPose().getTranslation().getDistance(pose.get().getTranslation()) < tooCloseMeters));
+    return defer(() -> driveToPose(pose.get()));
   }
 
   public Command printCurrentPose()
