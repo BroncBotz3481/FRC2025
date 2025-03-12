@@ -314,20 +314,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command driveToPose(Supplier<Pose2d> pose)
   {
-    PPHolonomicDriveController holo = new PPHolonomicDriveController(
-        // PPHolonomicController is the built in path following controller for holonomic drive trains
-        new PIDConstants(5.0, 0.0, 0.0),
-        // Translation PID constants
-        new PIDConstants(5.0, 0.0, 0.0)
-        // Rotation PID constants
-    );
-    return defer(() -> {
-      PathPlannerTrajectoryState state = new PathPlannerTrajectoryState();
-      return startRun(() -> {
-        holo.reset(swerveDrive.getPose(), swerveDrive.getRobotVelocity());
-        state.pose = pose.get();
-      }, () -> swerveDrive.drive(holo.calculateRobotRelativeSpeeds(swerveDrive.getPose(), state)));
-    });
+    return defer(() -> driveToPose(pose.get()));
   }
 
   public Command driveToPose(Pose2d pose)

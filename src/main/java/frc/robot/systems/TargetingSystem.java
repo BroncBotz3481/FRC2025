@@ -28,7 +28,7 @@ public class TargetingSystem
 
   private ReefBranch      targetBranch;
   private ReefBranchLevel targetBranchLevel;
-  private BranchSide      targetBranchSide = BranchSide.CLOSEST;
+  private ReefBranchSide  targetReefBranchSide = ReefBranchSide.CLOSEST;
 
 
   private List<Pose2d>            reefBranches                 = null;
@@ -64,7 +64,7 @@ public class TargetingSystem
   {
     if (targetBranch != null)
     {
-      switch (targetBranchSide)
+      switch (targetReefBranchSide)
       {
         case CLOSEST ->
         {
@@ -107,10 +107,10 @@ public class TargetingSystem
     });
   }
 
-  public Command setBranchSide(BranchSide side)
+  public Command setBranchSide(ReefBranchSide side)
   {
     return Commands.runOnce(() -> {
-      targetBranchSide = side;
+      targetReefBranchSide = side;
     });
   }
 
@@ -195,6 +195,17 @@ public class TargetingSystem
     return Commands.runOnce(() -> autoTarget(currentPose)).andThen(Commands.print("Auto-targetting complete"));
   }
 
+  public void printTargetPose(ReefBranch branch, ReefBranchLevel level, ReefBranchSide side, Supplier<Pose2d> pose)
+  {
+    targetBranch = branch;
+    targetBranchLevel = level;
+    targetReefBranchSide = side;
+
+    autoTarget(pose);
+    System.out.println("Target Pose: " + pose.get().toString());
+
+  }
+
   public enum ReefBranch
   {
     A, B, K, L, I, J, G, H, E, F, C, D
@@ -206,7 +217,7 @@ public class TargetingSystem
     L2, L3, L1, L4
   }
 
-  public enum BranchSide
+  public enum ReefBranchSide
   {
     CLOSEST, RIGHT, LEFT
   }
