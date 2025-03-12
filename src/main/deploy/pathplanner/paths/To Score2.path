@@ -12,7 +12,7 @@
         "y": 5.457834936746794
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HP_LEFT"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CORAL_L"
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
   "folder": "LeftSIdePath",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 125.33170984058852
+    "rotation": 127.588111194003
   },
   "useDefaultConstraints": true
 }

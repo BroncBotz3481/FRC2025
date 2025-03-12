@@ -12,7 +12,7 @@
         "y": 5.7297603132790575
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CORAL_J"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HP_LEFT"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 125.56589106693957
+    "rotation": 127.588111194003
   },
   "reversed": false,
   "folder": "LeftSIdePath",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.01381269838195
+    "rotation": -120.23270030213172
   },
   "useDefaultConstraints": true
 }
