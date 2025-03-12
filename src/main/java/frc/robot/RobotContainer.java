@@ -163,7 +163,7 @@ public class RobotContainer
     launchpad.changeLED(7,8, new Color8Bit(ButtonColours.ScoreCoral));
 
     launchpad.changeLED(8, 1, new Color8Bit(Color.kLimeGreen));
-    launchpad.changeLED(8, 1, new Color8Bit(Color.kMediumPurple));
+    launchpad.changeLED(8, 2, new Color8Bit(Color.kMediumPurple));
   }
 
   //DEFAULT COMMANDS ^
