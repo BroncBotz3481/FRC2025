@@ -58,7 +58,7 @@ public class Launchpad
       int button = button_num - (32 * Math.floorDiv(i, 32));
       if(button != 0)
       {
-      changeLED(col, row, new Color8Bit(Color.kOrange));
+      changeLED(col, row, new Color8Bit(Color.kOrangeRed));
 
       buttons[row][col] = vjoys[vjoy_num].button(button);
       buttons[row][col].onTrue(Commands.print("(" + row + "," + (col-1) + ") pressed"));

@@ -79,7 +79,7 @@ public class RobotContainer
                                                             .withControllerRotationAxis(()->m_driverController.getRightX()*-1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
-                                                            .scaleRotation(0.4)
+                                                            .scaleRotation(0.7)
                                                             .allianceRelativeControl(true);
   SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(()->m_driverController.getRightX(),()->m_driverController.getRightY())
   .headingWhile(true);
@@ -169,8 +169,8 @@ public class RobotContainer
     launchpad.changeLED(1,7, new Color8Bit(ButtonColours.AlgaeUnloaded));
     launchpad.changeLED(1,8, new Color8Bit(ButtonColours.CoralUnloaded));
 
-    launchpad.changeLED(3, 0, new Color8Bit(ButtonColours.CoralOuttake));
-    launchpad.changeLED(4, 0, new Color8Bit(ButtonColours.AlgaeOuttake));
+    launchpad.changeLED(3, 0, new Color8Bit(Color.kRed));
+    launchpad.changeLED(4, 0, new Color8Bit(Color.kBlue));
 
 
     launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP));
@@ -448,10 +448,10 @@ public class RobotContainer
     launchpad.getButton(2, 0).whileFalse( Commands.runOnce(()->launchpad.changeLED(2,0, new Color8Bit(ButtonColours.AlgaeColour))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(2,0, new Color8Bit(ButtonColours.IsPressed))));  
                                   
-    launchpad.getButton(3, 0).whileFalse( Commands.runOnce(()->launchpad.changeLED(3,0, new Color8Bit(ButtonColours.CoralOuttake))))
+    launchpad.getButton(3, 0).whileFalse( Commands.runOnce(()->launchpad.changeLED(3,0, new Color8Bit(Color.kRed))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(3,0, new Color8Bit(ButtonColours.IsPressed))));  
                                   
-    launchpad.getButton(4, 0).whileFalse( Commands.runOnce(()->launchpad.changeLED(4,0, new Color8Bit(ButtonColours.AlgaeOuttake))))
+    launchpad.getButton(4, 0).whileFalse( Commands.runOnce(()->launchpad.changeLED(4,0, new Color8Bit(Color.kBlue))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(4,0, new Color8Bit(ButtonColours.IsPressed))));  
     //HP
   
@@ -493,8 +493,8 @@ public class RobotContainer
                                                         .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
                                                         );
 
-      launchpad.getButton(3, 0).whileTrue(coralIntake.wristOuttake());
-      launchpad.getButton(4, 0).whileTrue(algaeIntake.out());
+      launchpad.getButton(3, 0).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.LEFT));
+      launchpad.getButton(4, 0).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.RIGHT));
 
       //score coral
       launchpad.getButton(7, 8).whileTrue(scoringSystem.scoreCoral());
@@ -560,6 +560,8 @@ public class RobotContainer
 
       launchpad.getButton(8, 2).whileTrue(coralArm.setCoralArmAngle(-60));
       launchpad.getButton(8,1).whileTrue(algaeArm.setAlgaeArmAngle(-60));
+
+      launchpad.getButton(8, 8).whileTrue(drivebase.printCurrentPose());
 
       //LAUNCH PAD ^
     }
@@ -628,7 +630,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("Auto1");
+    return drivebase.getAutonomousCommand("RightAuto1 Fast");
   }
 
   public Command driveToSetPoint(double x, double y, double angle)

@@ -326,7 +326,7 @@ public class SwerveSubsystem extends SubsystemBase
   {
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        0.5, 0.25,
+        0.55, 0.40,
         Degrees.of(90).per(Second).in(RadiansPerSecond), Units.degreesToRadians(10));
 
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
