@@ -543,7 +543,8 @@ public class RobotContainer
 
       m_OperatorController1.leftTrigger().whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP)
                                         .alongWith(coralIntake.wristIntake()));
-    
+
+      m_OperatorController1.leftBumper().whileTrue(algaeArm.setAlgaeArmAngle(-60));
   }
 
 //END OF CONFIG BINDINGS ^
