@@ -322,8 +322,7 @@ public class CoralArmSubsystem extends SubsystemBase
   public Command setGoal(double degree)
   {
     return startRun(() -> m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(Degrees.of(degree))
-                                                        .in(Rotations)), () -> reachSetpoint(degree)).until(atMax.or(
-        atMin));
+                                                        .in(Rotations)), () -> reachSetpoint(degree));
   }
 
 
