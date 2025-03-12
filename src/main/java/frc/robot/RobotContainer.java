@@ -168,8 +168,8 @@ public class RobotContainer
     launchpad.changeLED(1,7, new Color8Bit(ButtonColours.AlgaeUnloaded));
     launchpad.changeLED(1,8, new Color8Bit(ButtonColours.CoralUnloaded));
 
-    launchpad.changeLED(3, 0, new Color8Bit(ButtonColours.AlgaeOuttake));
-    launchpad.changeLED(4, 0, new Color8Bit(ButtonColours.CoralOuttake));
+    launchpad.changeLED(3, 0, new Color8Bit(ButtonColours.CoralOuttake));
+    launchpad.changeLED(4, 0, new Color8Bit(ButtonColours.AlgaeOuttake));
 
 
     launchpad.changeLED(7,1, new Color8Bit(ButtonColours.HP));
@@ -446,8 +446,8 @@ public class RobotContainer
     launchpad.getButton(8, 1).whileFalse( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(Color.kLimeGreen))))
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.IsPressed))));
                                   
-    launchpad.getButton(8, 2).whileFalse( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(Color.kMediumPurple))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.IsPressed))));  
+    launchpad.getButton(8, 2).whileFalse( Commands.runOnce(()->launchpad.changeLED(8,2, new Color8Bit(Color.kMediumPurple))))
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,2, new Color8Bit(ButtonColours.IsPressed))));  
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -512,31 +512,31 @@ public class RobotContainer
 
       launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).alongWith(coralIntake.wristIntake()));
       launchpad.getButton(4, 3).whileTrue(coralIntake.wristIntake());
-      launchpad.changeLED(4, 3, new Color8Bit(Color.kRed));
+      launchpad.changeLED(4, 3, new Color8Bit(Color.kDarkMagenta));
       launchpad.getButton(5, 3).whileTrue(coralIntake.wristScore());
       launchpad.changeLED(5, 3, new Color8Bit(Color.kBlue));
       launchpad.getButton(6, 3).whileTrue(coralIntake.wristOuttake());
       launchpad.changeLED(6, 3, new Color8Bit(Color.kWhite));
 
       launchpad.getButton(4, 4).whileTrue(algaeIntake.in());
-      launchpad.changeLED(4, 4, new Color8Bit(Color.kRed));
+      launchpad.changeLED(4, 4, new Color8Bit(Color.kDarkGreen));
       launchpad.getButton(5, 4).whileTrue(algaeIntake.setAlgaeIntakeRoller(0));
-      launchpad.changeLED(5, 4, new Color8Bit(Color.kBlue));
+      launchpad.changeLED(5, 4, new Color8Bit(Color.kWhite));
       launchpad.getButton(6, 4).whileTrue(algaeIntake.out());
-      launchpad.changeLED(6, 4, new Color8Bit(Color.kWhite));
+      launchpad.changeLED(6, 4, new Color8Bit(Color.kLimeGreen));
 
       launchpad.getButton(4, 5).whileTrue(elevator.setPower(0.5).unless(elevator.atMax));
-      launchpad.changeLED(4, 5, new Color8Bit(Color.kRed));
+      launchpad.changeLED(4, 5, new Color8Bit(Color.kLightBlue));
       launchpad.getButton(5,5).whileTrue(elevator.hold());
-      launchpad.changeLED(5,5, new Color8Bit(Color.kBlue));
+      launchpad.changeLED(5,5, new Color8Bit(Color.kWhite));
       launchpad.getButton(6,5).whileTrue(elevator.setPower(-0.4).unless(elevator.atMin));
-      launchpad.changeLED(6, 5, new Color8Bit(Color.kWhite));
+      launchpad.changeLED(6, 5, new Color8Bit(Color.kDarkBlue));
 
-      launchpad.changeLED(6,8, new Color8Bit(Color.kBrown));
+      launchpad.changeLED(6,8, new Color8Bit(Color.kMintcream));
       launchpad.getButton(6,8).whileTrue(elevator.setElevatorHeight(0.3).repeatedly().alongWith(Commands.waitSeconds(0.3)
       .andThen(algaeArm.setAlgaeArmAngle(-20).repeatedly())));
 
-      launchpad.changeLED(5,8, new Color8Bit(Color.kBlack));
+      launchpad.changeLED(5,8, new Color8Bit(Color.kMediumPurple));
       launchpad.getButton(5,8).whileTrue(elevator.setElevatorHeight(0.3).repeatedly().alongWith(Commands.waitSeconds(0.3)
       .andThen(coralArm.setCoralArmAngle(-20).repeatedly())));
 
