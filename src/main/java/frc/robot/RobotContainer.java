@@ -132,7 +132,7 @@ public class RobotContainer
     double coralAngle = coralArm.getAngle().in(Degrees);
     if(MathUtil.clamp(coralAngle, CoralArmConstants.kCoralArmMinAngle.in(Degrees), -35) != coralAngle)
     {
-      coralArm.setAngleEncoderPosition(algaeArm.getAngle());
+      coralArm.setAngleEncoderPosition(CoralArmConstants.kCoralArmStartingAngle);
     }
 
   }
