@@ -79,7 +79,7 @@ public class RobotContainer
                                                             .withControllerRotationAxis(()->m_driverController.getRightX()*-1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
-                                                            .scaleRotation(0.7)
+                                                            .scaleRotation(0.6)
                                                             .allianceRelativeControl(true);
   SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(()->m_driverController.getRightX(),()->m_driverController.getRightY())
   .headingWhile(true);
@@ -140,12 +140,13 @@ public class RobotContainer
   public void setDefaultCommands()
   {
     // Sets the coral arm angle to the same as the algae arm if it is not starting in the right height
-    fixCoralArmAngle();
+    //fixCoralArmAngle();
 
-    elevator.setDefaultCommand((elevator.setGoal(0.003)));
-    algaeArm.setDefaultCommand(algaeArm.setGoal(-30));
-    coralArm.setDefaultCommand(coralArm.setGoal(-30));
+    elevator.setDefaultCommand((elevator.setGoal(0.010)));
+    algaeArm.setDefaultCommand(algaeArm.hold());
+    coralArm.setDefaultCommand(coralArm.hold());
     climb.setDefaultCommand(climb.setPOwer(0));
+    coralIntake.setDefaultCommand(coralIntake.setCoralIntakePower(0));
     algaeIntake.setDefaultCommand(algaeIntake.hold(()->algaeArm.algaeLoaded() && algaeArm.getAngle().gte(Degrees.of(-30))));
     coralIntake.setDefaultCommand(coralIntake.hold(coralArm::coralLoaded));
     // coralIntake.setDefaultCommand(Commands.either(coralIntake.wristIntake(), coralIntake.wristRest(), coralArm::coralLoaded));
@@ -523,9 +524,8 @@ public class RobotContainer
 
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
 
-      launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly().alongWith(coralIntake.wristIntake()));
 
-      launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).alongWith(coralIntake.wristIntake()));
+      launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP));
       launchpad.getButton(4, 3).whileTrue(coralIntake.wristIntake());
       launchpad.changeLED(4, 3, new Color8Bit(Color.kRed));
       launchpad.getButton(5, 3).whileTrue(coralIntake.wristScore());
@@ -560,6 +560,11 @@ public class RobotContainer
 
       launchpad.getButton(8, 2).whileTrue(coralArm.setCoralArmAngle(-60));
       launchpad.getButton(8,1).whileTrue(algaeArm.setAlgaeArmAngle(-60));
+
+      launchpad.getButton(7, 0).whileTrue(coralArm.setCoralArmAngle(0));
+      launchpad.changeLED(7,0, new Color8Bit(Color.kMediumPurple));
+      launchpad.getButton(8,0).whileTrue(algaeArm.setAlgaeArmAngle(0));
+      launchpad.changeLED(8,0, new Color8Bit(Color.kGreen));
 
       launchpad.getButton(8, 8).whileTrue(drivebase.printCurrentPose());
 
