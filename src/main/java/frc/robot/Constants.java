@@ -154,7 +154,7 @@ public final class Constants
     public static final double kCoralArmKd               = 0.07863;
     public static final double kCoralArmkS               = 0.19214; // volts (V)
     public static final double kCoralArmKv               = 0.11319; // volts per velocity (V/RPM)
-    public static final double kCoralArmKa               = 0.028083; // volts per acceleration (V/(RPM/s))
+    public static final double kCoralArmKa               = 0; // volts per acceleration (V/(RPM/s))
     public static final double kCoralArmkG               = 0.023981; // volts (V)
     public static final double kCoralAngleAllowableError = RobotBase.isSimulation() ? 5 : 3;
 //degree, for testing whether it's aroundAngle
@@ -166,7 +166,11 @@ public final class Constants
     public static final Angle   kCoralArmMinAngle               = Degrees.of(-86);
     public static final Angle   kCoralArmMaxAngle               = Degrees.of(92);
     public static final double  kCoralArmRampRate               = 0.5;
+<<<<<<< HEAD
     public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(293);
+=======
+    public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(180);
+>>>>>>> cc3b9199d8f62e6be54873e03d0fc248292cc253
     public static final boolean kCoralArmInverted               = true;
     public static final double  kCoralArmMaxVelocityRPM
                                                                 = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(
@@ -190,7 +194,7 @@ public final class Constants
     public static final double   kElevatorKd              = 9.4456;
     public static final double   kElevatorkS              = 0.21471; // volts (V)
     public static final double   kElevatorkV              = 10.39;//10.773; // volt per velocity (V/(m/s))
-    public static final double   kElevatorkA              = 0.19736; // volt per acceleration (V/(m/s²))
+    public static final double   kElevatorkA              = 0; // volt per acceleration (V/(m/s²))
     public static final double   kElevatorkG              = 0.23861; // volts (V)
     public static       double   kMaxVelocity             = Meters.of(1).per(Second).in(MetersPerSecond);
     public static       double   kMaxAcceleration         = Meters.of(0.5).per(Second).per(Second).in(

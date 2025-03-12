@@ -49,10 +49,14 @@ public class ClimberSubsystem extends SubsystemBase
     }
 
 
+  public Command climb()
+  {
+    return setPOwer(1);
+  }
   
   public Command up()
   {
-    return setPOwer(0.5).until(isUp);
+    return setPOwer(1).until(isUp);
 
   }
 

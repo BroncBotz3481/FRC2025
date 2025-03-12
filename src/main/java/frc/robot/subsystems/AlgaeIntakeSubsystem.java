@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -84,6 +86,10 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
   {
     return setAlgaeIntakeRoller(IntakeConstants.AlgaeIntakeSpeeds);
   }
+
+public Command hold(BooleanSupplier algae) {
+  return run(()->m_rollerMotor.set(algae.getAsBoolean() ? IntakeConstants.AlgaeIntakeSpeeds : 0));
+}
 
 
 }

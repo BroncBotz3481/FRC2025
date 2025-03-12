@@ -253,9 +253,10 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public void synchronizeAbsoluteEncoder()
   {
-    m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
-                                                                           .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
-                                  .in(Rotations));
+    double setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Rotations);
+    while(CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Degrees) > 0)
+      setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Rotations);
+    m_encoder.setPosition(setpoint);
   }
 
   /**
@@ -319,7 +320,7 @@ public class CoralArmSubsystem extends SubsystemBase
   public Command setGoal(double degree)
   {
     return startRun(() -> m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(Degrees.of(degree))
-                                                        .in(Rotations)), () -> reachSetpoint(degree));
+                                                        .in(Rotations)), () -> reachSetpoint(degree)).until(atMax.or(atMin));
   }
 
 
@@ -348,13 +349,13 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     if (RobotBase.isSimulation())
     {
-      return coralDistanceSim.getMeasurement().distance_mm < 0.03;
+      return coralDistanceSim.getMeasurement().distance_mm < 100;
     } else
     {
       Measurement measure = coralDistance.getMeasurement();
       if (measure != null && measure.status == LASERCAN_STATUS_VALID_MEASUREMENT)
       {
-        return measure.distance_mm < 0.07;
+        return measure.distance_mm < 100;
       }
     }
     return false;
@@ -370,17 +371,18 @@ public class CoralArmSubsystem extends SubsystemBase
   }
 
 
+
   public boolean coralScored()
   {
     if (RobotBase.isSimulation())
     {
-      return coralDistanceSim.getMeasurement().distance_mm > 0.12;
+      return coralDistanceSim.getMeasurement().distance_mm > 300;
     } else
     {
       Measurement measure = coralDistance.getMeasurement();
       if (measure != null && measure.status == LASERCAN_STATUS_VALID_MEASUREMENT)
       {
-        return measure.distance_mm > 0.12;
+        return measure.distance_mm > 300;
       }
     }
     return false;
