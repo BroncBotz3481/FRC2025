@@ -195,15 +195,39 @@ public class TargetingSystem
     return Commands.runOnce(() -> autoTarget(currentPose)).andThen(Commands.print("Auto-targetting complete"));
   }
 
-  public void printTargetPose(ReefBranch branch, ReefBranchLevel level, ReefBranchSide side, Supplier<Pose2d> pose)
+  public void increaseBranch()
   {
-    targetBranch = branch;
+    if(targetBranch != null)
+    {
+      targetBranch = ReefBranch.values()[(targetBranch.ordinal() + 1) % 12];
+      System.out.println("Branch Selected: "+targetBranch.toString());
+    }
+  }
+
+  public void printTargetPose(ReefBranchLevel level, ReefBranchSide side)
+  {
+
     targetBranchLevel = level;
     targetReefBranchSide = side;
 
-    autoTarget(pose);
-    System.out.println("Target Pose: " + pose.get().toString());
+//    autoTarget(pose);
+    System.out.println("Coral Branch: "+targetBranch.toString()+" Target Pose: " + getCoralTargetPose().toString());
+  }
 
+  public void printTargetPose(ReefBranch branch, ReefBranchLevel level, ReefBranchSide side)
+  {
+    targetBranch = branch;
+    printTargetPose(level, side);
+  }
+
+  public void setCoralTargetOnField(SwerveSubsystem swerveDrive)
+  {
+    swerveDrive.getSwerveDrive().field.getObject("target").setPose(getCoralTargetPose());
+  }
+
+  public void setAlgaeTargetOnField(SwerveSubsystem swerveDrive)
+  {
+    swerveDrive.getSwerveDrive().field.getObject("target").setPose(getAlgaeTargetPose());
   }
 
   public enum ReefBranch

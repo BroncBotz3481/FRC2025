@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeavePath"
+                  "pathName": "StartLeftCage to CoralJ"
                 }
               },
               {
@@ -55,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ToHP1"
+                  "pathName": "CoralJ to HPLEFT"
                 }
               }
             ]
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "To Score"
+                  "pathName": "HPLEFT To CoralK"
                 }
               },
               {
@@ -105,7 +105,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ToHP2"
+                  "pathName": "CoralK To HPLEFT"
                 }
               }
             ]
@@ -124,7 +124,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "To Score2"
+                  "pathName": "HPLEFT To CoralL"
                 }
               },
               {

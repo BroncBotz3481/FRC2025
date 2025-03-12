@@ -46,6 +46,7 @@ import frc.robot.systems.ScoringSystem;
 import frc.robot.systems.TargetingSystem;
 import frc.robot.systems.TargetingSystem.ReefBranch;
 import frc.robot.systems.TargetingSystem.ReefBranchLevel;
+import frc.robot.systems.TargetingSystem.ReefBranchSide;
 import frc.robot.systems.field.AllianceFlipUtil;
 import frc.robot.systems.field.FieldConstants;
 import frc.robot.systems.field.FieldConstants.CoralStation;
@@ -205,6 +206,20 @@ public class RobotContainer
 
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
+
+    boolean autoPoseFetchTest = false;
+    if(autoPoseFetchTest)
+    {
+
+      drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+      m_driverController.button(1).whileTrue(Commands.runOnce(()->targetingSystem.printTargetPose(ReefBranch.A, ReefBranchLevel.L4, ReefBranchSide.CLOSEST))
+                                                     .andThen(Commands.runOnce(()->targetingSystem.setCoralTargetOnField(drivebase))));
+      m_driverController.button(2).whileTrue(Commands.runOnce(()->{
+                                                       targetingSystem.increaseBranch();
+                                                       targetingSystem.printTargetPose(ReefBranchLevel.L4, ReefBranchSide.CLOSEST);})
+                                                     .andThen(Commands.runOnce(()->targetingSystem.setCoralTargetOnField(drivebase))));
+
+    }
 
     boolean climberTesting = false;
     if(climberTesting)
@@ -447,7 +462,7 @@ public class RobotContainer
                                   .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,1, new Color8Bit(ButtonColours.IsPressed))));
                                   
     launchpad.getButton(8, 2).whileFalse( Commands.runOnce(()->launchpad.changeLED(8,2, new Color8Bit(Color.kMediumPurple))))
-                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,2, new Color8Bit(ButtonColours.IsPressed))));  
+                                  .whileTrue( Commands.runOnce(()->launchpad.changeLED(8,2, new Color8Bit(ButtonColours.IsPressed))));
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 

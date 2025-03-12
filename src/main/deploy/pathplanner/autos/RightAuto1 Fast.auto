@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of Copy of LeavePath 3"
+                  "pathName": "MidStartPoint To CoralG"
                 }
               },
               {
@@ -55,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of ToHP1"
+                  "pathName": "CoralG To HPRight"
                 }
               },
               {
@@ -86,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of ToScore"
+                  "pathName": "HPRight To CoralC"
                 }
               },
               {
@@ -111,7 +111,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of ToHP2"
+                  "pathName": "CoralC To HPRIGHT"
                 }
               },
               {
@@ -136,7 +136,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of of ToScore2"
+                  "pathName": "HPRIGHT To CoralD"
                 }
               },
               {
