@@ -126,7 +126,7 @@ public class LoadingSystem
                                           .until(m_algaeArm.atAlgaeAngle(m_targetSystem).and(m_elevator.atAlgaeHeight(m_targetSystem)))
                                           .withTimeout(5)
                           .andThen(Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                          m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly(), m_algaeIntake.in()).withDeadline(m_targetSystem.driveToAlgaeTarget(m_swerve)))
+                          m_algaeArm.getAlgaeCommand(m_targetSystem).andThen(m_algaeArm.hold()), m_algaeIntake.in()).withDeadline(m_targetSystem.driveToAlgaeTarget(m_swerve)))
                          .andThen(Commands.parallel(m_algaeIntake.in(),
                                                     m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
                                                     m_swerve.lockPos())

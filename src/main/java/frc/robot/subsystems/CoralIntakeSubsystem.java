@@ -4,6 +4,8 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 
+import java.util.function.BooleanSupplier;
+
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
 import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
@@ -226,8 +228,15 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public Command wristOuttake()
   {
-    return spitCoralOut(-1, Wrist.active);
+    return spitCoralOut(-0.6, Wrist.active);
   }
+
+
+public Command hold(BooleanSupplier coral) {
+  return run(()->{m_rollerMotor.set(coral.getAsBoolean() ? 0.5 : 0);
+    wristController.setReference(Wrist.rest, ControlType.kPosition);
+  });
+}
 
 }
 

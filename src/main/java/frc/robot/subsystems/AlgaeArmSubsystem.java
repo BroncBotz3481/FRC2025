@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
@@ -20,6 +21,10 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -69,7 +74,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
                                                             MotorType.kBrushless);
   private final AbsoluteEncoder m_absEncoder = m_motor.getAbsoluteEncoder();
 
-  private Canandcolor armLoaded = new Canandcolor(HWMap.Algae.algaeCanAndColorID);
+  private LaserCan armLoaded = new LaserCan(HWMap.Algae.algaeLaserCan);
 
   private final SparkClosedLoopController m_controller = m_motor.getClosedLoopController();
   private final RelativeEncoder           m_encoder    = m_motor.getEncoder();
@@ -192,10 +197,12 @@ public class AlgaeArmSubsystem extends SubsystemBase
    */
   public void synchronizeAbsoluteEncoder()
   {
-
-    m_encoder.setPosition(AlgaeArm.convertAlgaeAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
-                                                                           .minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero))
-                                  .in(Rotations));
+    double setpoin = AlgaeArm.convertAlgaeAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero)).in(Rotations);
+    while(setpoin > 0)
+    {
+      setpoin = AlgaeArm.convertAlgaeAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(AlgaeArmConstants.kAlgaeArmOffsetToHorizantalZero)).in(Rotations);
+    }
+    m_encoder.setPosition(setpoin);
   }
 
   /**
@@ -278,8 +285,10 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeLoaded()
   {
-    SmartDashboard.putNumber("Algae Sensor", armLoaded.getProximity());
-    return armLoaded.getProximity() < 0.1;//m_algaeInBin.get()|| m_algaeInArm.get();
+    Measurement measurement = armLoaded.getMeasurement();
+    if(measurement != null && measurement.status == LASERCAN_STATUS_VALID_MEASUREMENT)
+      return measurement.distance_mm < 50;
+    return false;
   }
 
   public Trigger algaeLoadedTrigger()
@@ -289,7 +298,11 @@ public class AlgaeArmSubsystem extends SubsystemBase
 
   public boolean algaeScored()
   {
-    return armLoaded.getProximity() > 0.31;//m_algaeInBin.get()|| m_algaeInArm.get();
+    Measurement measurement = armLoaded.getMeasurement();
+    if(measurement != null && measurement.status == LASERCAN_STATUS_VALID_MEASUREMENT)
+      return measurement.distance_mm > 100;
+
+    return true;
   }
 
   public boolean aroundAngle(double degree, double allowableError)
