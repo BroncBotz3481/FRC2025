@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
@@ -59,7 +57,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.Constants.CoralArmConstants;
 import frc.robot.HWMap;
-import frc.robot.RobotMath.AlgaeArm;
 import frc.robot.RobotMath.CoralArm;
 import frc.robot.Setpoints;
 import frc.robot.Setpoints.Arm.Coral;
@@ -253,9 +250,17 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public void synchronizeAbsoluteEncoder()
   {
-    double setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Rotations);
-    while(CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Degrees) > 0)
-      setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition()).minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero)).in(Rotations);
+    double setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
+                                                                       .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
+                              .in(Rotations);
+    while (CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
+                                                            .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
+                   .in(Degrees) > 0)
+    {
+      setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
+                                                                  .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
+                         .in(Rotations);
+    }
     m_encoder.setPosition(setpoint);
   }
 
@@ -320,7 +325,8 @@ public class CoralArmSubsystem extends SubsystemBase
   public Command setGoal(double degree)
   {
     return startRun(() -> m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(Degrees.of(degree))
-                                                        .in(Rotations)), () -> reachSetpoint(degree)).until(atMax.or(atMin));
+                                                        .in(Rotations)), () -> reachSetpoint(degree)).until(atMax.or(
+        atMin));
   }
 
 
@@ -361,7 +367,7 @@ public class CoralArmSubsystem extends SubsystemBase
     return false;
   }//Sim
 
-  
+
   public Command load()
   {
     return startRun(() -> {
@@ -369,7 +375,6 @@ public class CoralArmSubsystem extends SubsystemBase
       m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));
     }, () -> reachSetpoint(angleHold));
   }
-
 
 
   public boolean coralScored()
@@ -436,14 +441,17 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     return new Trigger(() -> aroundAngle(Setpoints.Arm.Coral.HP));
   }
+
   public Trigger aroundCoralL4()
   {
     return new Trigger(() -> aroundAngle(Setpoints.Arm.Coral.L4));
   }
+
   public Trigger coralLoadedTrigger()
   {
     return new Trigger(() -> coralLoaded());
   }
+
   // Scoring Angles
   public Command L1()
   {
