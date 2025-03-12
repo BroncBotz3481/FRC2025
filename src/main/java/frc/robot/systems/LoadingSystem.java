@@ -89,7 +89,7 @@ public class LoadingSystem
                          .and(m_coralArm.aroundCoralHPAngle()))
         .withTimeout(5) //Move Intake angle to 0
         .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(),
-                                   m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly(),
+                                   m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).andThen(m_coralArm.hold()),
                                    m_coralIntake.wristIntake())
         .until(m_coralIntake.atScoringAngle()))
         .andThen(m_coralIntake.wristIntake()
@@ -103,7 +103,7 @@ public class LoadingSystem
   {
 
     return Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                             m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly())
+                             m_algaeArm.getAlgaeCommand(m_targetSystem).andThen(m_algaeArm.hold()))
                    .until(m_elevator.atAlgaeHeight(m_targetSystem).and(m_algaeArm.atAlgaeAngle(m_targetSystem)))
                    .withTimeout(5)
                    .andThen(Commands.parallel(m_algaeIntake.in(),
@@ -122,7 +122,7 @@ public class LoadingSystem
     
 
     return Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-    m_algaeArm.getAlgaeCommand(m_targetSystem).repeatedly())                             
+    m_algaeArm.getAlgaeCommand(m_targetSystem).andThen(m_algaeArm.hold()))
                                           .until(m_algaeArm.atAlgaeAngle(m_targetSystem).and(m_elevator.atAlgaeHeight(m_targetSystem)))
                                           .withTimeout(5)
                           .andThen(Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
