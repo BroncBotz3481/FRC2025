@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.reduxrobotics.canand.CanandEventLoop;
 
 import au.grapplerobotics.CanBridge;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.CoralArmConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Setpoints.AutoScoring.HumanPlayer;
 import frc.robot.Setpoints.AutoScoring.HumanPlayer.Left;
@@ -125,8 +127,20 @@ public class RobotContainer
 //--------------------------------------------------------------------------------------------------------------------------------------- 
   //DEFUALT COMMANDS v
 
+  public void fixCoralArmAngle()
+  {
+    double coralAngle = coralArm.getAngle().in(Degrees);
+    if(MathUtil.clamp(coralAngle, CoralArmConstants.kCoralArmMinAngle.in(Degrees), -35) != coralAngle)
+    {
+      coralArm.setAngleEncoderPosition(algaeArm.getAngle());
+    }
+
+  }
   public void setDefaultCommands()
   {
+    // Sets the coral arm angle to the same as the algae arm if it is not starting in the right height
+    fixCoralArmAngle();
+
     elevator.setDefaultCommand((elevator.setGoal(0.003)));
     algaeArm.setDefaultCommand(algaeArm.setGoal(-30));
     coralArm.setDefaultCommand(coralArm.setGoal(-30));

@@ -250,18 +250,9 @@ public class CoralArmSubsystem extends SubsystemBase
    */
   public void synchronizeAbsoluteEncoder()
   {
-    double setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
-                                                                       .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
-                              .in(Rotations);
-    while (CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
-                                                            .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
-                   .in(Degrees) > 0)
-    {
-      setpoint = CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
-                                                                  .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
-                         .in(Rotations);
-    }
-    m_encoder.setPosition(setpoint);
+    m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(Rotations.of(m_absEncoder.getPosition())
+                                                                           .minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
+                                  .in(Rotations));
   }
 
   /**
@@ -308,6 +299,12 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     m_angle.mut_replace(CoralArm.convertSensorUnitsToCoralAngle(Rotations.of(m_encoder.getPosition())));
     return m_angle;
+  }
+
+  public void setAngleEncoderPosition(Angle degrees)
+  {
+    m_encoder.setPosition(CoralArm.convertCoralAngleToSensorUnits(degrees.minus(CoralArmConstants.kCoralArmOffsetToHorizantalZero))
+                                  .in(Rotations));
   }
 
   /**
