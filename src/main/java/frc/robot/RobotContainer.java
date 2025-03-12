@@ -142,7 +142,7 @@ public class RobotContainer
     // Sets the coral arm angle to the same as the algae arm if it is not starting in the right height
     //fixCoralArmAngle();
 
-    elevator.setDefaultCommand((elevator.setGoal(0.010)));
+    elevator.setDefaultCommand((elevator.setGoal(0.003)));
     algaeArm.setDefaultCommand(algaeArm.hold());
     coralArm.setDefaultCommand(coralArm.hold());
     climb.setDefaultCommand(climb.setPOwer(0));
