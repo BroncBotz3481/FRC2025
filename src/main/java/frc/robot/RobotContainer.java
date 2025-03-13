@@ -439,14 +439,14 @@ public class RobotContainer
     m_driverController.povDown().whileTrue(climb.down());
     //m_driverController.y().onTrue(drivebase.rotateToHeading((Rotation2d.fromDegrees(90))).withTimeout(1));
     //m_driverController.button(1).onTrue(Commands.print("Turn 90 Counter-Clockwise"));
-    m_driverController.a().onTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                 .andThen(Commands.runOnce(() ->
-                                                                               drivebase.getSwerveDrive().field.getObject(
-                                                                                   "target").setPose(targetingSystem.getAlgaeTargetPose()))));
-    m_driverController.b().onTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                 .andThen(Commands.runOnce(() ->
-                                                                               drivebase.getSwerveDrive().field.getObject(
-                                                                                   "target").setPose(targetingSystem.getCoralTargetPose()))));
+//    m_driverController.a().onTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+//                                                 .andThen(Commands.runOnce(() ->
+//                                                                               drivebase.getSwerveDrive().field.getObject(
+//                                                                                   "target").setPose(targetingSystem.getAlgaeTargetPose()))));
+//    m_driverController.b().onTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+//                                                 .andThen(Commands.runOnce(() ->
+//                                                                               drivebase.getSwerveDrive().field.getObject(
+//                                                                                   "target").setPose(targetingSystem.getCoralTargetPose()))));
 
     //DRIVER CONTROLS ^
     //--------------------------------------------------------------------------------------------------------------------
