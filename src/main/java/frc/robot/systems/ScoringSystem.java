@@ -69,7 +69,7 @@ public class ScoringSystem
                              m_coralArm.getCoralCommand(m_targetSystem).andThen(m_coralArm.hold()),
                              Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
                    .until(m_elevator.atCoralHeight(m_targetSystem).and(m_coralArm.atCoralAngle(m_targetSystem))
-                                    .and(m_coralIntake.atScoringAngle())).withTimeout(3)
+                                    .and(m_coralIntake.atScoringAngle())).withTimeout(2)
                    .andThen(Commands.parallel(
                                         m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
                                         m_coralArm.hold(false),
