@@ -199,15 +199,15 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
-//     setDefaultCommands();
-//     configureBindings();
+     setDefaultCommands();
+     configureBindings();
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
 
-    boolean autoAlignTest = true;
+    boolean autoAlignTest = false;
     if (autoAlignTest)
     {
       coralArm.setDefaultCommand(coralArm.hold());
