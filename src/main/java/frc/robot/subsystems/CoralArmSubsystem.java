@@ -421,14 +421,19 @@ public class CoralArmSubsystem extends SubsystemBase
   public Command score()
   {
     return startRun(() -> {
-      angleHold = getAngle().minus(Degrees.of(30)).in(Degrees);
+      synchronizeAbsoluteEncoder();
+      angleHold = getAngle().minus(Degrees.of(40)).in(Degrees);
       m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));
-    }, () -> reachSetpoint(angleHold));
+    }, () -> reachSetpoint(angleHold)).until(this::coralScored);
   }
 
-  public Command hold()
+  public Command hold(boolean sync)
   {
     return startRun(() -> {
+      if (sync)
+      {
+        synchronizeAbsoluteEncoder();
+      }
       angleHold = MathUtil.clamp(getAngle().in(Degrees),
                                  CoralArmConstants.kCoralArmMinAngle.in(Degrees) +
                                  CoralArmConstants.kCoralAngleAllowableError,
@@ -436,6 +441,11 @@ public class CoralArmSubsystem extends SubsystemBase
                                  CoralArmConstants.kCoralAngleAllowableError);
       m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));
     }, () -> reachSetpoint(angleHold));
+  }
+
+  public Command hold()
+  {
+    return hold(true);
   }
 
   public Trigger aroundCoralHPAngle()

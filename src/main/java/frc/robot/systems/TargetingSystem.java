@@ -1,5 +1,6 @@
 package frc.robot.systems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -52,12 +53,14 @@ public class TargetingSystem
 
   private static int rightBranchOrdinal(ReefBranch branch)
   {
-    return branch.ordinal() + ((branch.ordinal() % 2) == 0 ? 1 : 0) % 12;
+    boolean isRight = (branch.ordinal()+1) % 2 == 0;
+    return MathUtil.clamp(branch.ordinal() + (isRight ? 0 : 1),0,11);
   }
 
   private static int leftBranchOrdinal(ReefBranch branch)
   {
-    return branch.ordinal() + ((branch.ordinal() % 2) == 0 ? 0 : 1) % 12;
+    boolean isRight = (branch.ordinal()+1) % 2 == 0;
+    return MathUtil.clamp(branch.ordinal() - (isRight ? 1 : 0),0,11);
   }
 
   public int getTargetBranchOrdinal()

@@ -395,7 +395,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   public Command load()
   {
     return startRun(() -> {
-      angleHold = getAngle().minus(Degrees.of(10)).in(Degrees);
+      angleHold = getAngle().plus(Degrees.of(10)).in(Degrees);
       m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(getAngle()).in(Rotations));
     }, () -> reachSetpoint(angleHold));
   }

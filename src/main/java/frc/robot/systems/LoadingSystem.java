@@ -64,13 +64,13 @@ public class LoadingSystem
   {
 
     return (Commands.parallel(m_elevator.CoralHP().repeatedly(), //Drive to HP and Move ELEVATOR AND ARM
-                              m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly(),
+                              m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).andThen(m_coralArm.hold()),
                               m_swerve.lockPos()))
         .until(m_elevator.aroundCoralHP()
                          .and(m_coralArm.aroundCoralHPAngle()))
         .withTimeout(5) //Move Intake angle to 0
         .andThen(Commands.parallel(m_elevator.CoralHP().repeatedly(),
-                                   m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly(),
+                                   m_coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).andThen(m_coralArm.hold()),
                                    m_coralIntake.wristIntake())
         .until(m_coralIntake.atScoringAngle()))
         .andThen(Commands.parallel(m_coralIntake.wristIntake(),m_swerve.lockPos())

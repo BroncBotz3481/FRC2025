@@ -42,17 +42,17 @@ public class Setpoints
     public static class Coral
     {
 
-      public static double HP = 0;// TOtAl GuesS
+      public static double HP = 3;// TOtAl GuesS
       public static double L1 = 0;
       public static double L2 = 10;
-      public static double L3 = 33.14;
-      public static double L4 = 57.9;
+      public static double L3 = 40.14;
+      public static double L4 = 67.9;
     }
 
     public static class Algae
     {
 
-      public static final double L34       = 32.2;
+      public static final double L34       = 37.2;
       public static final double L23       = 2.637;
       public static final double NET       = 90;
       public static final double PROCESSOR = -32; // Guess
@@ -70,10 +70,10 @@ public class Setpoints
     {
 
       public static final Transform2d coralOffset = new Transform2d(Inches.of(28).in(Meters),
-                                                                    Inches.of(6).in(Meters),
+                                                                    Inches.of(3.5).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
-      public static final Transform2d algaeOffset = new Transform2d(Inches.of(30).in(Meters),
-                                                                    Inches.of(-13).in(Meters),
+      public static final Transform2d algaeOffset = new Transform2d(Inches.of(21).in(Meters),
+                                                                    Inches.of(-18).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
     }
 
