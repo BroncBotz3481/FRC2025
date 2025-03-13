@@ -46,7 +46,7 @@ public final class Constants
   public static final MechanismLigament2d kCoralArmMech;
   public static final MechanismLigament2d kElevatorTower;
   public static final MechanismLigament2d kElevatorFixed;
-  public static final double              maxSpeed      = 7;
+  public static final double              maxSpeed      = 7; // Might need to be 12.7474621
 
   static
   {
