@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.reduxrobotics.canand.CanandEventLoop;
 
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -390,6 +392,9 @@ public class RobotContainer
                                                   .and(coralArm.aroundCoralL4())))));
     NamedCommands.registerCommand("climber UP", climb.up());
     NamedCommands.registerCommand("climber DOWN", climb.down());
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData(autoChooser);
   }
 
   //ROBOT CONTAINER ^
@@ -651,7 +656,7 @@ public class RobotContainer
 //END OF CONFIG BINDINGS ^
 //----------------------------------------------------------------------------------------------------------------------------------
 // MISC METHODS AND COMMANDS v
-
+  SendableChooser<Command> autoChooser;
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -660,7 +665,8 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("RightAuto1 Fast");
+    return autoChooser.getSelected();
+//    return drivebase.getAutonomousCommand("RightAuto1 Fast");
   }
 
   public Command driveToSetPoint(double x, double y, double angle)

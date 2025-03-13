@@ -39,6 +39,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.robot.AlignmentConstants;
+import frc.robot.AlignmentConstants.DriveToPose;
 import frc.robot.Constants;
 import frc.robot.Setpoints;
 import frc.robot.Setpoints.AutoScoring;
@@ -236,7 +238,6 @@ public class SwerveSubsystem extends SubsystemBase
     {
       config = RobotConfig.fromGUISettings();
 
-      final boolean enableFeedforward = true;
       // Configure AutoBuilder last
       AutoBuilder.configure(
           swerveDrive::getPose,
@@ -246,13 +247,12 @@ public class SwerveSubsystem extends SubsystemBase
           swerveDrive::getRobotVelocity,
           // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           (speedsRobotRelative, moduleFeedForwards) -> {
-            if (enableFeedforward)
+            if (DriveToPose.enableDriveFeedFords)
             {
               swerveDrive.drive(
                   speedsRobotRelative,
                   swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
-                  moduleFeedForwards.linearForces()
-                               );
+                  moduleFeedForwards.linearForces());
             } else
             {
               swerveDrive.setChassisSpeeds(speedsRobotRelative);
@@ -260,11 +260,8 @@ public class SwerveSubsystem extends SubsystemBase
           },
           // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
           new PPHolonomicDriveController(
-              // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0),
-              // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
-              // Rotation PID constants
+              DriveToPose.translationPID,
+              DriveToPose.rotationPID
           ),
           config,
           // The robot configuration
@@ -328,9 +325,8 @@ public class SwerveSubsystem extends SubsystemBase
   {
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        0.55, 0.20,
-        Degrees.of(90).per(Second).in(RadiansPerSecond), Units.degreesToRadians(45));
-
+        DriveToPose.maximumVelocityMetersPerSecond, DriveToPose.maximumAccelerationMetersPerSecondSquared,
+        Degrees.of(DriveToPose.maximumAngularVelocityDegreesPerSecond).per(Second).in(RadiansPerSecond), Units.degreesToRadians(DriveToPose.maximumAngularAccelerationDegreesPerSecondSquared));
 // Since AutoBuilder is configured, we can use it to build pathfinding commands
     return AutoBuilder.pathfindToPose(
         pose,
