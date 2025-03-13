@@ -57,7 +57,7 @@ public class RobotContainer
 
   public static final CommandXboxController m_driverController    =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  public static final CommandXboxController m_OperatorController1 =
+  public static       CommandXboxController m_OperatorController1 =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
   private final Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(Color.kRed));
@@ -199,8 +199,8 @@ public class RobotContainer
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
-     setDefaultCommands();
-     configureBindings();
+    setDefaultCommands();
+    configureBindings();
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
@@ -429,14 +429,22 @@ public class RobotContainer
    */
   private void configureBindings()
   {
+    boolean singleController = false;
 
-    m_driverController.leftBumper()
-                      .whileTrue(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.4))); // Slow mode
-    m_driverController.leftBumper()
-                      .whileFalse(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.8)));//Fast mode
+    if (singleController)
+    {
+      m_OperatorController1 = m_driverController;
 
-    m_driverController.povUp().whileTrue(climb.climb());
-    m_driverController.povDown().whileTrue(climb.down());
+    } else
+    {
+      m_driverController.leftBumper()
+                        .whileTrue(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.4))); // Slow mode
+      m_driverController.leftBumper()
+                        .whileFalse(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.8)));//Fast mode
+
+      m_driverController.povUp().whileTrue(climb.climb());
+      m_driverController.povDown().whileTrue(climb.down());
+    }
     //m_driverController.y().onTrue(drivebase.rotateToHeading((Rotation2d.fromDegrees(90))).withTimeout(1));
     //m_driverController.button(1).onTrue(Commands.print("Turn 90 Counter-Clockwise"));
 //    m_driverController.a().onTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
