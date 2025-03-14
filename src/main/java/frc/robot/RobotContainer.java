@@ -413,6 +413,10 @@ public class RobotContainer
     NamedCommands.registerCommand("ArmOut", (coralArm.setCoralArmAngle(-40).alongWith(elevator.setElevatorHeight(0.006),algaeArm.setAlgaeArmAngle(-40)).withTimeout(1)));
     NamedCommands.registerCommand("climber UP", climb.up());
     NamedCommands.registerCommand("climber DOWN", climb.down());
+    NamedCommands.registerCommand("Elevatpr Up", elevator.CoralL4().withTimeout(1));//change into parallel cmds
+    NamedCommands.registerCommand("Coral Arm L4", coralArm.L4().withTimeout(1));
+    NamedCommands.registerCommand("Coral rolling intake", coralIntake.spitCoralOut(0.5, Setpoints.Wrist.active).withTimeout(1)) ;
+    NamedCommands.registerCommand("coral outake", coralIntake.wristOuttake().withTimeout(1));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData(autoChooser);
