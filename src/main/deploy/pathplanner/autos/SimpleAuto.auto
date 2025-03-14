@@ -19,6 +19,12 @@
                 "data": {
                   "name": "prepL4"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "elevatorL4"
+                }
               }
             ]
           }
@@ -30,22 +36,34 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Coral Intake"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "BackOut"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "coralHP"
                 }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BackOut"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "safe"
           }
         }
       ]

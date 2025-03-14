@@ -110,6 +110,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
     SparkMaxConfig cfgRoller = new SparkMaxConfig();
     cfgRoller.inverted(true);
     cfgRoller.idleMode(IdleMode.kBrake);
+    cfg.smartCurrentLimit(40);
     m_rollerMotor.configure(cfgRoller, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     m_wristEncoder.setPosition(0);
     m_wristMotor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);

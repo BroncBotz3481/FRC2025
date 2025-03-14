@@ -62,27 +62,27 @@ public class ScoringSystem
 
   public Command restArmsSafe()
   {
-    return m_coralArm.setCoralArmAngle(-40).alongWith(m_algaeArm.setAlgaeArmAngle(-40), m_coralIntake.wristRest());
+    return m_coralArm.setCoralArmAngle(-40).repeatedly().alongWith(m_algaeArm.setAlgaeArmAngle(-40).repeatedly(), m_coralIntake.wristRest());
   }
 
   public Command scoreCoral()
   {
     // Arm down, elevator down, drive backwards x in
     return Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                      m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold()),
-                             m_coralArm.getCoralCommand(m_targetSystem).andThen(m_coralArm.hold()),
+                      m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold().repeatedly()),
+                             m_coralArm.getCoralCommand(m_targetSystem).andThen(m_coralArm.hold(false).repeatedly()),
                              Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
                    .until(m_elevator.atCoralHeight(m_targetSystem).and(m_coralArm.atCoralAngle(m_targetSystem))
                                     .and(m_coralIntake.atScoringAngle())).withTimeout(2)
                    .andThen(Commands.parallel(
                                         m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                                        m_coralArm.hold(false),
-                                        m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold()),
+                                        m_coralArm.hold(false).repeatedly(),
+                                        m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold().repeatedly()),
                                         Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
                                     .withDeadline(m_targetSystem.driveToCoralTarget(m_swerve)))
-                   .andThen(m_coralIntake.wristScore().withDeadline(m_coralArm.score().withTimeout(1)))
-                   .andThen(m_swerve.driveBackwards().alongWith(m_coralIntake.wristIntake()).withTimeout(0.5))
-                   .andThen(restArmsSafe());
+                                    .andThen(m_coralIntake.wristScore().withDeadline(m_coralArm.score().withTimeout(1)))
+                                    .andThen(m_swerve.driveBackwards().alongWith(m_coralIntake.wristIntake(),m_coralArm.hold(false).repeatedly()).withTimeout(0.5))
+                                    .andThen(restArmsSafe());
   }
 
   ///  Autonomous command for scoring the algae arm

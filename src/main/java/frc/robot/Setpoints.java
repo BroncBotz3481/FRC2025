@@ -42,10 +42,10 @@ public class Setpoints
     public static class Coral
     {
 
-      public static double HP = 3;// TOtAl GuesS
+      public static double HP = 13;// TOtAl GuesS
       public static double L1 = 0;
       public static double L2 = 10;
-      public static double L3 = 40.14;
+      public static double L3 = 45.14;
       public static double L4 = 67.9;
     }
 

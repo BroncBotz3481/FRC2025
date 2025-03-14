@@ -15,7 +15,7 @@ public class AlignmentConstants
 
     public static final PIDConstants rotationPID = new PIDConstants(5.0,0,0);
     public static final double maximumAngularVelocityDegreesPerSecond = 90;
-    public static final double maximumAngularAccelerationDegreesPerSecondSquared = 45;
+    public static final double maximumAngularAccelerationDegreesPerSecondSquared = 55;
 
   }
 }
