@@ -5,9 +5,41 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ArmOut"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Elevator Up"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Coral Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Coral Arm L4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Coral Intake"
+                }
+              }
+            ]
           }
         },
         {
@@ -19,7 +51,13 @@
         {
           "type": "named",
           "data": {
-            "name": "scoreCoral"
+            "name": "Coral Outake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BackOut"
           }
         }
       ]
