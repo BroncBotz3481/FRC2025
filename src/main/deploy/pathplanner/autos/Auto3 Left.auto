@@ -5,25 +5,25 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "ArmOut"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "StartRightCage To CoralJ"
+                  "pathName": "LeavePath 3"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "LimbsUp"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "climberDOWN"
                 }
               }
             ]
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralJ to HPLEFT"
+                  "pathName": "ToHP1"
                 }
               }
             ]
@@ -80,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HPLEFT To CoralK"
+                  "pathName": "To Score"
                 }
               },
               {
@@ -111,7 +111,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralK To HPLEFT"
+                  "pathName": "ToHP2"
                 }
               }
             ]
@@ -130,7 +130,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HPLEFT To CoralL"
+                  "pathName": "To Score2"
                 }
               },
               {

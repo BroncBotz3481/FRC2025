@@ -69,11 +69,11 @@ public class Setpoints
     public static class Reef
     {
 
-      public static final Transform2d coralOffset = new Transform2d(Inches.of(28).in(Meters),
-                                                                    Inches.of(3.5).in(Meters),
+      public static final Transform2d coralOffset = new Transform2d(Inches.of(30.5).in(Meters),
+                                                                    Inches.of(4.5).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
-      public static final Transform2d algaeOffset = new Transform2d(Inches.of(21).in(Meters),
-                                                                    Inches.of(-18).in(Meters),
+      public static final Transform2d algaeOffset = new Transform2d(Inches.of(24).in(Meters),
+                                                                    Inches.of(-17).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
     }
 

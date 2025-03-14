@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.04,
+        "y": 3.98
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.605339122849777,
+        "y": 3.98
+      },
+      "isLocked": false,
+      "linkedName": "Coral_G"
+    },
+    {
+      "anchor": {
+        "x": 5.6225,
+        "y": 2.375625
+      },
+      "prevControl": {
+        "x": 6.012499999999999,
+        "y": 2.879375
+      },
+      "nextControl": {
+        "x": 5.469456701752149,
+        "y": 2.1779440730965263
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.414,
+        "y": 1.124375
+      },
+      "prevControl": {
+        "x": 1.1996631275106031,
+        "y": 0.7531326469129527
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "HPRight"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -125.53171868238475
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 179.4804929202925
+  },
+  "useDefaultConstraints": true
+}

@@ -2,6 +2,7 @@ package frc.robot.systems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.HWMap.Algae;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
@@ -44,17 +45,19 @@ public class ScoringSystem
   /// intact.
   public Command scoreCoralAuto()
   {
-    return Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
-                             m_coralArm.getCoralCommand(m_targetSystem).andThen(m_coralArm.hold()))
+    return m_coralArm.setCoralArmAngle(5).repeatedly();/*Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+    m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold()),
+                             m_coralArm.getCoralCommand(m_targetSystem).andThen(m_coralArm.hold(false)))
                    .until(m_elevator.atCoralHeight(m_targetSystem).and(m_coralArm.atCoralAngle(m_targetSystem)))
                    .withTimeout(5)
                    .andThen(m_coralIntake.wristScore().alongWith(m_coralArm.getCoralCommand(m_targetSystem)
-                                                                           .andThen(m_coralArm.hold()))
+                                                                           .andThen(m_coralArm.hold(false))),
+                                                                           m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold())
                                          .until(m_coralIntake.atScoringAngle()))
                    .andThen(Commands.parallel(m_coralIntake.wristScore(),
                                               m_elevator.getCoralCommand(m_targetSystem).repeatedly())
                                     .withDeadline(m_coralArm.score()).withTimeout(1)
-                                    .until(() -> m_coralArm.coralScored()));
+                                    .until(() -> m_coralArm.coralScored())).andThen(m_coralArm.setCoralArmAngle(-40));*/
   }
 
   public Command restArmsSafe()
@@ -66,6 +69,7 @@ public class ScoringSystem
   {
     // Arm down, elevator down, drive backwards x in
     return Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+                      m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold()),
                              m_coralArm.getCoralCommand(m_targetSystem).andThen(m_coralArm.hold()),
                              Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
                    .until(m_elevator.atCoralHeight(m_targetSystem).and(m_coralArm.atCoralAngle(m_targetSystem))
@@ -73,6 +77,7 @@ public class ScoringSystem
                    .andThen(Commands.parallel(
                                         m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
                                         m_coralArm.hold(false),
+                                        m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold()),
                                         Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
                                     .withDeadline(m_targetSystem.driveToCoralTarget(m_swerve)))
                    .andThen(m_coralIntake.wristScore().withDeadline(m_coralArm.score().withTimeout(1)))

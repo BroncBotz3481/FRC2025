@@ -5,25 +5,25 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "ArmOut"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "StartMidCage To CoralJ"
+                  "pathName": "LeavePath 2"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "LimbsUp"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "climberDOWN"
                 }
               }
             ]
@@ -37,12 +37,6 @@
                 "type": "named",
                 "data": {
                   "name": "scoreCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "climberUP"
                 }
               }
             ]
@@ -61,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralJ to HPLEFT"
+                  "pathName": "ToHP1"
                 }
               }
             ]
@@ -80,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HPLEFT To CoralK"
+                  "pathName": "To Score"
                 }
               },
               {
@@ -111,7 +105,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralK To HPLEFT"
+                  "pathName": "ToHP2"
                 }
               }
             ]
@@ -130,7 +124,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HPLEFT To CoralL"
+                  "pathName": "To Score2"
                 }
               },
               {

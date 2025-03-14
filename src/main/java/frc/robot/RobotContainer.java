@@ -397,18 +397,20 @@ public class RobotContainer
 
     NamedCommands.registerCommand("scoreCoral",
                                   targetingSystem.setBranchLevel(ReefBranchLevel.L4)
-                                                 .andThen(scoringSystem.scoreCoralAuto()));
-    NamedCommands.registerCommand("scoreProcessor", scoringSystem.scoreAlgaeProcessorAuto());
-    NamedCommands.registerCommand("loadCoral", loadingSystem.coralLoadAuto());
-    NamedCommands.registerCommand("loadAlgae", loadingSystem.algaeLoadAuto());
+                                                 .andThen(scoringSystem.scoreCoralAuto()).withTimeout(4).andThen(coralArm.setCoralArmAngle(-40).withTimeout(1)));
+    NamedCommands.registerCommand("scoreProcessor", scoringSystem.scoreAlgaeProcessorAuto().withTimeout(2));
+    NamedCommands.registerCommand("loadCoral", loadingSystem.coralLoadAuto().withTimeout(4));
+    NamedCommands.registerCommand("loadAlgae", loadingSystem.algaeLoadAuto().withTimeout(2));
     NamedCommands.registerCommand("LimbsDown", (elevator.CoralHP()
                                                         .alongWith(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP)
                                                                            .until(elevator.aroundCoralHP()
-                                                                                          .and(coralArm.aroundCoralHPAngle())))));
+                                                                                          .and(coralArm.aroundCoralHPAngle())))).withTimeout(1));
     NamedCommands.registerCommand("LimbsUp", (elevator.CoralL4()
                                                       .alongWith(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.L4)
                                                                          .until(elevator.aroundCoralL4()
-                                                                                        .and(coralArm.aroundCoralL4())))));
+                                                                                        .and(coralArm.aroundCoralL4()))).withTimeout(1)));
+
+    NamedCommands.registerCommand("ArmOut", (coralArm.setCoralArmAngle(-40).alongWith(elevator.setElevatorHeight(0.006),algaeArm.setAlgaeArmAngle(-40)).withTimeout(1)));
     NamedCommands.registerCommand("climber UP", climb.up());
     NamedCommands.registerCommand("climber DOWN", climb.down());
 
@@ -759,8 +761,8 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
-//    return drivebase.getAutonomousCommand("RightAuto1 Fast");
+    //return autoChooser.getSelected();
+  return drivebase.getAutonomousCommand("SimpleAuto");
   }
 
   public Command driveToSetPoint(double x, double y, double angle)

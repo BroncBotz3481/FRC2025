@@ -5,19 +5,19 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "ArmOut"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MidStartPoint To CoralG"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "climberDOWN"
+                  "pathName": "Copy of Copy of LeavePath 3"
                 }
               },
               {
@@ -38,12 +38,6 @@
                 "data": {
                   "name": "scoreCoral"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "climberUP"
-                }
               }
             ]
           }
@@ -55,19 +49,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralG To HPRight"
+                  "pathName": "Copy of ToHP1"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "LimbsDown"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "climberUP"
                 }
               }
             ]
@@ -86,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HPRight To CoralC"
+                  "pathName": "Copy of ToScore"
                 }
               },
               {
@@ -111,7 +99,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralC To HPRIGHT"
+                  "pathName": "Copy of ToHP2"
                 }
               },
               {
@@ -136,7 +124,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HPRIGHT To CoralD"
+                  "pathName": "Copy of of ToScore2"
                 }
               },
               {
