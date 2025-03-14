@@ -213,7 +213,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
   public Command wristScore()
   {
-    return setWristAngle(Wrist.active);
+    return spitCoralOut(0.5, Wrist.active);
   }
 
   public Command wristIntake()

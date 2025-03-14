@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CoralArmConstants;
@@ -394,10 +395,9 @@ public class RobotContainer
       coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0).repeatedly());
       coralIntake.setDefaultCommand(coralIntake.wristRest());
     }
-
-    NamedCommands.registerCommand("scoreCoral",
-                                  targetingSystem.setBranchLevel(ReefBranchLevel.L4)
-                                                 .andThen(scoringSystem.scoreCoralAuto()).withTimeout(4).andThen(coralArm.setCoralArmAngle(-40).withTimeout(1)));
+    NamedCommands.registerCommand("prepL4",elevator.CoralL4().repeatedly().alongWith(Commands.waitSeconds(0.3).andThen(coralArm.L4().repeatedly().alongWith(coralIntake.wristScore().repeatedly()))));
+    NamedCommands.registerCommand("scoreCoral", coralArm.score().until(coralArm::coralScored).withTimeout(1));
+    NamedCommands.registerCommand("coralHP", coralArm.setCoralArmAngle(5));
     NamedCommands.registerCommand("scoreProcessor", scoringSystem.scoreAlgaeProcessorAuto().withTimeout(2));
     NamedCommands.registerCommand("loadCoral", loadingSystem.coralLoadAuto().withTimeout(4));
     NamedCommands.registerCommand("loadAlgae", loadingSystem.algaeLoadAuto().withTimeout(2));
@@ -415,7 +415,7 @@ public class RobotContainer
     NamedCommands.registerCommand("climber DOWN", climb.down());
     NamedCommands.registerCommand("Elevatpr Up", elevator.CoralL4().until(elevator.aroundCoralL4()));
             ;//change into parallel cmds
-    NamedCommands.registerCommand("Coral Arm L4", coralArm.setCoralArmAngle(-40).withTimeout(1));
+    NamedCommands.registerCommand("Coral Arm L4", coralArm.L4().withTimeout(1));
     NamedCommands.registerCommand("Coral Intake", coralIntake.spitCoralOut(0.5, Setpoints.Wrist.active).withTimeout(1)) ;
     NamedCommands.registerCommand("Coral Outake", coralIntake.wristOuttake().until(()->!coralArm.coralLoaded()).withTimeout(1));
 

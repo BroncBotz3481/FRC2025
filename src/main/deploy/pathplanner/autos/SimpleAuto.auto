@@ -5,59 +5,47 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Elevator Up"
+                  "pathName": "simplePath"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Coral Intake"
+                  "name": "prepL4"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Coral Arm L4"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Coral Intake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "simplePath"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Coral Outake"
+            "name": "scoreCoral"
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "BackOut"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BackOut"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "coralHP"
+                }
+              }
+            ]
           }
         }
       ]
