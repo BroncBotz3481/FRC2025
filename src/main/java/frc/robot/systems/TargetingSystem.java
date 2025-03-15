@@ -213,8 +213,8 @@ public class TargetingSystem
     targetBranchLevel = level;
     targetReefBranchSide = side;
 
-//    autoTarget(pose);
-    // System.out.println("Coral Branch: "+targetBranch.toString()+" Target Pose: " + getCoralTargetPose().toString());
+   //autoTarget(pose);
+     System.out.println("Coral Branch: "+targetBranch.toString()+" Target Pose: " + getCoralTargetPose().toString());
   }
 
   public void printTargetPose(ReefBranch branch, ReefBranchLevel level, ReefBranchSide side)

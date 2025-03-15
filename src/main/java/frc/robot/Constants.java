@@ -129,7 +129,7 @@ public final class Constants
     public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-60);
     public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(215);
     public static final double  kAlgaeArmRampRate               = 0.5;
-    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(130);
+    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(255);
     public static final boolean kAlgaeArmInverted               = false;
     public static final double  kAlgaeArmMaxVelocityRPM         = AlgaeArm.convertAlgaeAngleToSensorUnits(
         Degrees.of(20)).per(

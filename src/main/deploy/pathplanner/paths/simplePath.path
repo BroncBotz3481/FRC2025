@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.814102564102565,
-        "y": 4.107564102564102
+        "x": 7.021237326706758,
+        "y": 4.003352730105249
       },
       "isLocked": false,
       "linkedName": "startMId"
@@ -20,8 +20,8 @@
         "y": 4.04
       },
       "prevControl": {
-        "x": 6.899350431313688,
-        "y": 4.04
+        "x": 6.473563887749461,
+        "y": 4.033501784360422
       },
       "nextControl": null,
       "isLocked": false,

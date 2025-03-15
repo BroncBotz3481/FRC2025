@@ -252,7 +252,7 @@ public class RobotContainer
 //      m_driverController.povUp().whileTrue(elevator.setElevatorHeight(0.3).andThen(elevator.setElevatorHeight(0.3).alongWith(algaeArm.setAlgaeArmAngle(-20),coralArm.setCoralArmAngle(-20)).withDeadline(climb.up())));
     }
 
-    boolean autoPoseFetchTest = false;
+    boolean autoPoseFetchTest = true;
     if (autoPoseFetchTest)
     {
 
@@ -801,8 +801,9 @@ public class RobotContainer
   {
     // An example command will be run in autonomous
     //return autoChooser.getSelected();
-  return drivebase.driveForwards().withTimeout(2);
+ // return drivebase.driveForwards().withTimeout(2);
   // return drivebase.getAutonomousCommand("SimpleAuto");
+  return drivebase.getAutonomousCommand("TestingAuto");
   }
 
   public Command driveToSetPoint(double x, double y, double angle)
