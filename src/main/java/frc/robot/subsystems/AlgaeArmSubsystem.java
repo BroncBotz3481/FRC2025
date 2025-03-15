@@ -287,7 +287,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   {
     Measurement measurement = armLoaded.getMeasurement();
     if(measurement != null && measurement.status == LASERCAN_STATUS_VALID_MEASUREMENT)
-      return measurement.distance_mm < 50;
+      return measurement.distance_mm < 60;
     return false;
   }
 
@@ -331,7 +331,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
       angleHold = getAngle().in(Degrees);
       m_pidController.reset(AlgaeArm.convertAlgaeAngleToSensorUnits(Degrees.of(angleHold)).in(Rotations));
     }, () -> {
-      reachSetpoint(angleHold);
+      reachSetpoint(MathUtil.clamp(angleHold, AlgaeArmConstants.kAlgaeArmMinAngle.in(Degrees),AlgaeArmConstants.kAlgaeArmMaxAngle.in(Degrees)));
     });
   }
 

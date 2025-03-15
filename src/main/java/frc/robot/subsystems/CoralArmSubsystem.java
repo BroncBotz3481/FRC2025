@@ -219,9 +219,9 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     if (getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees)))
     {
-      System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println(
-          "At max:" + getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees)));
+      // System.out.println("Current angle: " + getAngle().in(Degrees));
+      // System.out.println(
+          // "At max:" + getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees)));
     }
     return getAngle().isNear(CoralArmConstants.kCoralArmMaxAngle, Degrees.of(toleranceDegrees));
 
@@ -237,9 +237,9 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     if (getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees)))
     {
-      System.out.println("Current angle: " + getAngle().in(Degrees));
-      System.out.println(
-          "At min:" + getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees)));
+      // System.out.println("Current angle: " + getAngle().in(Degrees));
+      // System.out.println(
+          // "At min:" + getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees)));
     }
     return getAngle().isNear(CoralArmConstants.kCoralArmMinAngle, Degrees.of(toleranceDegrees));
 
@@ -440,7 +440,8 @@ public class CoralArmSubsystem extends SubsystemBase
                                  CoralArmConstants.kCoralArmMaxAngle.in(Degrees) -
                                  CoralArmConstants.kCoralAngleAllowableError);
       m_pidController.reset(CoralArm.convertCoralAngleToSensorUnits(getAngle()).in(Rotations));
-    }, () -> reachSetpoint(angleHold));
+    }, () ->       reachSetpoint(MathUtil.clamp(angleHold, CoralArmConstants.kCoralArmMinAngle.in(Degrees),CoralArmConstants.kCoralArmMaxAngle.in(Degrees))));
+  
   }
 
   public Command hold()

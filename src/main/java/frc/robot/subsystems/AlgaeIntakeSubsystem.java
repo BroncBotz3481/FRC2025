@@ -9,6 +9,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -41,6 +43,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
     SparkMaxConfig config = new SparkMaxConfig();
     config
           .inverted(true);
+          config.idleMode(IdleMode.kBrake);
     m_rollerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) done
     //       in the constructor or in the robot coordination class, such as RobotContainer.

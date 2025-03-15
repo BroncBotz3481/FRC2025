@@ -61,7 +61,7 @@ public class Launchpad
       changeLED(col, row, new Color8Bit(Color.kOrangeRed));
 
       buttons[row][col] = vjoys[vjoy_num].button(button);
-      buttons[row][col].onTrue(Commands.print("(" + row + "," + (col-1) + ") pressed"));
+      // buttons[row][col].onTrue(Commands.print("(" + row + "," + (col-1) + ") pressed"));
       buttons[row][col].onFalse(Commands.runOnce((() -> this.restoreSavedLED(col, row))));
       buttons[row][col].whileTrue(Commands.run((() -> this.feedback(col, row, pressedColor))));
       }

@@ -137,16 +137,16 @@ public class TargetingSystem
 
   public Command driveToCoralTarget(SwerveSubsystem swerveDrive)
   {
-    return Commands.print("GOING TO POSE").andThen(Commands.runOnce(() -> {
+    return (Commands.runOnce(() -> {
       swerveDrive.getSwerveDrive().field.getObject("target").setPose(getCoralTargetPose());
-    })).andThen(swerveDrive.driveToPose(this::getCoralTargetPose)).andThen(Commands.print("DONE GOING TO POSE"));
+    })).andThen(swerveDrive.driveToPose(this::getCoralTargetPose));
   }
 
   public Command driveToAlgaeTarget(SwerveSubsystem swerveDrive)
   {
-    return Commands.print("GOING TO POSE").andThen(Commands.runOnce(() -> {
+    return (Commands.runOnce(() -> {
       swerveDrive.getSwerveDrive().field.getObject("target").setPose(getAlgaeTargetPose());
-    })).andThen(swerveDrive.driveToPose(this::getAlgaeTargetPose)).andThen(Commands.print("DONE GOING TO POSE"));
+    })).andThen(swerveDrive.driveToPose(this::getAlgaeTargetPose));
   }
 
 
@@ -195,7 +195,7 @@ public class TargetingSystem
 
   public Command autoTargetCommand(Supplier<Pose2d> currentPose)
   {
-    return Commands.runOnce(() -> autoTarget(currentPose)).andThen(Commands.print("Auto-targetting complete"));
+    return Commands.runOnce(() -> autoTarget(currentPose));
   }
 
   public void increaseBranch()
@@ -203,7 +203,7 @@ public class TargetingSystem
     if(targetBranch != null)
     {
       targetBranch = ReefBranch.values()[(targetBranch.ordinal() + 1) % 12];
-      System.out.println("Branch Selected: "+targetBranch.toString());
+      // System.out.println("Branch Selected: "+targetBranch.toString());
     }
   }
 
@@ -214,7 +214,7 @@ public class TargetingSystem
     targetReefBranchSide = side;
 
 //    autoTarget(pose);
-    System.out.println("Coral Branch: "+targetBranch.toString()+" Target Pose: " + getCoralTargetPose().toString());
+    // System.out.println("Coral Branch: "+targetBranch.toString()+" Target Pose: " + getCoralTargetPose().toString());
   }
 
   public void printTargetPose(ReefBranch branch, ReefBranchLevel level, ReefBranchSide side)

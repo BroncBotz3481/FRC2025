@@ -7,6 +7,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 
+import java.lang.annotation.Target;
+
 import au.grapplerobotics.CanBridge;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -147,10 +149,15 @@ public class RobotContainer
   {
     // Sets the coral arm angle to the same as the algae arm if it is not starting in the right height
     //fixCoralArmAngle();
-    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->driveAngularVelocity.allianceRelativeControl(DriverStation.getAlliance().get() == Alliance.Red)));
+    m_driverController.b().whileTrue(Commands.runOnce(()->coralArm.synchronizeAbsoluteEncoder()).andThen(coralArm.setCoralArmAngle(-40)));
+    m_driverController.a().whileTrue(Commands.runOnce(()->algaeArm.synchronizeAbsoluteEncoder()).andThen(algaeArm.setAlgaeArmAngle(-40)));
+
+    m_driverController.x().whileTrue(Commands.runOnce(()->driveAngularVelocity.allianceRelativeControl(true)));
+    m_driverController.y().whileTrue(Commands.runOnce(()->driveAngularVelocity.allianceRelativeControl(false)));
+
+    // RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->driveAngularVelocity.allianceRelativeControl(DriverStation.getAlliance().get() == Alliance.Red)));
     elevator.setDefaultCommand((elevator.setGoal(0.003)));
-    algaeArm.setDefaultCommand(algaeArm.hold().repeatedly());
-    coralArm.setDefaultCommand(coralArm.hold(false).repeatedly());
+    
     climb.setDefaultCommand(climb.setPOwer(0));
     // coralIntake.setDefaultCommand(coralIntake.setCoralIntakePower(0));
     algaeIntake.setDefaultCommand(algaeIntake.hold(() -> algaeArm.algaeLoaded() &&
@@ -400,6 +407,13 @@ public class RobotContainer
       coralArm.setDefaultCommand(coralArm.setCoralArmAngle(0).repeatedly());
       coralIntake.setDefaultCommand(coralIntake.wristRest());
     }
+
+    NamedCommands.registerCommand("elevatorL1", elevator.CoralL1().repeatedly());
+    NamedCommands.registerCommand("prepL1", coralArm.L1().repeatedly());
+
+    NamedCommands.registerCommand("scoreCoralL4", coralArm.L4().repeatedly().alongWith(elevator.CoralL4().repeatedly(),coralIntake.wristScore()).until(coralArm.aroundCoralHPAngle().and(elevator.aroundCoralHP())).andThen((coralIntake.spitCoralOut(-0.5,Wrist.rest))));
+    
+
     NamedCommands.registerCommand("elevatorL4", elevator.CoralL4().repeatedly());
     NamedCommands.registerCommand("prepL4",coralArm.L4().repeatedly());
     NamedCommands.registerCommand("scoreCoralL4", coralArm.L4().repeatedly().alongWith(elevator.CoralL4().repeatedly(),coralIntake.wristScore()).until(coralArm.aroundCoralL4().and(elevator.aroundCoralL4())).andThen(coralArm.score().alongWith(coralIntake.wristScore())));
@@ -529,24 +543,17 @@ public class RobotContainer
     m_OperatorController1.povLeft().whileTrue(scoringSystem.scoreAlgaeNet());
     m_OperatorController1.povRight().whileTrue(algaeArm.PROCESSOR().alongWith(algaeIntake.out()));
 
-    m_OperatorController1.povDown().whileTrue(targetingSystem.setBranchLevel(ReefBranchLevel.L2)
-                                                             .andThen(Commands.runOnce(() ->
-                                                                                           drivebase.getSwerveDrive().field.getObject(
-                                                                                               "target").setPose(
-                                                                                               targetingSystem.getAlgaeTargetPose())))
-                                                             .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
-                                                             .andThen(loadingSystem.algaeLoad()));
+    m_OperatorController1.povDown().whileTrue(algaeArm.L23().repeatedly().alongWith(elevator.AlgaeL23().repeatedly()));
 
     //Algae Load L34
-    m_OperatorController1.povUp().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                           .andThen(Commands.runOnce(() ->
-                                                                                         drivebase.getSwerveDrive().field.getObject(
-                                                                                             "target").setPose(
-                                                                                             targetingSystem.getAlgaeTargetPose())))
-                                                           .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                           .andThen(loadingSystem.algaeLoad()));
+    m_OperatorController1.povUp().whileTrue(algaeArm.L34().repeatedly().alongWith(elevator.AlgaeL34().repeatedly()));
 
     m_OperatorController1.start().whileTrue(algaeArm.setAlgaeArmAngle(-40).alongWith(coralArm.setCoralArmAngle(-40)));
+
+    m_OperatorController1.rightStick().whileTrue(algaeIntake.setAlgaeIntakeRoller(0));
+    m_OperatorController1.axisGreaterThan(4, 0.5).whileTrue(algaeIntake.in());
+    m_OperatorController1.leftStick().whileTrue(coralIntake.wristRest());
+    m_OperatorController1.axisGreaterThan(1, 0.5).whileTrue(coralIntake.wristIntake());
 //--------------------------------------------------------------------------------------------------------------------------------------
     //OPERATOR CONTROLS - Launchpad v
 
@@ -753,7 +760,26 @@ public class RobotContainer
       launchpad.changeLED(7, 0, new Color8Bit(Color.kMediumPurple));
       launchpad.getButton(8, 0).whileTrue(algaeArm.setAlgaeArmAngle(0));
       launchpad.changeLED(8, 0, new Color8Bit(Color.kGreen));
+      
 
+      launchpad.getButton(8, 4).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose).andThen(coralArm.L4().repeatedly().alongWith(elevator.CoralL4().repeatedly())));
+      launchpad.changeLED(8, 4, new Color8Bit(Color.kPurple));
+
+      launchpad.getButton(8, 5).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose).andThen(coralArm.L3().repeatedly().alongWith(elevator.CoralL3().repeatedly())));
+      launchpad.changeLED(8, 5, new Color8Bit(Color.kPurple));
+
+      launchpad.getButton(8, 6).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose).andThen(coralArm.L2().repeatedly().alongWith(elevator.CoralL2().repeatedly())));
+      launchpad.changeLED(8, 6, new Color8Bit(Color.kPurple));
+
+      launchpad.getButton(8, 7).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose).andThen(coralArm.L1().repeatedly().alongWith(elevator.CoralL1().repeatedly())));
+      launchpad.changeLED(8, 7, new Color8Bit(Color.kPurple));
+
+      launchpad.getButton(2, 8).whileTrue(algaeArm.L34().repeatedly());
+      launchpad.changeLED(2, 8, new Color8Bit(Color.kGreen));
+
+      launchpad.getButton(2, 7).whileTrue(algaeArm.L23().repeatedly());
+      launchpad.changeLED(2, 7, new Color8Bit(Color.kGreen));
+      
       launchpad.getButton(8, 8).whileTrue(drivebase.printCurrentPose());
 
       //LAUNCH PAD ^
@@ -899,4 +925,16 @@ public class RobotContainer
                                                                          8,
                                                                          new Color8Bit(ButtonColours.notSelectedColour))));
   }
+
+  public void setAutoDefaults() {
+    // TODO Auto-generated method stub
+    coralArm.setDefaultCommand(coralArm.setCoralArmAngle(-40).repeatedly());
+    algaeArm.setDefaultCommand(algaeArm.setAlgaeArmAngle(-40).repeatedly());
+  }
+
+public void setTeleOPDefaults() {
+    // TODO Auto-generated method stub
+    algaeArm.setDefaultCommand(algaeArm.hold().repeatedly());
+    coralArm.setDefaultCommand(coralArm.hold(false).repeatedly());
+}
 }

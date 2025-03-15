@@ -294,8 +294,7 @@ public class ElevatorSubsystem extends SubsystemBase
     return (m_sysIdRoutine.dynamic(Direction.kForward).until(atMax))
         .andThen(m_sysIdRoutine.dynamic(Direction.kReverse).until(atMin))
         .andThen(m_sysIdRoutine.quasistatic(Direction.kForward).until(atMax))
-        .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse).until(atMin))
-        .andThen(Commands.print("DONE"));
+        .andThen(m_sysIdRoutine.quasistatic(Direction.kReverse).until(atMin));
   }
 
   /**
@@ -428,7 +427,7 @@ public class ElevatorSubsystem extends SubsystemBase
     return startRun(() -> {
       holdPoint = MathUtil.clamp(getHeightMeters(), 0.01, 6);
       m_controller.reset(holdPoint);
-    }, () -> reachGoal(holdPoint));
+    }, () -> reachGoal(MathUtil.clamp(holdPoint,ElevatorConstants.kMinElevatorHeightMeters,ElevatorConstants.kMaxElevatorHeightMeters)));
   }
 
   // Scoring heights

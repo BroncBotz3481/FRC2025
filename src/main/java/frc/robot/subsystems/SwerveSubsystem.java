@@ -318,7 +318,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command printCurrentPose()
   {
-    return Commands.deferredProxy(()->Commands.print("Current Pose: "+getPose().toString()));
+    return Commands.none();//Commands.deferredProxy(()->Commands.print("Current Pose: "+getPose().toString()));
   }
 
   public Command driveToPose(Pose2d pose)
@@ -464,7 +464,7 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
-  public Command driveForwards()
+  public Command  driveForwards()
   {
     return run(() -> {
       swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
