@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 
 import java.lang.annotation.Target;
+import java.util.Set;
 
 import au.grapplerobotics.CanBridge;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -39,7 +40,7 @@ import frc.robot.controllers.ButtonColours;
 import frc.robot.controllers.Launchpad;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
+//import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -73,12 +74,12 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem();
   // Replace with CommandPS4Controller or CommandJoystick if needed
-
+double flip = 1;
 
   // The real world (whats that?)
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> m_driverController.getLeftY(),
-                                                                () -> m_driverController.getLeftX())
+                                                                () -> m_driverController.getLeftY()*-1,
+                                                                () -> m_driverController.getLeftX()*-1)
                                                             .withControllerRotationAxis(() ->
                                                                                             m_driverController.getRightX() *
                                                                                             -1)
@@ -93,7 +94,7 @@ public class RobotContainer
 
   private final ElevatorSubsystem    elevator    = new ElevatorSubsystem();
   private final CoralArmSubsystem    coralArm    = new CoralArmSubsystem();
-  private final ClimberSubsystem     climb       = new ClimberSubsystem();
+ // private final ClimberSubsystem     climb       = new ClimberSubsystem();
   private final AlgaeIntakeSubsystem algaeIntake = new AlgaeIntakeSubsystem();
   private final AlgaeArmSubsystem    algaeArm    = new AlgaeArmSubsystem();
   private final FloorIntakeSubsystem floorIntake = new FloorIntakeSubsystem();
@@ -107,7 +108,6 @@ public class RobotContainer
                                                                     coralIntake,
                                                                     targetingSystem,
                                                                     algaeIntake,
-                                                                    climb,
                                                                     drivebase);
   private final ScoringSystem   scoringSystem   = new ScoringSystem(coralArm,
                                                                     elevator,
@@ -156,9 +156,9 @@ public class RobotContainer
     m_driverController.y().whileTrue(Commands.runOnce(()->driveAngularVelocity.allianceRelativeControl(false)));
 
     // RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->driveAngularVelocity.allianceRelativeControl(DriverStation.getAlliance().get() == Alliance.Red)));
-    elevator.setDefaultCommand((elevator.setGoal(0.003)));
-    
-    climb.setDefaultCommand(climb.setPOwer(0));
+    elevator.setDefaultCommand((elevator.setGoal(0)));
+    algaeArm.setDefaultCommand(algaeArm.hold().repeatedly());
+    coralArm.setDefaultCommand(coralArm.hold(false).repeatedly());
     // coralIntake.setDefaultCommand(coralIntake.setCoralIntakePower(0));
     algaeIntake.setDefaultCommand(algaeIntake.hold(() -> algaeArm.algaeLoaded() &&
                                                          algaeArm.getAngle().gte(Degrees.of(-30))));
@@ -167,7 +167,7 @@ public class RobotContainer
     // algaeIntake.setDefaultCommand(Commands.either(algaeIntake.in(), algaeIntake.setAlgaeIntakeRoller(0), algaeArm::algaeLoaded));
     // drivebase.setDefaultCommand(drivebase.driveFieldOriented(driveDirectAngle));
     drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
-    m_driverController.a().whileTrue(coralIntake.wristIntake().repeatedly());
+    // m_driverController.a().whileTrue(coralIntake.wristIntake().repeatedly());
     launchpad.changeLED(2, 0, new Color8Bit(ButtonColours.AlgaeColour));
     launchpad.changeLED(0, 1, new Color8Bit(ButtonColours.CoralLevelColour));
     launchpad.changeLED(0, 2, new Color8Bit(ButtonColours.CoralLevelColour));
@@ -274,12 +274,12 @@ public class RobotContainer
     boolean climberTesting = false;
     if (climberTesting)
     {
-      m_driverController.y().whileTrue(climb.up());
-      m_driverController.x().whileTrue(climb.down());
-      m_driverController.b().whileTrue(climb.setPOwer(0.5));
-      m_driverController.a().whileTrue(climb.setPOwer(-0.5));
-      m_driverController.leftBumper().whileTrue(loadingSystem.dislodgeAlgaeArm());
-      climb.setDefaultCommand(climb.setPOwer(0));
+      // m_driverController.y().whileTrue(climb.up());
+      // m_driverController.x().whileTrue(climb.down());
+      // m_driverController.b().whileTrue(climb.setPOwer(0.5));
+      // m_driverController.a().whileTrue(climb.setPOwer(-0.5));
+      // m_driverController.leftBumper().whileTrue(loadingSystem.dislodgeAlgaeArm());
+      // climb.setDefaultCommand(climb.setPOwer(0));
 
     }
 
@@ -432,8 +432,8 @@ public class RobotContainer
                                                                                         .and(coralArm.aroundCoralL4()))).withTimeout(1)));
 
     NamedCommands.registerCommand("ArmOut", (coralArm.setCoralArmAngle(-40).alongWith(elevator.setElevatorHeight(0.006),algaeArm.setAlgaeArmAngle(-40)).withTimeout(1)));
-    NamedCommands.registerCommand("climber UP", climb.up());
-    NamedCommands.registerCommand("climber DOWN", climb.down());
+    NamedCommands.registerCommand("climber UP", Commands.none());
+    NamedCommands.registerCommand("climber DOWN", Commands.none());
     NamedCommands.registerCommand("Elevatpr Up", elevator.CoralL4().until(elevator.aroundCoralL4()));
             ;//change into parallel cmds
     NamedCommands.registerCommand("Coral Arm L4", coralArm.L4().withTimeout(1));
@@ -470,8 +470,8 @@ public class RobotContainer
       m_driverController.leftBumper()
                         .whileFalse(Commands.run(() -> driveAngularVelocity.scaleTranslation(0.8)));//Fast mode
 
-      m_driverController.povUp().whileTrue(climb.climb());
-      m_driverController.povDown().whileTrue(climb.down());
+      m_driverController.povUp().whileTrue( Commands.none());
+      m_driverController.povDown().whileTrue( Commands.none());
     }
     //m_driverController.y().onTrue(drivebase.rotateToHeading((Rotation2d.fromDegrees(90))).withTimeout(1));
     //m_driverController.button(1).onTrue(Commands.print("Turn 90 Counter-Clockwise"));
@@ -801,9 +801,12 @@ public class RobotContainer
   {
     // An example command will be run in autonomous
     //return autoChooser.getSelected();
- // return drivebase.driveForwards().withTimeout(2);
-  // return drivebase.getAutonomousCommand("SimpleAuto");
-  return drivebase.getAutonomousCommand("TestingAuto");
+// return drivebase.driveForwards().withTimeout(2);
+ return drivebase.driveBackwards().withTimeout(2);
+ //return null;
+   //
+  //  return drivebase.getAutonomousCommand("SimpleAuto");
+ // return drivebase.getAutonomousCommand("TestingAuto");
   }
 
   public Command driveToSetPoint(double x, double y, double angle)
@@ -929,13 +932,17 @@ public class RobotContainer
 
   public void setAutoDefaults() {
     // TODO Auto-generated method stub
-    coralArm.setDefaultCommand(coralArm.setCoralArmAngle(-40).repeatedly());
-    algaeArm.setDefaultCommand(algaeArm.setAlgaeArmAngle(-40).repeatedly());
+    coralArm.setDefaultCommand(coralArm.setPower(0));
+    algaeArm.setDefaultCommand(algaeArm.setPower(0));
+    // coralArm.setDefaultCommand(coralArm.setCoralArmAngle(-40).repeatedly());
+    // algaeArm.setDefaultCommand(algaeArm.setAlgaeArmAngle(-40).repeatedly());
   }
 
 public void setTeleOPDefaults() {
     // TODO Auto-generated method stub
-    algaeArm.setDefaultCommand(algaeArm.hold().repeatedly());
-    coralArm.setDefaultCommand(coralArm.hold(false).repeatedly());
+    algaeArm.setDefaultCommand(Commands.defer(()->algaeArm.setAlgaeArmAngle(Math.round(algaeArm.getAngle().in(Degrees))).repeatedly(), Set.of(algaeArm)));
+
+    coralArm.setDefaultCommand(Commands.defer(()->coralArm.setCoralArmAngle((coralArm.getAngle().in(Degrees))).repeatedly(), Set.of(coralArm)));
+   // coralArm.setDefaultCommand(coralArm.hold().repeatedly());
 }
 }

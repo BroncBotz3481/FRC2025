@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.AlignmentConstants;
 import frc.robot.AlignmentConstants.DriveToPose;
@@ -66,6 +67,7 @@ import swervelib.SwerveDriveTest;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+
 
 public class SwerveSubsystem extends SubsystemBase
 {
@@ -96,6 +98,8 @@ public class SwerveSubsystem extends SubsystemBase
     }
     setupPathPlanner();
     setupLimelight();
+    // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
+   
   }
 
 
@@ -318,7 +322,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command printCurrentPose()
   {
-    return Commands.none();//Commands.deferredProxy(()->Commands.print("Current Pose: "+getPose().toString()));
+    return Commands.none();//dCommands.deferredProxy(()->Commands.print("Current Pose: "+getPose().toString()));
   }
 
   public Command driveToPose(Pose2d pose)
@@ -433,7 +437,7 @@ public class SwerveSubsystem extends SubsystemBase
 
     });
   }
-
+  
   public Command driveToRightHP()
   {
     return defer(() -> {
@@ -484,6 +488,8 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
 
+
+
   public Command drive(Supplier<ChassisSpeeds> driveAngularVelocity)
   {
     return run(() -> {
@@ -499,6 +505,10 @@ public class SwerveSubsystem extends SubsystemBase
                                                                                           getHeading().getRadians() -
                                                                                           rotation2d.getRadians()),
                                        false, true));
+  }
+
+  public void zeroGyro(){
+    swerveDrive.zeroGyro();
   }
 
 }

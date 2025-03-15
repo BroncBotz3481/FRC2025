@@ -7,7 +7,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Setpoints;
 import frc.robot.subsystems.AlgaeArmSubsystem;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
+//import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -26,7 +26,6 @@ public class LoadingSystem
   private AlgaeIntakeSubsystem m_algaeIntake;
   private CoralIntakeSubsystem m_coralIntake;
   private SwerveSubsystem      m_swerve;
-  private ClimberSubsystem m_climb;
 
 
   public LoadingSystem(CoralArmSubsystem coralArm,
@@ -35,7 +34,6 @@ public class LoadingSystem
                        CoralIntakeSubsystem coralIntake,
                        TargetingSystem targetSys,
                        AlgaeIntakeSubsystem algaeIntake,
-                       ClimberSubsystem climber,
                        SwerveSubsystem swerve)
   {
     m_coralArm = coralArm;
@@ -46,15 +44,14 @@ public class LoadingSystem
     m_algaeIntake = algaeIntake;
     m_coralIntake = coralIntake;
     m_swerve = swerve;
-    m_climb = climber;
   }
 
-  public Command dislodgeAlgaeArm()
-  {
-    return m_climb.down()
-                  .andThen(m_algaeArm.setAlgaeArmAngle(-10).withTimeout(1))
-                  .andThen(m_climb.up());
-  }
+  // public Command dislodgeAlgaeArm()
+  // {
+  //   return m_climb.down()
+  //                 .andThen(m_algaeArm.setAlgaeArmAngle(-10).withTimeout(1))
+  //                 .andThen(m_climb.up());
+  // }
 
   //For testing, set the sensor to low voltage first
   //The elevator needs to rise first for the arm to come out

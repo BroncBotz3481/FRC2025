@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.HWMap.Climber;
 
+@Deprecated
 public class ClimberSubsystem extends SubsystemBase
 {
 
