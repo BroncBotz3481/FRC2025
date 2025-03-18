@@ -411,7 +411,7 @@ double flip = 1;
     NamedCommands.registerCommand("elevatorL1", elevator.CoralL1().repeatedly());
     NamedCommands.registerCommand("prepL1", coralArm.L1().repeatedly());
 
-    NamedCommands.registerCommand("scoreCoralL4", coralArm.L4().repeatedly().alongWith(elevator.CoralL4().repeatedly(),coralIntake.wristScore()).until(coralArm.aroundCoralHPAngle().and(elevator.aroundCoralHP())).andThen((coralIntake.spitCoralOut(-0.5,Wrist.rest))));
+   // NamedCommands.registerCommand("scoreCoralL4", coralArm.L4().repeatedly().alongWith(elevator.CoralL4().repeatedly(),coralIntake.wristScore()).until(coralArm.aroundCoralHPAngle().and(elevator.aroundCoralHP())).andThen((coralIntake.spitCoralOut(-0.5,Wrist.rest))));
     
 
     NamedCommands.registerCommand("elevatorL4", elevator.CoralL4().repeatedly());
@@ -439,6 +439,7 @@ double flip = 1;
     NamedCommands.registerCommand("Coral Arm L4", coralArm.L4().withTimeout(1));
     NamedCommands.registerCommand("Coral Intake", coralIntake.spitCoralOut(0.5, Setpoints.Wrist.active).withTimeout(1)) ;
     NamedCommands.registerCommand("Coral Outake", coralIntake.wristOuttake().until(()->!coralArm.coralLoaded()).withTimeout(1));
+    NamedCommands.registerCommand("Lock Pose", drivebase.lockPos());
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData(autoChooser);
@@ -802,10 +803,10 @@ double flip = 1;
     // An example command will be run in autonomous
     //return autoChooser.getSelected();
 // return drivebase.driveForwards().withTimeout(2);
- return drivebase.driveBackwards().withTimeout(2);
+//USE THE BACKWARDS ONE 
+ //return drivebase.driveBackwards().withTimeout(2);
  //return null;
-   //
-  //  return drivebase.getAutonomousCommand("SimpleAuto");
+    return drivebase.getAutonomousCommand("SimpleAuto");
  // return drivebase.getAutonomousCommand("TestingAuto");
   }
 

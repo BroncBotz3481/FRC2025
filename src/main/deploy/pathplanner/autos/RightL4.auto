@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Apriltag6simplePath"
+                  "pathName": "LeftStart"
                 }
               },
               {
@@ -54,7 +54,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TestingBackOut"
+                  "pathName": "LeftBackOut"
                 }
               }
             ]

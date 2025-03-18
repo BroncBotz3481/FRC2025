@@ -36,12 +36,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Coral Intake"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -58,6 +52,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Lock Pose"
           }
         },
         {

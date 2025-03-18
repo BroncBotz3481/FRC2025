@@ -152,6 +152,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "LeftAuto",
+  "folder": "Not working Autos",
   "choreoAuto": false
 }
