@@ -340,6 +340,12 @@ public class CoralArmSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    Measurement laserCanMeasurement = coralDistance.getMeasurement();
+    if(laserCanMeasurement == null)
+    {
+      SmartDashboard.putBoolean("Coral Detected", coralLoaded());
+      // SmartDashboard.putNumber("Coral Arm LaserCAN (mm)", laserCanMeasurement.distance_mm);
+    }
     SmartDashboard.putNumber("Coral Arm Sensor (Rotations)", m_encoder.getPosition());
     SmartDashboard.putNumber("Coral Arm Angle (Degrees)", getAngle().in(Degrees));
     SmartDashboard.putNumber("Coral Arm Angle Absolute (Degrees)",

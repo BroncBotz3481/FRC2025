@@ -393,7 +393,7 @@ double flip = 1;
       m_OperatorController1.rightBumper().whileTrue(coralIntake.setCoralIntakePower(-0.2));
 
       coralIntake.setDefaultCommand(coralIntake.setCoralIntakePower(0));
-      coralArm.setDefaultCommand(coralArm.hold());
+      //coralArm.setDefaultCommand(coralArm.hold());
     }
 
     boolean wristTesting = false;
@@ -806,7 +806,16 @@ double flip = 1;
 //USE THE BACKWARDS ONE 
  //return drivebase.driveBackwards().withTimeout(2);
  //return null;
-    return drivebase.getAutonomousCommand("SimpleAuto");
+    return targetingSystem.autoTargetCommand(drivebase::getPose)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getCoralTargetPose())))
+    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4)
+    .andThen(targetingSystem.setBranchSide(ReefBranchSide.RIGHT))
+    .andThen(elevator.setElevatorHeight(0.2))
+    .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
+    .andThen(scoringSystem.scoreCoral()));
  // return drivebase.getAutonomousCommand("TestingAuto");
   }
 
