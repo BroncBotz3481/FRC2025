@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftStart"
+                  "pathName": "RightStart"
                 }
               },
               {
@@ -54,7 +54,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftBackOut"
+                  "pathName": "RightBackOut"
                 }
               }
             ]
