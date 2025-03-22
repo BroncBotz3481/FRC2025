@@ -83,7 +83,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   public SwerveSubsystem()
   {
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
     try
     {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.maxSpeed,

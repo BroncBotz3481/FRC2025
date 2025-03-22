@@ -214,6 +214,7 @@ public class TargetingSystem
     targetReefBranchSide = side;
 
    //autoTarget(pose);
+   if(targetBranch!=null)
      System.out.println("Coral Branch: "+targetBranch.toString()+" Target Pose: " + getCoralTargetPose().toString());
   }
 

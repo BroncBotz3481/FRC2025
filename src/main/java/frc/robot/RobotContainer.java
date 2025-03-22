@@ -252,7 +252,7 @@ double flip = 1;
 //      m_driverController.povUp().whileTrue(elevator.setElevatorHeight(0.3).andThen(elevator.setElevatorHeight(0.3).alongWith(algaeArm.setAlgaeArmAngle(-20),coralArm.setCoralArmAngle(-20)).withDeadline(climb.up())));
     }
 
-    boolean autoPoseFetchTest = true;
+    boolean autoPoseFetchTest = false;
     if (autoPoseFetchTest)
     {
 
@@ -490,54 +490,19 @@ double flip = 1;
     //OPERATOR CONTROLLER CONTROLS v
 
     //L1 Score Coral
-    m_OperatorController1.a().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                       .andThen(Commands.runOnce(() ->
-                                                                                     drivebase.getSwerveDrive().field.getObject(
-                                                                                         "target").setPose(
-                                                                                         targetingSystem.getCoralTargetPose())))
-                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L1))
-                                                       .andThen(scoringSystem.scoreCoral())
-                                       );
+    m_OperatorController1.a().whileTrue(coralArm.L1().andThen(elevator.CoralL1()).alongWith(coralIntake.setWristAngle(Wrist.rest)));
+                                       
 
-    m_OperatorController1.b().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                       .andThen(Commands.runOnce(() ->
-                                                                                     drivebase.getSwerveDrive().field.getObject(
-                                                                                         "target").setPose(
-                                                                                         targetingSystem.getCoralTargetPose())))
-                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2))
-                                                       .andThen(scoringSystem.scoreCoral())
-                                       );
+    m_OperatorController1.b().whileTrue(coralArm.L2().andThen(elevator.CoralL2()).alongWith(coralIntake.setWristAngle(Wrist.active)));                                   
 
-    m_OperatorController1.x().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                       .andThen(Commands.runOnce(() ->
-                                                                                     drivebase.getSwerveDrive().field.getObject(
-                                                                                         "target").setPose(
-                                                                                         targetingSystem.getCoralTargetPose())))
-                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3))
-                                                       .andThen(scoringSystem.scoreCoral())
-                                       );
+    m_OperatorController1.x().whileTrue(coralArm.L3().andThen(elevator.CoralL3()).alongWith(coralIntake.setWristAngle(Wrist.active)));
 
-    m_OperatorController1.y().whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
-                                                       .andThen(Commands.runOnce(() ->
-                                                                                     drivebase.getSwerveDrive().field.getObject(
-                                                                                         "target").setPose(
-                                                                                         targetingSystem.getCoralTargetPose())))
-                                                       .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
-                                                       .andThen(scoringSystem.scoreCoral())
-                                       );
-    m_OperatorController1.leftBumper().whileTrue(targetingSystem.setBranchSide(ReefBranchSide.LEFT)
-                                                                .andThen(Commands.runOnce(() ->
-                                                                                              drivebase.getSwerveDrive().field.getObject(
-                                                                                                  "target").setPose(
-                                                                                                  targetingSystem.getCoralTargetPose()))));
-    m_OperatorController1.rightBumper().whileTrue(targetingSystem.setBranchSide(ReefBranchSide.RIGHT)
-                                                                 .andThen(Commands.runOnce(() ->
-                                                                                               drivebase.getSwerveDrive().field.getObject(
-                                                                                                   "target").setPose(
-                                                                                                   targetingSystem.getCoralTargetPose()))));
+    m_OperatorController1.y().whileTrue(coralArm.L4().andThen(elevator.CoralL4()).alongWith(coralIntake.setWristAngle(Wrist.active)));
+                                       
+    m_OperatorController1.leftBumper().whileTrue(coralIntake.wristOuttake());
+    m_OperatorController1.rightBumper().whileTrue(algaeIntake.out());
 
-    m_OperatorController1.rightTrigger().whileTrue(algaeIntake.out()
-                                                              .finallyDo(() -> algaeIntake.setAlgaeIntakeRoller(0)));
+    m_OperatorController1.rightTrigger().whileTrue(algaeIntake.in());
     m_OperatorController1.leftTrigger().whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP).repeatedly()
                                                           .alongWith(coralIntake.wristIntake().repeatedly()));
 
@@ -551,10 +516,7 @@ double flip = 1;
 
     m_OperatorController1.start().whileTrue(algaeArm.setAlgaeArmAngle(-40).alongWith(coralArm.setCoralArmAngle(-40)));
 
-    m_OperatorController1.rightStick().whileTrue(algaeIntake.setAlgaeIntakeRoller(0));
-    m_OperatorController1.axisGreaterThan(4, 0.5).whileTrue(algaeIntake.in());
-    m_OperatorController1.leftStick().whileTrue(coralIntake.wristRest());
-    m_OperatorController1.axisGreaterThan(1, 0.5).whileTrue(coralIntake.wristIntake());
+    
 //--------------------------------------------------------------------------------------------------------------------------------------
     //OPERATOR CONTROLS - Launchpad v
 
@@ -802,18 +764,18 @@ double flip = 1;
   {
     // An example command will be run in autonomous
     //return autoChooser.getSelected();
-// return drivebase.driveForwards().withTimeout(2);
 //USE THE BACKWARDS ONE 
  //return drivebase.driveBackwards().withTimeout(2);
  //return null;
-    return targetingSystem.setTargetCommand(ReefBranch.H, ReefBranchLevel.L4)
-    .andThen(Commands.runOnce(() ->
-                                  drivebase.getSwerveDrive().field.getObject(
-                                      "target").setPose(
-                                      targetingSystem.getCoralTargetPose())))
-    .andThen(elevator.setElevatorHeight(0.2))
-    .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
-    .andThen(scoringSystem.scoreCoral());
+    // return targetingSystem.setTargetCommand(ReefBranch.H, ReefBranchLevel.L4)
+    // .andThen(Commands.runOnce(() ->
+    //                               drivebase.getSwerveDrive().field.getObject(
+    //                                   "target").setPose(
+    //                                   targetingSystem.getCoralTargetPose())))
+    // .andThen(elevator.setElevatorHeight(0.2))
+    // .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
+    // .andThen(scoringSystem.scoreCoral());
+    return null;
  // return drivebase.getAutonomousCommand("TestingAuto");
   }
 

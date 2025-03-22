@@ -287,7 +287,7 @@ public class AlgaeArmSubsystem extends SubsystemBase
   {
     Measurement measurement = armLoaded.getMeasurement();
     if(measurement != null && measurement.status == LASERCAN_STATUS_VALID_MEASUREMENT)
-      return measurement.distance_mm < 60;
+      return measurement.distance_mm < 70;
     return false;
   }
 
