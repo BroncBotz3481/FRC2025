@@ -682,7 +682,7 @@ double flip = 1;
       // m_OperatorController1.button(19).onTrue(loadingSystem.coralLock());
       launchpad.getButton(6, 1).whileTrue(coralIntake.setCoralIntakePower(1));
 
-      launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngle(Setpoints.Arm.Coral.HP));
+      launchpad.getButton(7, 1).whileTrue(coralArm.setCoralArmAngleInf(Setpoints.Arm.Coral.HP).alongWith(coralIntake.wristIntake()));
       launchpad.getButton(4, 3).whileTrue(coralIntake.wristIntake());
       launchpad.changeLED(4, 3, new Color8Bit(Color.kRed));
       launchpad.getButton(5, 3).whileTrue(coralIntake.wristScore());

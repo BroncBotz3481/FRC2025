@@ -1,14 +1,4 @@
 {
-  "Keyboard 0 Settings": {
-    "window": {
-      "visible": true
-    }
-  },
-  "Keyboard 2 Settings": {
-    "window": {
-      "visible": true
-    }
-  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -105,7 +95,8 @@
   ],
   "robotJoysticks": [
     {
-      "guid": "Keyboard2"
+      "guid": "78696e70757401000000000000000000",
+      "useGamepad": true
     },
     {
       "guid": "0300000034120000adbe000000000000"
@@ -116,9 +107,12 @@
     {
       "guid": "0300000034120000adbe000000000000"
     },
-    {},
     {
-      "guid": "0300000034120000adbe000000000000"
+      "guid": "78696e70757401000000000000000000",
+      "useGamepad": true
+    },
+    {
+      "useGamepad": true
     }
   ]
 }
