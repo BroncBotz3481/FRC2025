@@ -767,15 +767,15 @@ double flip = 1;
 //USE THE BACKWARDS ONE 
  //return drivebase.driveBackwards().withTimeout(2);
  //return null;
-    // return targetingSystem.setTargetCommand(ReefBranch.H, ReefBranchLevel.L4)
-    // .andThen(Commands.runOnce(() ->
-    //                               drivebase.getSwerveDrive().field.getObject(
-    //                                   "target").setPose(
-    //                                   targetingSystem.getCoralTargetPose())))
-    // .andThen(elevator.setElevatorHeight(0.2))
-    // .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
-    // .andThen(scoringSystem.scoreCoral());
-    return null;
+    return targetingSystem.setTargetCommand(ReefBranch.H, ReefBranchLevel.L4)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getCoralTargetPose())))
+    .andThen(elevator.setElevatorHeight(0.2))
+    .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
+    .andThen(scoringSystem.scoreCoral());
+    //return null;
  // return drivebase.getAutonomousCommand("TestingAuto");
   }
 

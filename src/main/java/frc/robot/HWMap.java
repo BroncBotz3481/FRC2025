@@ -17,7 +17,7 @@ public class HWMap
 
     public static final int algaeRollerID      = 19;
     public static final int algaeArmMotorID    = 16;
-    public static final int algaeLaserCan = 22;
+    public static final int algaeLaserCan = 21;
   }
 
   public static class Coral

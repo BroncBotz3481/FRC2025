@@ -129,7 +129,7 @@ public final class Constants
     public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-60);
     public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(215);
     public static final double  kAlgaeArmRampRate               = 0.5;
-    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(115);
+    public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(115.2);
     public static final boolean kAlgaeArmInverted               = false;
     public static final double  kAlgaeArmMaxVelocityRPM         = AlgaeArm.convertAlgaeAngleToSensorUnits(
         Degrees.of(20)).per(
@@ -166,7 +166,7 @@ public final class Constants
     public static final Angle   kCoralArmMinAngle               = Degrees.of(-92);
     public static final Angle   kCoralArmMaxAngle               = Degrees.of(87);
     public static final double  kCoralArmRampRate               = 0.5;
-    public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(267);
+    public static final Angle   kCoralArmOffsetToHorizantalZero = Degrees.of(268.6);
     public static final boolean kCoralArmInverted               = true;
     public static final double  kCoralArmMaxVelocityRPM
                                                                 = CoralArm.convertCoralAngleToSensorUnits(Degrees.of(
@@ -220,11 +220,12 @@ public final class Constants
   public static class IntakeConstants
   {
 
-    public static final double AlgaeIntakeSpeeds  = 1;
+    public static final double AlgaeIntakeSpeeds  = 0.5;
     public static final double AlgaeOuttakeSpeeds = -0.8;
 
     public static final int    k_wristCurrentLimit       = 40;
     public static final double k_wristClosedLoopRampRate = 0.25;
+    public static final double AlgaeHoldSpeed = 0.2;
 
   }
 

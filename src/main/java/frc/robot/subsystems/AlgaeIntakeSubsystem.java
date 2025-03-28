@@ -42,7 +42,8 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
   {
     SparkMaxConfig config = new SparkMaxConfig();
     config
-          .inverted(true);
+          .inverted(true)
+          .smartCurrentLimit(40);
           config.idleMode(IdleMode.kBrake);
     m_rollerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command) done
@@ -91,7 +92,7 @@ public class AlgaeIntakeSubsystem extends SubsystemBase
   }
 
 public Command hold(BooleanSupplier algae) {
-  return run(()->m_rollerMotor.set(algae.getAsBoolean() ? IntakeConstants.AlgaeIntakeSpeeds : 0));
+  return run(()->m_rollerMotor.set(algae.getAsBoolean() ? IntakeConstants.AlgaeHoldSpeed : 0));
 }
 
 

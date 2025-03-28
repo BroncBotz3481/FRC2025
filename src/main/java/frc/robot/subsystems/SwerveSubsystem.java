@@ -83,7 +83,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   public SwerveSubsystem()
   {
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try
     {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.maxSpeed,
@@ -232,7 +232,7 @@ public class SwerveSubsystem extends SubsystemBase
 
   /**
    * Setup AutoBuilder for PathPlanner.
-   */
+   **/
   public void setupPathPlanner()
   {
     // Load the RobotConfig from the GUI settings. You should probably

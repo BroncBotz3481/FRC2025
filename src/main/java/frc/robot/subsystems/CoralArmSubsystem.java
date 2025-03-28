@@ -364,7 +364,7 @@ public class CoralArmSubsystem extends SubsystemBase
   {
     if (RobotBase.isSimulation())
     {
-      return coralDistanceSim.getMeasurement().distance_mm < 100;
+      return coralDistanceSim.getMeasurement().distance_mm < 110;
     } else
     {
       Measurement measure = coralDistance.getMeasurement();
