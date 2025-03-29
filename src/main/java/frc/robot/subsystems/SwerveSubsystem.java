@@ -325,17 +325,36 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command driveToPose(Pose2d pose)
   {
-    DriveToPose.driveController.getXController().reset();
-    DriveToPose.driveController.getYController().reset();
-    DriveToPose.driveController.getThetaController().reset(getPose().getRotation().getRadians());
+    boolean useSetpointGenerator  = false;
+    boolean useProfiledController = false;
+    boolean resetBeforehand       = true;
+    Supplier<ChassisSpeeds> robotRelativeSpeeds;
 
-    DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose(), swerveDrive.getFieldVelocity());
+    if (resetBeforehand)
+    {
+      DriveToPose.driveController.getXController().reset();
+      DriveToPose.driveController.getYController().reset();
+      DriveToPose.driveController.getThetaController().reset(getPose().getRotation().getRadians());
 
-    Supplier<ChassisSpeeds> robotRelativeSpeeds  = () -> DriveToPose.driveController.calculate(getPose(),
-                                                                                               pose,
-                                                                                               0,
-                                                                                               pose.getRotation());
-    boolean                 useSetpointGenerator = false;
+      if (useProfiledController)
+      {
+        DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose(), swerveDrive.getFieldVelocity());
+      }
+    }
+    if (useProfiledController)
+    {
+      robotRelativeSpeeds = () -> DriveToPose.profiledDriveController.calculate(getPose(),
+                                                                                pose,
+                                                                                0,
+                                                                                pose.getRotation());
+    } else
+    {
+      robotRelativeSpeeds = () -> DriveToPose.driveController.calculate(getPose(),
+                                                                        pose,
+                                                                        0,
+                                                                        pose.getRotation());
+    }
+
     if (useSetpointGenerator)
     {
       try
