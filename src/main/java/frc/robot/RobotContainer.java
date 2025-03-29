@@ -7,20 +7,17 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 
-import java.lang.annotation.Target;
 import java.util.Set;
 
-import au.grapplerobotics.CanBridge;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.reduxrobotics.canand.CanandEventLoop;
+
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -29,9 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CoralArmConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -213,38 +208,35 @@ double flip = 1;
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
     setDefaultCommands();
-    configureBindings();
+    //configureBindings();
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
 
-    boolean autoAlignTest = false;
+    boolean autoAlignTest = true;
     if (autoAlignTest)
     {
-      coralArm.setDefaultCommand(coralArm.hold());
-      algaeArm.setDefaultCommand(algaeArm.hold());
-      coralIntake.setDefaultCommand(coralIntake.wristRest());
-      algaeIntake.setDefaultCommand(algaeIntake.hold(algaeArm::algaeLoaded));
-      elevator.setDefaultCommand(elevator.setGoal(0.003));
-      drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
-      m_driverController.leftBumper().whileTrue(targetingSystem.setBranchSide(ReefBranchSide.LEFT)
-                                                               .andThen(Commands.runOnce(() -> drivebase.getSwerveDrive().field.getObject(
-                                                                                                            "target")
-                                                                                                                               .setPose(
-                                                                                                                                   targetingSystem.getCoralTargetPose()))));
-      m_driverController.rightBumper().whileTrue(targetingSystem.setBranchSide(ReefBranchSide.RIGHT)
-                                                                .andThen(Commands.runOnce(() -> drivebase.getSwerveDrive().field.getObject(
-                                                                                                             "target")
-                                                                                                                                .setPose(
-                                                                                                                                    targetingSystem.getCoralTargetPose()))));
+      // coralArm.setDefaultCommand(coralArm.hold());
+      // algaeArm.setDefaultCommand(algaeArm.hold());
+      // coralIntake.setDefaultCommand(coralIntake.wristRest());
+      // algaeIntake.setDefaultCommand(algaeIntake.hold(algaeArm::algaeLoaded));
+      // elevator.setDefaultCommand(elevator.setGoal(0.003));
+      // drivebase.setDefaultCommand(driveRobotOrientedAngularVelocity);
+      m_driverController.button(1).whileTrue(targetingSystem.autoTargetCommand(drivebase::getPose)
+      .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                       "target").setPose(
+                                                               targetingSystem.getCoralTargetPose())))
+                              .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
+                        );
 
-      m_driverController.a().whileTrue(targetingSystem.setBranchLevel(ReefBranchLevel.L4)
-                                                      .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
-                                                      .andThen(Commands.runOnce(() -> drivebase.getSwerveDrive().field.getObject(
-                                                          "target").setPose(targetingSystem.getCoralTargetPose()))));
-      m_driverController.x().whileTrue(scoringSystem.scoreCoral());
+      m_driverController.button(2).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.LEFT));
+      m_driverController.button(3).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.RIGHT));
+
+//score coral
+      m_driverController.button(4).whileTrue(scoringSystem.scoreCoral());
       m_driverController.y().whileTrue(loadingSystem.coralLoad());
       m_driverController.b().whileTrue(loadingSystem.algaeLoad());
       m_driverController.start().whileTrue(drivebase.printCurrentPose());
@@ -648,8 +640,16 @@ double flip = 1;
                                                          .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L4))
                                          );
 
-      launchpad.getButton(3, 0).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.LEFT));
-      launchpad.getButton(4, 0).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.RIGHT));
+      launchpad.getButton(3, 0).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.LEFT)
+                                              .andThen(Commands.runOnce(() ->
+                                              drivebase.getSwerveDrive().field.getObject(
+                                                  "target").setPose(
+                                                                          targetingSystem.getCoralTargetPose()))));
+      launchpad.getButton(4, 0).whileTrue(targetingSystem.setBranchSide(ReefBranchSide.RIGHT)
+                                              .andThen(Commands.runOnce(() ->
+                                              drivebase.getSwerveDrive().field.getObject(
+                                                  "target").setPose(
+                                                                          targetingSystem.getCoralTargetPose()))));
 
       //score coral
       launchpad.getButton(7, 8).whileTrue(scoringSystem.scoreCoral());
