@@ -370,7 +370,7 @@ public class CoralArmSubsystem extends SubsystemBase
       Measurement measure = coralDistance.getMeasurement();
       if (measure != null && measure.status == LASERCAN_STATUS_VALID_MEASUREMENT)
       {
-        return measure.distance_mm < 25;
+        return measure.distance_mm < 90;
       }
     }
     return false;

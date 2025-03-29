@@ -126,7 +126,7 @@ public final class Constants
     public static final double  kAlgaeArmMass                   = Units.lbsToKilograms(15); // Kilograms
     public static final double  kAlgaeArmLength                 = Inches.of(31).in(Meters);//.7meter
     public static final Angle   kAlgaeArmStartingAngle          = Degrees.of(-60);
-    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-60);
+    public static final Angle   kAlgaeArmMinAngle               = Degrees.of(-78);
     public static final Angle   kAlgaeArmMaxAngle               = Degrees.of(215);
     public static final double  kAlgaeArmRampRate               = 0.5;
     public static final Angle   kAlgaeArmOffsetToHorizantalZero = Degrees.of(115.2);

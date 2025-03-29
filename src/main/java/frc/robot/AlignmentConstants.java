@@ -33,11 +33,11 @@ public class AlignmentConstants
 
     public static final boolean enableDriveFeedFords = true;
 
-    public static final PIDConstants          translationPID                            = new PIDConstants(5.0,
+    public static final PIDConstants          translationPID                            = new PIDConstants(4.0,
                                                                                                            0,
                                                                                                            0); // 4.0, 0,0
-    public static final double                maximumVelocityMetersPerSecond            = 0.70;
-    public static final double                maximumAccelerationMetersPerSecondSquared = 0.65;
+    public static final double                maximumVelocityMetersPerSecond            = 1.3;
+    public static final double                maximumAccelerationMetersPerSecondSquared = 0.95;
     public static final PIDController         translationController                     = new PIDController(
         translationPID.kP,
         translationPID.kI,
@@ -48,7 +48,7 @@ public class AlignmentConstants
         translationPID.kD,
         new Constraints(maximumVelocityMetersPerSecond, maximumAccelerationMetersPerSecondSquared));
 
-    public static final PIDConstants          rotationPID                                       = new PIDConstants(5.0,
+    public static final PIDConstants          rotationPID                                       = new PIDConstants(3.0,
                                                                                                                    // 3.0
                                                                                                                    0,
                                                                                                                    0);

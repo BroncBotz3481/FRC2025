@@ -67,7 +67,7 @@ class LaunchpadMini3Controller:
     def setupNetworkTableClient(self, launchpadNTKey: str):
         self.networkTables = ntcore.NetworkTableInstance.getDefault()
         self.networkTables.startClient4("launchpad")
-#         self.networkTables.setServerTeam(self.teamnumber)
+        self.networkTables.setServerTeam(self.teamnumber)
         self.networkTables.setServer("localhost") # Sim only
         self.networkTables.startDSClient()
         self.launchpadTable = self.networkTables.getTable(launchpadNTKey)

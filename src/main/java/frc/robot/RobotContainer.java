@@ -64,7 +64,7 @@ public class RobotContainer
   public static       CommandXboxController m_OperatorController1 =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
-  private final Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(Color.kRed));
+  public final Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(Color.kRed));
 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem();
@@ -202,20 +202,30 @@ double flip = 1;
 
   public RobotContainer()
   {
+//flamingo
+    boolean autoAlignTest = false;
+    boolean autoPoseFetchTest = false;
+    boolean climberTesting = false;
+    boolean armSensorTesting = false;
+    boolean scoreCoralTesting = false;
+    boolean elevatorTesting = false;
+    boolean algaeArmTesting = false;
+    boolean coralArmTesting = false;
+    boolean wristTesting = false;
+
     CanandEventLoop.getInstance();
     CanBridge.runTCP();
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Side View", Constants.sideRobotView);
     // Configure the trigger bindings
     setDefaultCommands();
-    //configureBindings();
+    configureBindings();
 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
 //------------------------------------------------------------------------
     //TESTING COMMANDS v
 
-    boolean autoAlignTest = true;
     if (autoAlignTest)
     {
       // coralArm.setDefaultCommand(coralArm.hold());
@@ -237,14 +247,13 @@ double flip = 1;
 
 //score coral
       m_driverController.button(4).whileTrue(scoringSystem.scoreCoral());
-      m_driverController.y().whileTrue(loadingSystem.coralLoad());
-      m_driverController.b().whileTrue(loadingSystem.algaeLoad());
-      m_driverController.start().whileTrue(drivebase.printCurrentPose());
+      // m_driverController.b().whileTrue(loadingSystem.coralLoad());
+      // m_driverController.b().whileTrue(loadingSystem.algaeLoad());
+      // m_driverController.start().whileTrue(drivebase.printCurrentPose());
 //      m_driverController.povDown().whileTrue(elevator.setElevatorHeight(0.3).andThen(elevator.setElevatorHeight(0.3).repeatedly().withDeadline(climb.down())).andThen(coralArm.setCoralArmAngle(-20).alongWith(algaeArm.setAlgaeArmAngle(-20), elevator.setElevatorHeight(0.3))));
 //      m_driverController.povUp().whileTrue(elevator.setElevatorHeight(0.3).andThen(elevator.setElevatorHeight(0.3).alongWith(algaeArm.setAlgaeArmAngle(-20),coralArm.setCoralArmAngle(-20)).withDeadline(climb.up())));
     }
 
-    boolean autoPoseFetchTest = false;
     if (autoPoseFetchTest)
     {
 
@@ -263,7 +272,6 @@ double flip = 1;
 
     }
 
-    boolean climberTesting = false;
     if (climberTesting)
     {
       // m_driverController.y().whileTrue(climb.up());
@@ -275,7 +283,6 @@ double flip = 1;
 
     }
 
-    boolean armSensorTesting = false;
     if (armSensorTesting)
     {
       algaeArm.setDefaultCommand(algaeArm.setAlgaeArmAngle(0));
@@ -288,7 +295,6 @@ double flip = 1;
       m_driverController.b().whileTrue(coralIntake.wristOuttake());
     }
 
-    boolean scoreCoralTesting = false;
     if (scoreCoralTesting)
     {
       m_driverController.a().whileTrue(coralArm.setPower(0.1));
@@ -314,7 +320,6 @@ double flip = 1;
     }
 
     // Elevator Testing
-    boolean elevatorTesting = false;
     if (elevatorTesting)
     {
       m_driverController.leftBumper().whileTrue(elevator.setPower(0.2).until(elevator.atMax));
@@ -333,7 +338,6 @@ double flip = 1;
       elevator.setDefaultCommand(elevator.hold());
     }
 
-    boolean algaeArmTesting = false;
     if (algaeArmTesting)
     {
       m_driverController.b().whileTrue(algaeArm.setPower(0.2));
@@ -366,7 +370,6 @@ double flip = 1;
       algaeArm.setDefaultCommand(algaeArm.hold());
     }
 
-    boolean coralArmTesting = false;
     if (coralArmTesting)
     {
       m_driverController.povUp().whileTrue(coralArm.setPower(0.1));
@@ -388,7 +391,6 @@ double flip = 1;
       //coralArm.setDefaultCommand(coralArm.hold());
     }
 
-    boolean wristTesting = false;
     if (wristTesting)
     {
       m_driverController.a().whileTrue(coralIntake.setWristPower(0.1));
@@ -512,8 +514,8 @@ double flip = 1;
 //--------------------------------------------------------------------------------------------------------------------------------------
     //OPERATOR CONTROLS - Launchpad v
 
-    boolean launchpadTesting = true;
-    if (launchpadTesting)
+    boolean launchpadEnabled = true;
+    if (launchpadEnabled)
     {
 
       coralArm.coralLoadedTrigger().whileFalse(Commands.runOnce(() -> launchpad.changeLED(0,
@@ -745,6 +747,9 @@ double flip = 1;
       
       launchpad.getButton(8, 8).whileTrue(drivebase.printCurrentPose());
 
+      //idiot button
+      launchpad.getButton(8, 3).whileTrue(algaeArm.setAlgaeArmCommandInf(-76).alongWith(coralArm.setCoralArmAngleInf(-75)));
+
       //LAUNCH PAD ^
     }
 
@@ -776,7 +781,6 @@ double flip = 1;
     .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
     .andThen(scoringSystem.scoreCoral());
     //return null;
- // return drivebase.getAutonomousCommand("TestingAuto");
   }
 
   public Command driveToSetPoint(double x, double y, double angle)

@@ -68,7 +68,7 @@ public class ScoringSystem
   public Command scoreCoral()
   {
     // Arm down, elevator down, drive backwards x in
-    return Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
+    return m_swerve.stopDrivingCommand().andThen(Commands.parallel(m_elevator.getCoralCommand(m_targetSystem).repeatedly(),
                       m_algaeArm.setAlgaeArmAngle(-40).andThen(m_algaeArm.hold().repeatedly()),
                              m_coralArm.getCoralCommand(m_targetSystem).andThen(m_coralArm.hold(false).repeatedly()),
                              Commands.waitSeconds(0.3).andThen(m_coralIntake.wristScore()))
@@ -82,7 +82,7 @@ public class ScoringSystem
                                     .withDeadline(m_targetSystem.driveToCoralTarget(m_swerve)))
                                     .andThen(m_coralIntake.wristScore().withDeadline(m_coralArm.score().withTimeout(1)))
                                     .andThen(m_swerve.driveBackwards().alongWith(m_coralIntake.wristIntake(),m_coralArm.hold(false).repeatedly()).withTimeout(0.5))
-                                    .andThen(restArmsSafe());
+                                    .andThen(restArmsSafe()));
   }
 
   ///  Autonomous command for scoring the algae arm

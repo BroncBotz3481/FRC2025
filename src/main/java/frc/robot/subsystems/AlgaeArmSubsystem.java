@@ -265,6 +265,10 @@ public class AlgaeArmSubsystem extends SubsystemBase
     return setGoal(degree).until(() -> aroundAngle(degree));
   }
 
+  public Command setAlgaeArmCommandInf(double degree){
+    return setGoal(degree);
+  }
+
 
   public void stop()
   {

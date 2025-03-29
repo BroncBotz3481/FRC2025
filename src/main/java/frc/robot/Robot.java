@@ -4,8 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -21,6 +26,7 @@ public class Robot extends TimedRobot
 
   private final RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
+  Color8Bit idiotButtonColor = new Color8Bit(Color.kRed);
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization code.
@@ -31,8 +37,11 @@ public class Robot extends TimedRobot
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
    CanBridge.runTCP();
+
     //DriverStation.startDataLog(DataLogManager.getLog());
   }
+  int currentColor = 0;
+  
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics that you want ran
@@ -49,6 +58,23 @@ public class Robot extends TimedRobot
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    if(MathUtil.isNear(0, (RobotController.getTime()/200000) % 1,0.1))
+    {
+      int baseBrightness = 50;
+      int currentBrightness = currentColor == 0 ? idiotButtonColor.red : (currentColor == 1 ? idiotButtonColor.green : idiotButtonColor.blue);
+      int newBrightness = ((currentBrightness+ 1) % (255-baseBrightness)) + baseBrightness;
+      if(newBrightness == baseBrightness)
+        currentColor = (currentColor + 1) % 3;
+      if(currentColor == 0)
+        idiotButtonColor = new Color8Bit(newBrightness, 0,0);
+      else if(currentColor == 1)
+        idiotButtonColor = new Color8Bit(0, newBrightness,0);
+      else if(currentColor == 2)
+        idiotButtonColor = new Color8Bit(0, 0,newBrightness);
+
+
+      m_robotContainer.launchpad.changeLED(8, 3, idiotButtonColor);
+    }
   }
 
   /**

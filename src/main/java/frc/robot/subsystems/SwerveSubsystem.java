@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.AlignmentConstants.DriveToPose;
+import frc.robot.AlignmentConstants;
 import frc.robot.Constants;
 import frc.robot.Setpoints;
 import frc.robot.Setpoints.AutoScoring;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import limelight.Limelight;
 import limelight.networktables.AngularVelocity3d;
@@ -323,12 +325,19 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.drive(new ChassisSpeeds(0.0, 0.0, 0.0));
   }
 
+  public Command stopDrivingCommand()
+  {
+    return runOnce(()->stopDriving());
+  }
+
   public Command driveToPose(Pose2d pose)
   {
+    stopDriving();
     boolean useSetpointGenerator  = false;
-    boolean useProfiledController = false;
+    boolean useProfiledController = true;
     boolean resetBeforehand       = true;
     Supplier<ChassisSpeeds> robotRelativeSpeeds;
+    BooleanSupplier atTargetPose;
 
     if (resetBeforehand)
     {
@@ -338,17 +347,19 @@ public class SwerveSubsystem extends SubsystemBase
 
       if (useProfiledController)
       {
-        DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose(), swerveDrive.getFieldVelocity());
+        DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose());
       }
     }
     if (useProfiledController)
     {
+      atTargetPose = DriveToPose.profiledDriveController::atReference;
       robotRelativeSpeeds = () -> DriveToPose.profiledDriveController.calculate(getPose(),
                                                                                 pose,
                                                                                 0,
                                                                                 pose.getRotation());
     } else
     {
+      atTargetPose = DriveToPose.driveController::atReference;
       robotRelativeSpeeds = () -> DriveToPose.driveController.calculate(getPose(),
                                                                         pose,
                                                                         0,
@@ -360,14 +371,14 @@ public class SwerveSubsystem extends SubsystemBase
       try
       {
 
-        return driveWithSetpointGenerator(robotRelativeSpeeds).finallyDo(this::stopDriving);
+        return driveWithSetpointGenerator(robotRelativeSpeeds).until(atTargetPose).finallyDo(this::stopDriving);
       } catch (Exception ignored)
       {
         DriverStation.reportWarning("Could not use setpoint generator with drive to pose.", false);
       }
     }
 
-    return run(() -> swerveDrive.drive(robotRelativeSpeeds.get())).finallyDo(this::stopDriving);
+    return run(() -> swerveDrive.drive(robotRelativeSpeeds.get())).until(atTargetPose).finallyDo(this::stopDriving);
     /*
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(

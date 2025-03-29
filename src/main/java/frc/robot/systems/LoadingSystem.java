@@ -118,7 +118,7 @@ public class LoadingSystem
   {
     
 
-    return Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
+    return m_swerve.stopDrivingCommand().andThen(Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
     m_algaeArm.getAlgaeCommand(m_targetSystem).andThen(m_algaeArm.hold()))
                                           .until(m_algaeArm.atAlgaeAngle(m_targetSystem).and(m_elevator.atAlgaeHeight(m_targetSystem)))
                                           .withTimeout(3)
@@ -132,7 +132,7 @@ public class LoadingSystem
                                           .until(() -> m_algaeArm.algaeLoaded()))
                          .andThen(m_swerve.driveBackwards()
                                           .alongWith(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),m_algaeIntake.in())
-                                          .withTimeout(1));
+                                          .withTimeout(1)));
 
 
   }
