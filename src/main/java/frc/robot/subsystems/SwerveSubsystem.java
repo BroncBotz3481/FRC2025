@@ -4,25 +4,20 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,9 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import frc.robot.AlignmentConstants;
 import frc.robot.AlignmentConstants.DriveToPose;
 import frc.robot.Constants;
 import frc.robot.Setpoints;
@@ -76,10 +69,11 @@ public class SwerveSubsystem extends SubsystemBase
    * Creates a new ExampleSubsystem.
    */
 
-  File                   directory = new File(Filesystem.getDeployDirectory(), "swerve");
-  SwerveDrive            swerveDrive;
-  Limelight              limelight;
-  LimelightPoseEstimator limelightPoseEstimator;
+  File                     directory = new File(Filesystem.getDeployDirectory(), "swerve");
+  SwerveDrive              swerveDrive;
+  Limelight                limelight;
+  LimelightPoseEstimator   limelightPoseEstimator;
+  HolonomicDriveController alignmentController;
 
   public SwerveSubsystem()
   {
@@ -99,7 +93,7 @@ public class SwerveSubsystem extends SubsystemBase
     setupPathPlanner();
     setupLimelight();
     // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
-   
+
   }
 
 
@@ -327,6 +321,28 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command driveToPose(Pose2d pose)
   {
+    boolean useSetpointGenerator = false;
+    if (useSetpointGenerator)
+    {
+      try
+      {
+
+        return driveWithSetpointGenerator(() -> DriveToPose.driveController.calculate(getPose(),
+                                                                                      pose,
+                                                                                      0,
+                                                                                      pose.getRotation()))
+            .until(DriveToPose.driveController::atReference)
+            .andThen(lockPos().withTimeout(Seconds.of(0.5)));
+      } catch (Exception ignored)
+      {
+        DriverStation.reportWarning("Could not use setpoint generator with drive to pose.", false);
+      }
+    }
+
+    return run(() -> swerveDrive.drive(DriveToPose.driveController.calculate(getPose(), pose, 0, pose.getRotation())))
+        .until(DriveToPose.driveController::atReference)
+        .andThen(lockPos().withTimeout(Seconds.of(0.5)));
+    /*
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
         DriveToPose.maximumVelocityMetersPerSecond, DriveToPose.maximumAccelerationMetersPerSecondSquared,
@@ -336,7 +352,7 @@ public class SwerveSubsystem extends SubsystemBase
         pose,
         constraints,
         edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
-                                     );
+                                     );*/
   }
 
 
@@ -437,7 +453,7 @@ public class SwerveSubsystem extends SubsystemBase
 
     });
   }
-  
+
   public Command driveToRightHP()
   {
     return defer(() -> {
@@ -468,7 +484,7 @@ public class SwerveSubsystem extends SubsystemBase
     });
   }
 
-  public Command  driveForwards()
+  public Command driveForwards()
   {
     return run(() -> {
       swerveDrive.drive(new Translation2d(1, 0), 0, false, false);
@@ -488,8 +504,6 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
 
-
-
   public Command drive(Supplier<ChassisSpeeds> driveAngularVelocity)
   {
     return run(() -> {
@@ -507,7 +521,8 @@ public class SwerveSubsystem extends SubsystemBase
                                        false, true));
   }
 
-  public void zeroGyro(){
+  public void zeroGyro()
+  {
     swerveDrive.zeroGyro();
   }
 
