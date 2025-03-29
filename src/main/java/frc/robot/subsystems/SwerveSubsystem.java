@@ -321,6 +321,11 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command driveToPose(Pose2d pose)
   {
+    DriveToPose.driveController.getXController().reset();
+    DriveToPose.driveController.getYController().reset();
+    DriveToPose.driveController.getThetaController().reset(getPose().getRotation().getRadians());
+
+    DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose(), swerveDrive.getRobotVelocity());
     boolean useSetpointGenerator = false;
     if (useSetpointGenerator)
     {
