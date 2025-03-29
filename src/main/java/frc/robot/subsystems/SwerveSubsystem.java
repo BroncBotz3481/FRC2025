@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -319,6 +318,11 @@ public class SwerveSubsystem extends SubsystemBase
     return Commands.none();//dCommands.deferredProxy(()->Commands.print("Current Pose: "+getPose().toString()));
   }
 
+  public void stopDriving()
+  {
+    swerveDrive.drive(new ChassisSpeeds(0.0, 0.0, 0.0));
+  }
+
   public Command driveToPose(Pose2d pose)
   {
     DriveToPose.driveController.getXController().reset();
@@ -326,27 +330,25 @@ public class SwerveSubsystem extends SubsystemBase
     DriveToPose.driveController.getThetaController().reset(getPose().getRotation().getRadians());
 
     DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose(), swerveDrive.getFieldVelocity());
-    boolean useSetpointGenerator = false;
+
+    Supplier<ChassisSpeeds> robotRelativeSpeeds  = () -> DriveToPose.driveController.calculate(getPose(),
+                                                                                               pose,
+                                                                                               0,
+                                                                                               pose.getRotation());
+    boolean                 useSetpointGenerator = false;
     if (useSetpointGenerator)
     {
       try
       {
 
-        return driveWithSetpointGenerator(() -> DriveToPose.driveController.calculate(getPose(),
-                                                                                      pose,
-                                                                                      0,
-                                                                                      pose.getRotation()))
-            .until(DriveToPose.driveController::atReference)
-            .andThen(lockPos().withTimeout(Seconds.of(0.5)));
+        return driveWithSetpointGenerator(robotRelativeSpeeds).finallyDo(this::stopDriving);
       } catch (Exception ignored)
       {
         DriverStation.reportWarning("Could not use setpoint generator with drive to pose.", false);
       }
     }
 
-    return run(() -> swerveDrive.drive(DriveToPose.driveController.calculate(getPose(), pose, 0, pose.getRotation())))
-        .until(DriveToPose.driveController::atReference)
-        .andThen(lockPos().withTimeout(Seconds.of(0.5)));
+    return run(() -> swerveDrive.drive(robotRelativeSpeeds.get())).finallyDo(this::stopDriving);
     /*
 // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
