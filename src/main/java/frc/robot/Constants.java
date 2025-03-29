@@ -226,6 +226,7 @@ public final class Constants
     public static final int    k_wristCurrentLimit       = 40;
     public static final double k_wristClosedLoopRampRate = 0.25;
     public static final double AlgaeHoldSpeed = 0.2;
+    public static final double CoralHoldSpeed = 0.5;
 
   }
 

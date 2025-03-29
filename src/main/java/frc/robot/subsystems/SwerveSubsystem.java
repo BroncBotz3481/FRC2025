@@ -4,13 +4,17 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Second;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
@@ -315,6 +319,20 @@ public class SwerveSubsystem extends SubsystemBase
     return defer(() -> driveToPose(pose.get()));
   }
 
+  public Command pathndToPose(Supplier<Pose2d> pose)
+  {
+    return defer(()->{
+    PathConstraints constraints = new PathConstraints(
+        DriveToPose.maximumVelocityMetersPerSecond, DriveToPose.maximumAccelerationMetersPerSecondSquared,
+        Degrees.of(DriveToPose.maximumAngularVelocityDegreesPerSecond).per(Second).in(RadiansPerSecond), Units.degreesToRadians(DriveToPose.maximumAngularAccelerationDegreesPerSecondSquared));
+// Since AutoBuilder is configured, we can use it to build pathfinding commands
+    return AutoBuilder.pathfindToPose(
+        pose.get(),
+        constraints,
+        edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
+                                     );
+    });
+  }
   public Command printCurrentPose()
   {
     return Commands.none();//dCommands.deferredProxy(()->Commands.print("Current Pose: "+getPose().toString()));
@@ -381,15 +399,7 @@ public class SwerveSubsystem extends SubsystemBase
     return run(() -> swerveDrive.drive(robotRelativeSpeeds.get())).until(atTargetPose).finallyDo(this::stopDriving);
     /*
 // Create the constraints to use while pathfinding
-    PathConstraints constraints = new PathConstraints(
-        DriveToPose.maximumVelocityMetersPerSecond, DriveToPose.maximumAccelerationMetersPerSecondSquared,
-        Degrees.of(DriveToPose.maximumAngularVelocityDegreesPerSecond).per(Second).in(RadiansPerSecond), Units.degreesToRadians(DriveToPose.maximumAngularAccelerationDegreesPerSecondSquared));
-// Since AutoBuilder is configured, we can use it to build pathfinding commands
-    return AutoBuilder.pathfindToPose(
-        pose,
-        constraints,
-        edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
-                                     );*/
+    */
   }
 
 

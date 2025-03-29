@@ -235,7 +235,7 @@ public class CoralIntakeSubsystem extends SubsystemBase
 
 
 public Command hold(BooleanSupplier coral) {
-  return run(()->{m_rollerMotor.set(coral.getAsBoolean() ? 0.5 : 0);
+  return run(()->{m_rollerMotor.set(coral.getAsBoolean() ? IntakeConstants.CoralHoldSpeed : 0);
     wristController.setReference(Wrist.rest, ControlType.kPosition);
   });
 }
