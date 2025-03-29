@@ -325,7 +325,7 @@ public class SwerveSubsystem extends SubsystemBase
     DriveToPose.driveController.getYController().reset();
     DriveToPose.driveController.getThetaController().reset(getPose().getRotation().getRadians());
 
-    DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose(), swerveDrive.getRobotVelocity());
+    DriveToPose.profiledDriveController.reset(getSwerveDrive().getPose(), swerveDrive.getFieldVelocity());
     boolean useSetpointGenerator = false;
     if (useSetpointGenerator)
     {
