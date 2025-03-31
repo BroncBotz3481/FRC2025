@@ -768,15 +768,17 @@ double flip = 1;
    */
   public Command getAutonomousCommand()
   {
-    //
-    // An example command will be run in autonomous
-    //return autoChooser.getSelected();
-//USE THE BACKWARDS ONE 
- //return drivebase.driveBackwards().withTimeout(2);
- //return null;
 
- //choices "H","J","F"
- String Branch = "H";
+    //choices "H","J","F"
+    //returns driveforward if branch is not specified
+    return AutoSelectorWithNet("H");
+    //return justCoralL4Auto(ReefBranch.H);
+
+  }
+
+
+  public Command AutoSelectorWithNet(String Branch){
+    
 
  if (Branch == "H"){
     return targetingSystem.setTargetCommand(ReefBranch.H, ReefBranchLevel.L4)
@@ -833,13 +835,23 @@ double flip = 1;
     .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
     .andThen(loadingSystem.algaeLoad()).andThen((driveToSetPoint(7.6,4,30))
     ).andThen(scoringSystem.scoreAlgaeNet())
-    .andThen(scoringSystem.restArmsSafe().alongWith(elevator.setElevatorHeight(0.002)))
+    .andThen(scoringSystem.restArmsSafe().alongWith(elevator.setElevatorHeight(0.003)))
     );
  }
  else {
     return drivebase.driveForwards().withTimeout(2);
   }
-    //return null;
+  }
+
+  public Command justCoralL4Auto(ReefBranch Branch){
+    return targetingSystem.setTargetCommand(Branch, ReefBranchLevel.L4)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getCoralTargetPose())))
+    .andThen(elevator.setElevatorHeight(0.2))
+    .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
+    .andThen(scoringSystem.scoreCoral()).andThen(scoringSystem.restArmsSafe());
   }
 
   public Command driveToSetPoint(double x, double y, double angle)
