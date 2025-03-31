@@ -22,10 +22,10 @@ public class AlignmentConstants
   public static class DriveToPose
   {
 
-    public static final Distance translationTolerance = Inches.of(0.5);
-    public static final Angle    rotationTolerance    = Degrees.of(1);
-    public static final Pose2d   poseTolerance        = new Pose2d(translationTolerance,
-                                                                   translationTolerance,
+    public static final Distance translationTolerance = Inches.of(0.25);
+    public static final Angle    rotationTolerance    = Degrees.of(0.5);
+    public static final Pose2d   poseTolerance        = new Pose2d(Inches.of(0.3),
+                                                                    Inches.of(0.3),
                                                                    new Rotation2d(rotationTolerance));
 
     public static final Distance MAX_AUTO_DRIVE_REEF_DISTANCE  = Meters.of(2);
@@ -33,7 +33,7 @@ public class AlignmentConstants
 
     public static final boolean enableDriveFeedFords = true;
 
-    public static final PIDConstants          translationPID                            = new PIDConstants(5.5,
+    public static final PIDConstants          translationPID                            = new PIDConstants(10,
                                                                                                            0,
                                                                                                            0); // 4.0, 0,0
     public static final double                maximumVelocityMetersPerSecond            = 1.3;
@@ -48,7 +48,7 @@ public class AlignmentConstants
         translationPID.kD,
         new Constraints(maximumVelocityMetersPerSecond, maximumAccelerationMetersPerSecondSquared));
 
-    public static final PIDConstants          rotationPID                                       = new PIDConstants(3.0,
+    public static final PIDConstants          rotationPID                                       = new PIDConstants(8.0,
                                                                                                                    // 3.0
                                                                                                                    0,
                                                                                                                    0);
