@@ -33,7 +33,7 @@ public class AlignmentConstants
 
     public static final boolean enableDriveFeedFords = true;
 
-    public static final PIDConstants          translationPID                            = new PIDConstants(4.0,
+    public static final PIDConstants          translationPID                            = new PIDConstants(5.5,
                                                                                                            0,
                                                                                                            0); // 4.0, 0,0
     public static final double                maximumVelocityMetersPerSecond            = 1.3;
