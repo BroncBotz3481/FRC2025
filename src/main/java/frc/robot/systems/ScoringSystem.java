@@ -82,7 +82,8 @@ public class ScoringSystem
                                     .withDeadline(m_targetSystem.driveToCoralTarget(m_swerve)))
                                     .andThen(m_coralIntake.wristScore().withDeadline(m_coralArm.score().withTimeout(1)))
                                     .andThen(m_swerve.driveBackwards().alongWith(m_coralIntake.wristIntake(),m_coralArm.hold(false).repeatedly()).withTimeout(0.5))
-                                    .andThen(restArmsSafe()));
+                                    //.andThen(restArmsSafe()
+                                    );
   }
 
   ///  Autonomous command for scoring the algae arm

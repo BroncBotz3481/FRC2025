@@ -203,6 +203,7 @@ double flip = 1;
   public RobotContainer()
   {
 //flamingo
+
     boolean autoAlignTest = false;
     boolean autoPoseFetchTest = false;
     boolean climberTesting = false;
@@ -767,11 +768,17 @@ double flip = 1;
    */
   public Command getAutonomousCommand()
   {
+    //
     // An example command will be run in autonomous
     //return autoChooser.getSelected();
 //USE THE BACKWARDS ONE 
  //return drivebase.driveBackwards().withTimeout(2);
  //return null;
+
+ //choices "H","J","F"
+ String Branch = "H";
+
+ if (Branch == "H"){
     return targetingSystem.setTargetCommand(ReefBranch.H, ReefBranchLevel.L4)
     .andThen(Commands.runOnce(() ->
                                   drivebase.getSwerveDrive().field.getObject(
@@ -779,18 +786,81 @@ double flip = 1;
                                       targetingSystem.getCoralTargetPose())))
     .andThen(elevator.setElevatorHeight(0.2))
     .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
-    .andThen(scoringSystem.scoreCoral());
+    .andThen(scoringSystem.scoreCoral())
+    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getAlgaeTargetPose())))
+    .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
+    .andThen(loadingSystem.algaeLoad()).andThen((driveToSetPoint(7.6,4,30))
+    ).andThen(scoringSystem.scoreAlgaeNet())
+    .andThen(scoringSystem.restArmsSafe().alongWith(elevator.setElevatorHeight(0.002)))
+    );
+ }else if(Branch == "F"){
+  return targetingSystem.setTargetCommand(ReefBranch.F, ReefBranchLevel.L4)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getCoralTargetPose())))
+    .andThen(elevator.setElevatorHeight(0.2))
+    .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
+    .andThen(scoringSystem.scoreCoral())
+    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getAlgaeTargetPose())))
+    .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
+    .andThen(loadingSystem.algaeLoad()).andThen((driveToSetPoint(7.6,4,30))
+    ).andThen(scoringSystem.scoreAlgaeNet())
+    .andThen(scoringSystem.restArmsSafe().alongWith(elevator.setElevatorHeight(0.002)))
+    );
+ }else if(Branch == "J"){
+    return targetingSystem.setTargetCommand(ReefBranch.J, ReefBranchLevel.L4)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getCoralTargetPose())))
+    .andThen(elevator.setElevatorHeight(0.2))
+    .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
+    .andThen(scoringSystem.scoreCoral())
+    .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3)
+    .andThen(Commands.runOnce(() ->
+                                  drivebase.getSwerveDrive().field.getObject(
+                                      "target").setPose(
+                                      targetingSystem.getAlgaeTargetPose())))
+    .andThen(targetingSystem.autoTargetCommand(drivebase::getPose))
+    .andThen(loadingSystem.algaeLoad()).andThen((driveToSetPoint(7.6,4,30))
+    ).andThen(scoringSystem.scoreAlgaeNet())
+    .andThen(scoringSystem.restArmsSafe().alongWith(elevator.setElevatorHeight(0.002)))
+    );
+ }
+ else {
+    return drivebase.driveForwards().withTimeout(2);
+  }
     //return null;
   }
 
   public Command driveToSetPoint(double x, double y, double angle)
   {
-    return drivebase.driveToPose(
+
+    if (AllianceFlipUtil.shouldFlip())
+    {//red
+    return drivebase.driveToPose(AllianceFlipUtil.flip(
+        new Pose2d(new Translation2d
+                       (Meter.of(x),
+                        Meter.of(y)),
+                   Rotation2d.fromDegrees(angle))));
+    }else {//blue
+      return drivebase.driveToPose(
         new Pose2d(new Translation2d
                        (Meter.of(x),
                         Meter.of(y)),
                    Rotation2d.fromDegrees(angle)));
-  }
+    }
+    }
+  
 
 
   public Command driveToHumanPlayer1()
