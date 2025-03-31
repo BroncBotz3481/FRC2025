@@ -10,7 +10,7 @@ public class Setpoints
 {
 
   public static class Wrist {
-    public static final double rest = 0.54;
+    public static final double rest = 0.94;
     public static final double active = 0.69;
   }
 
