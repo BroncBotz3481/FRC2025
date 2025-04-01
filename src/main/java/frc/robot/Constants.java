@@ -220,13 +220,13 @@ public final class Constants
   public static class IntakeConstants
   {
 
-    public static final double AlgaeIntakeSpeeds  = 0.5;
+    public static final double AlgaeIntakeSpeeds  = 0.8;
     public static final double AlgaeOuttakeSpeeds = -0.8;
 
     public static final int    k_wristCurrentLimit       = 40;
     public static final double k_wristClosedLoopRampRate = 0.25;
     public static final double AlgaeHoldSpeed = 0.2;
-    public static final double CoralHoldSpeed = 0.5;
+    public static final double CoralHoldSpeed = 0.2;
 
   }
 

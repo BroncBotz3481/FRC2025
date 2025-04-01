@@ -124,15 +124,17 @@ public class LoadingSystem
                                           .until(m_algaeArm.atAlgaeAngle(m_targetSystem).and(m_elevator.atAlgaeHeight(m_targetSystem)))
                                           .withTimeout(2.5)
                           .andThen(Commands.parallel(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                          m_algaeArm.getAlgaeCommand(m_targetSystem).andThen(m_algaeArm.hold()), m_algaeIntake.in()).withDeadline(m_targetSystem.driveToAlgaeTarget(m_swerve)))
+                          m_algaeArm.getAlgaeCommand(m_targetSystem).andThen(m_algaeArm.hold()), m_algaeIntake.in(),
+                          m_coralArm.setCoralArmAngleInf(-60)).withDeadline(m_targetSystem.driveToAlgaeTarget(m_swerve)))
                          .andThen(Commands.parallel(m_algaeIntake.in(),
                                                     m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),
-                                                    m_swerve.lockPos())
+                                                    m_swerve.lockPos(),
+                                                    m_coralArm.setCoralArmAngleInf(-60))
                                           .withDeadline(m_algaeArm.load())
                                           .withTimeout(1)
                                           .until(() -> m_algaeArm.algaeLoaded()))
                          .andThen(m_swerve.driveBackwards()
-                                          .alongWith(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),m_algaeIntake.in())
+                                          .alongWith(m_elevator.getAlgaeCommand(m_targetSystem).repeatedly(),m_algaeIntake.in(), m_coralArm.setCoralArmAngleInf(-60))
                                           .withTimeout(1)));
 
 

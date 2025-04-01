@@ -81,7 +81,7 @@ public class ProfiledHolonomicDriveController
     Rotation2d    eRotate      = this.m_rotationError;
     Translation2d tolTranslate = this.m_poseTolerance.getTranslation();
     Rotation2d    tolRotate    = this.m_poseTolerance.getRotation();
-    System.out.println("x: "+Units.metersToInches(eTranslate.getX())+" y: "+Units.metersToInches(eTranslate.getY())+" rot: "+eRotate.getDegrees());
+    // System.out.println("x: "+Units.metersToInches(eTranslate.getX())+" y: "+Units.metersToInches(eTranslate.getY())+" rot: "+eRotate.getDegrees());
     return Math.abs(eTranslate.getX()) < tolTranslate.getX() && Math.abs(eTranslate.getY()) < tolTranslate.getY() &&
            Math.abs(eRotate.getRadians()) < tolRotate.getRadians();
   }

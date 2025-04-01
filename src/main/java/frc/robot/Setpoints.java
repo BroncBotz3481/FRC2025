@@ -10,8 +10,8 @@ public class Setpoints
 {
 
   public static class Wrist {
-    public static final double rest = 0.94;
-    public static final double active = 0.69;
+    public static final double rest = 0.60;
+    public static final double active = 0.35;
   }
 
   public static class Elevator
@@ -44,7 +44,7 @@ public class Setpoints
 
       public static double HP = 13;// TOtAl GuesS
       public static double L1 = 0;
-      public static double L2 = 10;
+      public static double L2 = 12;
       public static double L3 = 45.14;
       public static double L4 = 67.9;
     }
@@ -70,10 +70,10 @@ public class Setpoints
     {
 // x + front ->, y + left 
       public static final Transform2d coralOffset = new Transform2d(Inches.of(28).in(Meters),
-                                                                    Inches.of(6).in(Meters),
+                                                                    Inches.of(7.5).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
-      public static final Transform2d     algaeOffset = new Transform2d(Inches.of(22).in(Meters),
-                                                                    Inches.of(-18).in(Meters),
+      public static final Transform2d     algaeOffset = new Transform2d(Inches.of(24).in(Meters),
+                                                                    Inches.of(-14).in(Meters),
                                                                     Rotation2d.fromDegrees(180));
     }
 

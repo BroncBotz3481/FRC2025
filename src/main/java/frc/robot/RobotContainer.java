@@ -771,8 +771,8 @@ double flip = 1;
 
     //choices "H","J","F"
     //returns driveforward if branch is not specified
-    return AutoSelectorWithNet("H");
-    //return justCoralL4Auto(ReefBranch.H);
+   // return AutoSelectorWithNet("H");
+    return justCoralL4Auto(ReefBranch.H);
 
   }
 
@@ -788,7 +788,7 @@ double flip = 1;
                                       targetingSystem.getCoralTargetPose())))
     .andThen(elevator.setElevatorHeight(0.2))
     .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
-    .andThen(scoringSystem.scoreCoral())
+    .andThen(scoringSystem.scoreCoral()).andThen(drivebase.driveBackwards().withTimeout(1))
     .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L2)
     .andThen(Commands.runOnce(() ->
                                   drivebase.getSwerveDrive().field.getObject(
@@ -807,7 +807,7 @@ double flip = 1;
                                       targetingSystem.getCoralTargetPose())))
     .andThen(elevator.setElevatorHeight(0.2))
     .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
-    .andThen(scoringSystem.scoreCoral())
+    .andThen(scoringSystem.scoreCoral()).andThen(drivebase.driveBackwards().withTimeout(1))
     .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3)
     .andThen(Commands.runOnce(() ->
                                   drivebase.getSwerveDrive().field.getObject(
@@ -826,7 +826,7 @@ double flip = 1;
                                       targetingSystem.getCoralTargetPose())))
     .andThen(elevator.setElevatorHeight(0.2))
     .andThen(elevator.setElevatorHeight(0.2).repeatedly().withDeadline(coralArm.setCoralArmAngle(-40)))
-    .andThen(scoringSystem.scoreCoral())
+    .andThen(scoringSystem.scoreCoral()).andThen(drivebase.driveBackwards().withTimeout(1))
     .andThen(targetingSystem.setBranchLevel(ReefBranchLevel.L3)
     .andThen(Commands.runOnce(() ->
                                   drivebase.getSwerveDrive().field.getObject(
